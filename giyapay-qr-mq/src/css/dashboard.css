@@ -1,0 +1,104 @@
+.dashboard-container {
+  width: 100%;
+}
+
+.dashboard-header {
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+}
+
+.brand-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.profile-icon {
+  color: #333;
+}
+
+.dashboard-content {
+  width: 90%;
+  margin: 20px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+
+  .menu-button {
+    display: flex;
+  }
+
+  .profile-icon {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .menu-button {
+    display: none;
+  }
+}
+
+/* Drawer customization for mobile */
+.MuiDrawer-paper {
+  width: 100%;
+  height: auto;
+  padding: 10px 20px;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0 auto;
+}
+
+.drawer-menu-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+.drawer-menu-item:hover {
+  background-color: #f0f0f0;
+  color: #007bff;
+}
+
+.drawer-close-icon {
+  float: right;
+  margin-bottom: 10px;
+}

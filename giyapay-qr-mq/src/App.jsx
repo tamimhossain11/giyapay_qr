@@ -1,0 +1,88 @@
+import React from 'react';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './Components/Login';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import SuperDashboard from './superDashboard/SuperDashboard';
+import OverView from './MultiUserPages/OverView';
+import PrivateRoute from './Components/PrivateRoute';
+import AddQr from './BranchDashboard/AddQr';
+import ManageQr from './BranchDashboard/ManageQr';
+import AddBranchForm from './superDashboard/AddBranch';
+import BranchManagement from './superDashboard/ManageBranch';
+import BranchDashboard from './BranchDashboard/BranchDashboard';
+import ProfilePage from './MultiUserPages/ProfilePage';
+import ManageUsers from './superDashboard/ManageUsers';
+import AddAdmin from './superDashboard/AddAdmin';
+import AddUser from './superDashboard/AddUsers';
+import EditUser from './Components/EditUser';
+import EditBranch from './Components/EditBranch';
+import CallbackResponsePage from './ClientPages/CallbackResponsePage';
+import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/callback/:callbackType" element={<CallbackResponsePage />} />
+
+        {/*Super Admin routes */}
+        <Route
+          path="/super-dashboard/*"
+          element={
+            <PrivateRoute expectedUserType="admin">
+              <SuperDashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route path="" element={<OverView />} />
+          <Route path="manage-branches" element={<BranchManagement />} />
+          <Route path="manage-branches/add" element={<AddBranchForm />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="manage-users" element={<ManageUsers />} />
+          <Route path="manage-users/add" element={<AddUser />} />
+          <Route path="edit-users/:id" element={<EditUser />} />
+          <Route path="edit-branch/:id" element={<EditBranch />} />
+          <Route path="manage-qr" element={<ManageQr />} />
+          <Route path="admin/add" element={<AddAdmin />} />
+
+        </Route>
+
+        {/* Co-Admin routes */}
+        <Route
+          path="/co-admin-dashboard/*"
+          element={
+            <PrivateRoute expectedUserType="Co-Admin">
+              <CoAdminDashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route path="" element={<OverView />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+
+        {/* Branch User routes */}
+        <Route
+          path="/branch-dashboard/*"
+          element={
+            <PrivateRoute expectedUserType="Branch User">
+              <BranchDashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route path="" element={<ManageQr />} />
+          <Route path="manage-qr" element={<ManageQr />} />
+          <Route path="add-qr" element={<AddQr />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;

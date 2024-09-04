@@ -237,7 +237,7 @@ const ManageQr = () => {
                 label="Branch Name"
               >
                 <MenuItem value="">All Branches</MenuItem>
-                {/* Dynamically populate branch names */}
+            
               </Select>
             </FormControl>
             <FormControl variant="outlined" fullWidth>

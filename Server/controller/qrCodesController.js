@@ -170,7 +170,6 @@ const getFilteredQrCodes = async (req, res) => {
     try {
       const { searchTerm, branchFilter, userFilter, referenceFilter, startDate, endDate } = req.query;
   
-      // Building the query dynamically based on provided filters
       const filterConditions = {};
   
       if (searchTerm) {
@@ -207,7 +206,6 @@ const getFilteredQrCodes = async (req, res) => {
         };
       }
   
-      // Fetch filtered QR codes with associated User and Branch details
       const qrCodes = await QrCode.findAll({
         where: filterConditions,
         include: [

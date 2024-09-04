@@ -63,7 +63,8 @@ const QrCode = sequelize.define('QrCode', {
   },
 }, {
   tableName: 'qr_codes',
-  timestamps: false,
+  timestamps: true, // Manages created_at and updated_at automatically
+  underscored: true, // Uses snake_case for column names
 });
 
 export default QrCode;

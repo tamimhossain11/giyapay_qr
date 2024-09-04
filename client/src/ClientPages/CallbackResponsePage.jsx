@@ -13,33 +13,26 @@ const CallbackResponsePage = () => {
     const params = new URLSearchParams(location.search);
     const nonce = params.get('nonce');
     const refno = params.get('refno');
-    const amount = params.get('amount');
+    const amountInCents = params.get('amount'); // Assuming amount is in cents
     const signature = params.get('signature');
     const invoice_number = params.get('invoice_number');
     const error = params.get('error');
 
-    console.log('Sending request with:', {
-      nonce,
-      refno,
-      amount,
-      signature,
-      invoice_number,
-    });
-
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
-    } else if (nonce && refno && amount && signature && invoice_number) {
+    } else if (nonce && refno && amountInCents && signature && invoice_number) {
+      const amount = (parseFloat(amountInCents) / 100).toFixed(2); // Convert to decimal format
+
       axios
         .post(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/callback/${callbackType}`, {
           nonce,
           refno,
-          amount,
+          amount, // Send the formatted amount to the backend
           signature,
           invoice_number,
         })
         .then((response) => {
-          console.log('Transaction saved:', response.data);
-          setTransactionDetails({ amount, refno }); // Save amount and reference number
+          setTransactionDetails({ amount, refno }); // Save the formatted amount and reference number
         })
         .catch((error) => {
           console.error('Error saving transaction:', error.response ? error.response.data : error.message);
@@ -56,7 +49,7 @@ const CallbackResponsePage = () => {
               Payment Successful!
             </Typography>
             <Typography variant="body1">Thank you for your payment.</Typography>
-            <Typography variant="body1">Amount: {transactionDetails.amount}</Typography>
+            <Typography variant="body1">Amount: ₱{transactionDetails.amount}</Typography>
             <Typography variant="body1">Reference Number: {transactionDetails.refno}</Typography>
           </>
         );

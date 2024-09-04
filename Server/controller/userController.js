@@ -123,50 +123,43 @@ export const updateUserStatus = async (req, res) => {
 
 // Controller function to update user details
 export const updateUser = async (req, res) => {
-  const transaction = await sequelize.transaction();
-  try {
-    const { id } = req.params;
-    const { firstName, lastName, username, password, userType, branch_id, status } = req.body;
+  const userId = req.params.id;
+  const { first_name, last_name, username, email, user_type, branch_id, status } = req.body;
 
-    const user = await User.findByPk(id, { transaction });
+  try {
+    const user = await User.findByPk(userId);
+
     if (!user) {
-      await transaction.rollback();
-      return res.status(404).json({ message: 'User not found' });
+      console.log(`User with ID ${userId} not found`);
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    if (firstName) user.first_name = firstName;
-    if (lastName) user.last_name = lastName;
-    if (username) user.username = username;
-    if (userType) user.user_type = userType;
-    if (status) user.status = status;
+    // Check if branch_id is being changed
+    if (branch_id && user.branch_id !== branch_id) {
+      const existingUser = await User.findOne({ where: { branch_id } });
 
-    if (branch_id) {
-      const branch = await Branch.findByPk(branch_id, { transaction });
-      if (!branch) {
-        await transaction.rollback();
-        return res.status(404).json({ error: 'Branch not found' });
-      }
-
-      const existingUser = await User.findOne({ where: { branch_id }, transaction });
-      if (existingUser && existingUser.id !== id) {
-        await transaction.rollback();
+      if (existingUser && existingUser.id !== userId) {
         return res.status(400).json({ error: 'This branch already has an assigned user' });
       }
-
-      user.branch_id = branch_id;
     }
 
-    if (password) {
-      user.password = await bcrypt.hash(password, 10);
-    }
+    // Update only provided fields
+    const updatedFields = {
+      ...(first_name && { first_name }),
+      ...(last_name && { last_name }),
+      ...(username && { username }),
+      ...(email && { email }),
+      ...(user_type && { user_type }),
+      ...(branch_id !== undefined && { branch_id }),
+      ...(status !== undefined && { status })  // Include status only if it's defined
+    };
 
-    await user.save({ transaction });
-    await transaction.commit();
-    res.json({ message: 'User updated successfully', user });
+    await user.update(updatedFields);
+
+    res.status(200).json({ message: 'User updated successfully' });
   } catch (error) {
-    await transaction.rollback();
-    console.error('Error updating user:', error.message);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'An error occurred while updating the user' });
   }
 };
 

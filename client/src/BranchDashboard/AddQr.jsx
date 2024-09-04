@@ -151,14 +151,20 @@ const AddQr = () => {
   };
 
   const checkInvoiceNumberExists = async (invoice_number) => {
+    const encodedInvoiceNumber = encodeURIComponent(invoice_number);
+    const url = `${backendUrl}/api/qr-codes/check-invoice/${encodedInvoiceNumber}`;
+    
+    console.log('Checking URL:', url);
+    
     try {
-      const response = await axios.get(`${backendUrl}/api/qr-codes/check-invoice?invoice_number=${invoice_number}`);
-      return response.data.exists; // Backend should return { exists: true/false }
+      const response = await axios.get(url);
+      return response.data.status; // Backend should return { status: true/false }
     } catch (error) {
-      console.error('Error checking invoice number:', error);
+      console.error('Error checking invoice number:', error.response ? error.response.data : error.message);
       return false;
     }
   };
+  
 
   return (
     <Container maxWidth="sm">

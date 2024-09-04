@@ -57,10 +57,6 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  callbackType: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   invoice_number: {   // Added new column
     type: DataTypes.STRING,
     allowNull: true,

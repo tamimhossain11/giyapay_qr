@@ -39,62 +39,54 @@ const createQrCode = async (req, res) => {
 };
 
 const handleCallback = async (req, res) => {
-    try {
-        console.log('Received callback request:', req.body); // Log the received request body
+  try {
+      console.log('Received callback request:', req.body);
 
-        // Extract relevant data from request body
-        const { nonce, refno, timestamp, amount, signature, invoice_number } = req.body;
-        const callbackType = req.params.callbackType;
-        
-        console.log('Callback Type:', callbackType); // Log the callback type
+      const { nonce, refno, amount, signature, invoice_number } = req.body;
+      const callbackType = req.params.callbackType;
 
-        // Validate incoming data
-        if (!nonce || !refno || !timestamp || !amount || !signature || !invoice_number) {
-            console.error('Invalid data provided:', req.body);
-            return res.status(400).json({ message: 'Invalid data provided' });
-        }
+      if (!nonce || !refno || !amount || !signature || !invoice_number) {
+          console.error('Invalid data provided:', req.body);
+          return res.status(400).json({ message: 'Invalid data provided' });
+      }
 
-        // Find the QR code entry based on invoice number
-        const qrCode = await QrCode.findOne({ where: { invoice_number } });
+      const qrCode = await QrCode.findOne({ where: { invoice_number } });
 
-        if (!qrCode) {
-            console.error('QR Code not found for invoice number:', invoice_number);
-            return res.status(404).json({ message: 'QR Code not found' });
-        }
+      if (!qrCode) {
+          console.error('QR Code not found for invoice number:', invoice_number);
+          return res.status(404).json({ message: 'QR Code not found' });
+      }
 
-        // Prepare updated fields
-        const updateData = {
-            amount,
-            payment_reference: refno,
-            updated_at: new Date(timestamp),
-        };
+      const updateData = {
+          amount,
+          payment_reference: refno,
+      };
 
-        // Set the status based on callback type
-        switch (callbackType) {
-            case 'success-callback':
-                updateData.status = 'Success';
-                break;
-            case 'error-callback':
-                updateData.status = 'Error';
-                break;
-            case 'cancel-callback':
-                updateData.status = 'Cancelled';
-                break;
-            default:
-                updateData.status = 'Unknown';
-                break;
-        }
+      switch (callbackType) {
+          case 'success-callback':
+              updateData.status = 'Success';
+              break;
+          case 'error-callback':
+              updateData.status = 'Error';
+              break;
+          case 'cancel-callback':
+              updateData.status = 'Cancelled';
+              break;
+          default:
+              updateData.status = 'Unknown';
+              break;
+      }
 
-        // Save the changes to the database
-        await qrCode.update(updateData);
+      await qrCode.update(updateData);
 
-        console.log('QR Code updated successfully:', qrCode); // Log successful update
-        res.status(200).json({ message: 'QR Code updated successfully', qrCode });
-    } catch (error) {
-        console.error('Error handling callback:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
+      console.log('QR Code updated successfully:', qrCode);
+      res.status(200).json({ message: 'QR Code updated successfully', qrCode });
+  } catch (error) {
+      console.error('Error handling callback:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
 };
+
 
 const getAllQrCodes = async (req, res) => {
     try {
@@ -154,38 +146,24 @@ const getQrCodeById = async (req, res) => {
 
 const checkInvoice = async (req, res) => {
     try {
-        const { invoice_number } = req.params;
-
-        if (!invoice_number) {
-            return res.status(400).json({ error: 'Invoice number is required' });
-        }
-
-        const qrCode = await QrCode.findOne({
-            where: { invoice_number },
-            include: [
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'first_name', 'last_name', 'username'],
-                },
-                {
-                    model: Branch,
-                    as: 'branch',
-                    attributes: ['id', 'branch_name'],
-                },
-            ],
-        });
-
-        if (!qrCode) {
-            return res.status(404).json({ message: 'QR Code not found for the provided invoice number' });
-        }
-
-        res.json({ status: true, qrCode });
+      const { invoice_number } = req.params;
+  
+      if (!invoice_number) {
+        return res.status(400).json({ error: 'Invoice number is required' });
+      }
+  
+      const qrCode = await QrCode.findOne({ where: { invoice_number } });
+  
+      if (!qrCode) {
+        return res.status(404).json({ status: false });
+      }
+  
+      res.json({ status: true });
     } catch (error) {
-        console.error('Error checking invoice:', error);
-        res.status(500).json({ error: 'Internal server error' });
+      console.error('Error checking invoice:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-};
+  };  
 
 //Filter
 const getFilteredQrCodes = async (req, res) => {

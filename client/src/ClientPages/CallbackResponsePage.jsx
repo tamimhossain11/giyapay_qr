@@ -13,7 +13,6 @@ const CallbackResponsePage = () => {
     const params = new URLSearchParams(location.search);
     const nonce = params.get('nonce');
     const refno = params.get('refno');
-    const timestamp = params.get('timestamp');
     const amount = params.get('amount');
     const signature = params.get('signature');
     const invoice_number = params.get('invoice_number');
@@ -22,7 +21,6 @@ const CallbackResponsePage = () => {
     console.log('Sending request with:', {
       nonce,
       refno,
-      timestamp,
       amount,
       signature,
       invoice_number,
@@ -30,12 +28,11 @@ const CallbackResponsePage = () => {
 
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
-    } else if (nonce && refno && timestamp && amount && signature && invoice_number) {
+    } else if (nonce && refno && amount && signature && invoice_number) {
       axios
         .post(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/callback/${callbackType}`, {
           nonce,
           refno,
-          timestamp,
           amount,
           signature,
           invoice_number,

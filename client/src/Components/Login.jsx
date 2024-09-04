@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import logo from '../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
-import LoginButton from '../Mui/LoginButton';
+import LoginButton from '../Mui/LoginButton'
+import Button from '@mui/material/Button';
 
 const Login = () => {
     const [values, setValues] = useState({ email: '', password: '' });
@@ -66,6 +67,8 @@ const Login = () => {
         navigate('/');
     };
 
+    
+
     return (
         <div className="login-page">
             <div className="login-container">
@@ -76,9 +79,16 @@ const Login = () => {
                     {isLoggedIn ? (
                         <div className="logout-section">
                             <h2>Welcome Back</h2>
-                            <LoginButton onClick={handleLogout}>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={handleLogout}
+                                fullWidth
+                                sx={{ mt: 2 }}
+                                className="logout-button"
+                            >
                                 LOG OUT
-                            </LoginButton>
+                            </Button>
                         </div>
                     ) : (
                         <div className="login-form">
@@ -109,7 +119,12 @@ const Login = () => {
                                     <input type="checkbox" className="form-check-input" id="rememberMe" />
                                     <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
                                 </div>
-                                <LoginButton type="submit">
+                                <LoginButton
+                                    type="submit"
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    className="login-button"
+                                >
                                     SIGN IN
                                 </LoginButton>
                             </form>

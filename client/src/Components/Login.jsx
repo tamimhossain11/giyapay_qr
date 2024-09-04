@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import logo from '../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
-import Button from '@mui/material/Button';
+import LoginButton from '../Mui/LoginButton';
 
 const Login = () => {
     const [values, setValues] = useState({ email: '', password: '' });
@@ -76,16 +76,9 @@ const Login = () => {
                     {isLoggedIn ? (
                         <div className="logout-section">
                             <h2>Welcome Back</h2>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={handleLogout}
-                                fullWidth
-                                sx={{ mt: 2 }}
-                                className="logout-button"
-                            >
+                            <LoginButton onClick={handleLogout}>
                                 LOG OUT
-                            </Button>
+                            </LoginButton>
                         </div>
                     ) : (
                         <div className="login-form">
@@ -116,15 +109,9 @@ const Login = () => {
                                     <input type="checkbox" className="form-check-input" id="rememberMe" />
                                     <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
                                 </div>
-                                <Button
-                                    variant="contained"
-                                    type="submit"
-                                    fullWidth
-                                    sx={{ mt: 2 }}
-                                    className="login-button"
-                                >
+                                <LoginButton type="submit">
                                     SIGN IN
-                                </Button>
+                                </LoginButton>
                             </form>
                             {error && <div className="error">{error}</div>}
                         </div>

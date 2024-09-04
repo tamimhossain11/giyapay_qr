@@ -10,19 +10,23 @@ import { styled } from '@mui/material/styles';
 
 const CustomOutlinedInput = styled(OutlinedInput)(({ theme }) => ({
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#1e88e5',
+    borderColor: '#000000',
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#1e88e5',
+    borderColor: '#000000',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#1e88e5',
-  },
-  '& .MuiInputLabel-root': {
-    color: '#1e88e5',
+    borderColor: '#000000',
   },
   '& .MuiInputAdornment-root': {
-    color: '#1e88e5',
+    color: '#000000',
+  },
+}));
+
+const CustomInputLabel = styled(InputLabel)(({ theme }) => ({
+  color: '#000000',
+  '&.Mui-focused': {
+    color: '#000000',
   },
 }));
 
@@ -41,7 +45,7 @@ export default function InputAdornments({ label, type, value, onChange, placehol
 
   return (
     <FormControl sx={{ m: 1, width: '100%' }} variant={variant} fullWidth>
-      <InputLabel htmlFor={`${variant}-adornment-${label.toLowerCase()}`}>{label}</InputLabel>
+      <CustomInputLabel htmlFor={`${variant}-adornment-${label.toLowerCase()}`}>{label}</CustomInputLabel>
       <CustomOutlinedInput
         id={`${variant}-adornment-${label.toLowerCase()}`}
         type={type === 'password' ? (showPassword ? 'text' : 'password') : type}

@@ -43,67 +43,69 @@ const ManageQr = () => {
     endDate: '',
   });
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
-  const fetchQrCodes = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const userResponse = await axios.get('http://localhost:3000/users/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const user = userResponse.data;
+    const fetchQrCodes = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userResponse = await axios.get(`${backendUrl}/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const user = userResponse.data;
 
-      const qrCodeResponse = await axios.get('http://localhost:3000/api/qr-codes/get', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
-        ...qr,
-        user_name: qr.user ? qr.user.username : 'Unknown User',
-        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
-      }));
+        const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
+          ...qr,
+          user_name: qr.user ? qr.user.username : 'Unknown User',
+          branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+        }));
 
-      if (user.branch_id) {
-        const filteredQrCodes = formattedQrCodes.filter((qr) => qr.branch_id === user.branch_id);
-        setQrCodes(filteredQrCodes);
-        setFilteredQrCodes(filteredQrCodes);
-      } else {
-        setQrCodes(formattedQrCodes);
-        setFilteredQrCodes(formattedQrCodes);
+        if (user.branch_id) {
+          const filteredQrCodes = formattedQrCodes.filter((qr) => qr.branch_id === user.branch_id);
+          setQrCodes(filteredQrCodes);
+          setFilteredQrCodes(filteredQrCodes);
+        } else {
+          setQrCodes(formattedQrCodes);
+          setFilteredQrCodes(formattedQrCodes);
+        }
+      } catch (error) {
+        console.error('Error fetching QR codes or user data:', error);
       }
-    } catch (error) {
-      console.error('Error fetching QR codes or user data:', error);
-    }
-  };
+    };
 
-  fetchQrCodes();
-}, []);
-
+    fetchQrCodes();
+  }, [backendUrl]);
 
   useEffect(() => {
     let results = qrCodes;
 
     if (searchTerm) {
-      results = results.filter(qr =>
+      results = results.filter((qr) =>
         qr.payment_reference.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (branchFilter) {
-      results = results.filter(qr => qr.branch_name === branchFilter);
+      results = results.filter((qr) => qr.branch_name === branchFilter);
     }
 
     if (userFilter) {
-      results = results.filter(qr => qr.user_name === userFilter);
+      results = results.filter((qr) => qr.user_name === userFilter);
     }
 
     if (referenceFilter) {
-      results = results.filter(qr => qr.payment_reference === referenceFilter);
+      results = results.filter((qr) => qr.payment_reference === referenceFilter);
     }
 
     if (dateFilter.startDate && dateFilter.endDate) {
-      results = results.filter(qr =>
-        new Date(qr.created_at) >= new Date(dateFilter.startDate) &&
-        new Date(qr.created_at) <= new Date(dateFilter.endDate)
+      results = results.filter(
+        (qr) =>
+          new Date(qr.created_at) >= new Date(dateFilter.startDate) &&
+          new Date(qr.created_at) <= new Date(dateFilter.endDate)
       );
     }
 
@@ -229,9 +231,8 @@ const ManageQr = () => {
               onChange={(e) => setBranchFilter(e.target.value)}
               label="Branch Name"
             >
-              {/* Populate with branch names dynamically */}
               <MenuItem value="">All Branches</MenuItem>
-              {/* Add more options here */}
+              {/* Dynamically populate branch names */}
             </Select>
           </FormControl>
           <FormControl variant="outlined" fullWidth>
@@ -241,9 +242,8 @@ const ManageQr = () => {
               onChange={(e) => setUserFilter(e.target.value)}
               label="User Name"
             >
-              {/* Populate with user names dynamically */}
               <MenuItem value="">All Users</MenuItem>
-              {/* Add more options here */}
+              {/* Dynamically populate user names */}
             </Select>
           </FormControl>
 
@@ -295,28 +295,30 @@ const ManageQr = () => {
                 <TableCell>Branch Name</TableCell>
                 <TableCell>Created At</TableCell>
                 <TableCell>Updated At</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr) => (
                 <TableRow key={qr.id}>
-                  <TableCell>{qr.id}</TableCell> {/* Change here */}
+                  <TableCell>
+                    <QRCode value={qr.qr_code} size={100} />
+                  </TableCell>
                   <TableCell>{qr.payment_reference}</TableCell>
                   <TableCell>{qr.amount}</TableCell>
                   <TableCell>{qr.status}</TableCell>
                   <TableCell>{qr.user_name}</TableCell>
                   <TableCell>{qr.branch_name}</TableCell>
-                  <TableCell>{new Date(qr.created_at).toLocaleString()}</TableCell>
-                  <TableCell>{new Date(qr.updated_at).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Tooltip title="View QR Code">
-                      <IconButton onClick={() => handleOpenView(qr)}>
+                  <TableCell>{new Date(qr.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(qr.updated_at).toLocaleDateString()}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View">
+                      <IconButton onClick={() => handleOpenView(qr)} color="primary">
                         <ViewIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete QR Code">
-                      <IconButton onClick={() => handleOpenDelete(qr)}>
+                    <Tooltip title="Delete">
+                      <IconButton onClick={() => handleOpenDelete(qr)} color="secondary">
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -324,75 +326,61 @@ const ManageQr = () => {
                 </TableRow>
               ))}
             </TableBody>
-
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={filteredQrCodes.length}
-          rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Box>
 
-      {/* View QR Code Modal */}
       <Modal open={openView} onClose={handleCloseView}>
-        <Box style={styles.modalBox}>
+        <Paper style={styles.modalBox}>
           {selectedQr && (
             <>
-              <Typography variant="h6" gutterBottom>
-                QR Code Preview
+              <QRCode value={selectedQr.qr_code} size={200} />
+              <Typography variant="h6" mt={2}>
+                Payment Reference: {selectedQr.payment_reference}
               </Typography>
-              <QRCode value={selectedQr.qr_code} />
-              <Typography variant="body1" gutterBottom>
-                <strong>Payment Reference:</strong> {selectedQr.payment_reference}
+              <Typography variant="body1">Amount: {selectedQr.amount}</Typography>
+              <Typography variant="body1">Status: {selectedQr.status}</Typography>
+              <Typography variant="body1">User Name: {selectedQr.user_name}</Typography>
+              <Typography variant="body1">Branch Name: {selectedQr.branch_name}</Typography>
+              <Typography variant="body1">
+                Created At: {new Date(selectedQr.created_at).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Amount:</strong> {selectedQr.amount}
+              <Typography variant="body1">
+                Updated At: {new Date(selectedQr.updated_at).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" gutterBottom>
-                <strong>Status:</strong> {selectedQr.status}
-              </Typography>
-              <Button variant="contained" color="primary" style={styles.modalButton} onClick={handleCloseView}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCloseView}
+                style={styles.modalButton}
+              >
                 Close
               </Button>
             </>
           )}
-        </Box>
+        </Paper>
       </Modal>
 
-      {/* Delete QR Code Confirmation Modal */}
       <Modal open={openDelete} onClose={handleCloseDelete}>
-        <Box style={styles.modalBox}>
-          <Typography variant="h6" gutterBottom>
-            Confirm Delete
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            Are you sure you want to delete the QR code with Payment Reference: {selectedQr?.payment_reference}?
-          </Typography>
-          <Button variant="contained" color="secondary" style={styles.modalButton} onClick={handleCloseDelete}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            style={styles.modalButton}
-            onClick={async () => {
-              try {
-                await axios.delete(`http://localhost:3000/api/qr-codes/delete/${selectedQr.id}`);
-                setFilteredQrCodes(filteredQrCodes.filter(qr => qr.id !== selectedQr.id));
-                setOpenDelete(false);
-              } catch (error) {
-                console.error('Error deleting QR code:', error);
-              }
-            }}
-          >
-            Delete
-          </Button>
-        </Box>
+        <Paper style={styles.modalBox}>
+          <Typography variant="h6">Are you sure you want to delete this QR Code?</Typography>
+          <Box mt={2} display="flex" justifyContent="space-between" width="100%">
+            <Button variant="contained" color="secondary" onClick={() => {/* handle delete */ }}>
+              Delete
+            </Button>
+            <Button variant="outlined" onClick={handleCloseDelete}>
+              Cancel
+            </Button>
+          </Box>
+        </Paper>
       </Modal>
     </Container>
   );

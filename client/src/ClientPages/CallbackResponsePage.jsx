@@ -7,6 +7,7 @@ const CallbackResponsePage = () => {
   const { callbackType } = useParams();
   const location = useLocation();
   const [errorMessage, setErrorMessage] = useState('');
+  const [transactionDetails, setTransactionDetails] = useState({ amount: '', refno: '' });
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -30,20 +31,22 @@ const CallbackResponsePage = () => {
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
     } else if (nonce && refno && timestamp && amount && signature && invoice_number) {
-      axios.post(`http://localhost:3000/api/qr-codes/callback/${callbackType}`, {
-        nonce,
-        refno,
-        timestamp,
-        amount,
-        signature,
-        invoice_number,
-      })
-      .then(response => {
-        console.log('Transaction saved:', response.data);
-      })
-      .catch(error => {
-        console.error('Error saving transaction:', error.response ? error.response.data : error.message);
-      });
+      axios
+        .post(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/callback/${callbackType}`, {
+          nonce,
+          refno,
+          timestamp,
+          amount,
+          signature,
+          invoice_number,
+        })
+        .then((response) => {
+          console.log('Transaction saved:', response.data);
+          setTransactionDetails({ amount, refno }); // Save amount and reference number
+        })
+        .catch((error) => {
+          console.error('Error saving transaction:', error.response ? error.response.data : error.message);
+        });
     }
   }, [callbackType, location]);
 
@@ -55,9 +58,9 @@ const CallbackResponsePage = () => {
             <Typography variant="h4" gutterBottom>
               Payment Successful!
             </Typography>
-            <Typography variant="body1">
-              Thank you for your payment.
-            </Typography>
+            <Typography variant="body1">Thank you for your payment.</Typography>
+            <Typography variant="body1">Amount: {transactionDetails.amount}</Typography>
+            <Typography variant="body1">Reference Number: {transactionDetails.refno}</Typography>
           </>
         );
       case 'error-callback':

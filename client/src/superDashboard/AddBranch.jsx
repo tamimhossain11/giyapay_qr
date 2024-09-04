@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Box, Typography, Autocomplete } from '@mui/material';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const CreateBranch = () => {
@@ -15,7 +15,7 @@ const CreateBranch = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users/all');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`);
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -35,9 +35,9 @@ const CreateBranch = () => {
       };
 
       if (id) {
-        await axios.put(`http://localhost:3000/branches/${id}`, branchData);
+        await axios.put(`${import.meta.env.VITE_BACKEND_URL}/branches/${id}`, branchData);
       } else {
-        await axios.post('http://localhost:3000/branches', branchData);
+        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/branches`, branchData);
       }
 
       navigate('/super-dashboard/manage-branches');
@@ -45,6 +45,7 @@ const CreateBranch = () => {
       console.error('Failed to save branch:', error);
     }
   };
+
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>

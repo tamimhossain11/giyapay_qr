@@ -17,7 +17,7 @@ const AddUser = () => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/branches/all');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
         setBranches(response.data);
       } catch (error) {
         console.error('Error fetching branches:', error);
@@ -38,7 +38,7 @@ const AddUser = () => {
         branchId: branchUser ? branchUser.id : null,
       };
 
-      await axios.post('http://localhost:3000/users/add', userData);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/add`, userData);
       navigate('/super-dashboard/manage-users');
     } catch (error) {
       console.error('Failed to save the user:', error);

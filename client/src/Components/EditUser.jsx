@@ -13,7 +13,7 @@ const EditUser = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/users/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${id}`);
         setUser(response.data);
         setSelectedBranch(response.data.branch_Id);
       } catch (error) {
@@ -23,7 +23,7 @@ const EditUser = () => {
 
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/branches/all');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
         setBranches(response.data);
       } catch (error) {
         console.error('Failed to fetch branches:', error);
@@ -42,14 +42,12 @@ const EditUser = () => {
       };
       console.log('Payload being sent to the server:', updatedUser);
 
-      await axios.put(`http://localhost:3000/users/edit/${id}`, updatedUser);
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
       navigate('/super-dashboard/manage-users');
     } catch (error) {
       console.error('Failed to update user:', error);
     }
   };
-
-
 
   return (
     <div>

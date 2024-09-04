@@ -25,6 +25,8 @@ const BranchDashboard = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -37,7 +39,7 @@ const BranchDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/auth/logout",
+        `${backendUrl}/auth/logout`,
         {},
         {
           headers: {

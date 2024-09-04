@@ -10,11 +10,11 @@ const ManageBranches = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState(null);
   const isTabletOrMobile = useMediaQuery('(max-width: 900px)');
-  
+
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/branches/all');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
         setBranches(response.data);
       } catch (error) {
         console.error('Failed to fetch branches:', error);
@@ -38,7 +38,7 @@ const ManageBranches = () => {
     if (!branchToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/branches/${branchToDelete.id}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/branches/${branchToDelete.id}`);
       setBranches(branches.filter((branch) => branch.id !== branchToDelete.id));
       closeDeleteDialog();
     } catch (error) {

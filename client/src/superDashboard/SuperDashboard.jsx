@@ -37,7 +37,7 @@ const SuperDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/auth/logout",
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
         {},
         {
           headers: {
@@ -54,6 +54,7 @@ const SuperDashboard = () => {
       navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
+      // Add some user feedback, e.g., a notification or alert
     }
     handleMenuClose();
   };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../css/login.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import logo from '../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
 import Button from '@mui/material/Button';
@@ -27,7 +27,7 @@ const Login = () => {
         event.preventDefault();
 
         try {
-            const result = await axios.post('http://localhost:3000/auth/login', values);
+            const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, values);
             if (result.data.token) {
                 const decodedToken = jwtDecode(result.data.token);
                 const expirationTime = decodedToken.exp * 1000;

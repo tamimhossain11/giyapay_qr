@@ -14,23 +14,28 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  CircularProgress,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
-  const [open, setOpen] = useState(false);  // State for dialog visibility
-  const [selectedUserId, setSelectedUserId] = useState(null);  // State for the selected user ID for deletion
+  const [open, setOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const isMobile = useMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get('http://localhost:3000/users/all');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`);
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -39,9 +44,9 @@ const ManageUsers = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/users/delete/${selectedUserId}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/users/delete/${selectedUserId}`);
       setUsers(users.filter((user) => user.id !== selectedUserId));
-      setOpen(false);  // Close the dialog after deletion
+      setOpen(false);
     } catch (error) {
       console.error('Failed to delete user:', error);
     }
@@ -49,16 +54,16 @@ const ManageUsers = () => {
 
   const handleClickOpen = (id) => {
     setSelectedUserId(id);
-    setOpen(true);  // Open the dialog
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);  // Close the dialog without deleting
+    setOpen(false);
   };
 
   const toggleStatus = async (id, currentStatus) => {
     try {
-      await axios.put(`http://localhost:3000/users/edit_status/${id}`, {
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit_status/${id}`, {
         status: currentStatus === 'Active' ? 'Inactive' : 'Active',
       });
       setUsers(users.map(user => user.id === id ? { ...user, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : user));
@@ -81,70 +86,74 @@ const ManageUsers = () => {
       >
         Add User
       </Button>
-      <Box sx={{ overflowX: 'auto' }}>
-        <Table size={isMobile ? 'small' : 'medium'}>
-          <TableHead>
-            <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>User Type</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Branch</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.first_name}</TableCell>
-                <TableCell>{user.last_name}</TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.user_type}</TableCell>
-                <TableCell>{user.status}</TableCell>
-                <TableCell>{user.branch ? user.branch.branch_name : 'Bank'}</TableCell>
-                <TableCell>
-                  <Box display="flex" gap={1} flexDirection={isMobile ? 'column' : 'row'}>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleClickOpen(user.id)}  // Trigger dialog on delete click
-                      sx={{ maxWidth: '150px' }}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      component={Link}
-                      to={`/super-dashboard/edit-users/${user.id}`}
-                      sx={{ maxWidth: '150px' }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color={user.status === 'Active' ? 'warning' : 'success'}
-                      onClick={() => toggleStatus(user.id, user.status)}
-                      sx={{ maxWidth: '150px' }}
-                    >
-                      {user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                    </Button>
-                  </Box>
-                </TableCell>
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box sx={{ overflowX: 'auto' }}>
+          <Table size={isMobile ? 'small' : 'medium'}>
+            <TableHead>
+              <TableRow>
+                <TableCell>First Name</TableCell>
+                <TableCell>Last Name</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>User Type</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Branch</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.first_name}</TableCell>
+                  <TableCell>{user.last_name}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.user_type}</TableCell>
+                  <TableCell>{user.status}</TableCell>
+                  <TableCell>{user.branch ? user.branch.branch_name : 'Bank'}</TableCell>
+                  <TableCell>
+                    <Box display="flex" gap={1} flexDirection={isMobile ? 'column' : 'row'}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleClickOpen(user.id)}
+                        sx={{ maxWidth: '150px' }}
+                      >
+                        Delete
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        component={Link}
+                        to={`/super-dashboard/edit-users/${user.id}`}
+                        sx={{ maxWidth: '150px' }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color={user.status === 'Active' ? 'warning' : 'success'}
+                        onClick={() => toggleStatus(user.id, user.status)}
+                        sx={{ maxWidth: '150px' }}
+                      >
+                        {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                      </Button>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>

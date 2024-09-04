@@ -13,7 +13,7 @@ const EditBranch = () => {
   useEffect(() => {
     const fetchBranch = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/branches/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/${id}`);
         const branch = response.data;
         setBranchName(branch.branch_name);
         setBankName(branch.bank_name);
@@ -22,7 +22,6 @@ const EditBranch = () => {
         console.error('Failed to fetch branch details:', error);
       }
     };
-    
 
     fetchBranch();
   }, [id]);
@@ -30,7 +29,7 @@ const EditBranch = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await axios.put(`http://localhost:3000/branches/edit/${id}`, {
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/branches/edit/${id}`, {
         branch_name: branchName,
         bank_name: bankName,
         bank_branch: bankBranch,

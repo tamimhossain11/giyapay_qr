@@ -19,15 +19,19 @@ const AddQr = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
     const fetchUserAndBranchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const userResponse = await axios.get('http://localhost:3000/users/profile', {
+        const userResponse = await axios.get(`${backendUrl}/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        console.log('API Response:', userResponse.data);
 
         const user = userResponse.data;
 
@@ -48,7 +52,7 @@ const AddQr = () => {
     };
 
     fetchUserAndBranchData();
-  }, []);
+  }, [backendUrl]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -84,9 +88,9 @@ const AddQr = () => {
       );
 
       const params = {
-        success_callback: `http://localhost:5173/callback/success-callback?invoice_number=${formData.invoice_number}`,
-        error_callback: `http://localhost:5173/callback/error-callback?invoice_number=${formData.invoice_number}`,
-        cancel_callback: `http://localhost:5173/callback/cancel-callback?invoice_number=${formData.invoice_number}`,
+        success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}`,
+        error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}`,
+        cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}`,
         merchant_id: 'merchant1234',
         amount: amountInCents,
         currency: 'PHP',
@@ -98,13 +102,13 @@ const AddQr = () => {
         payWith: 'GiyaPay',
         gateway_account_type: 'Individualized',
         payment_method: 'MASTERCARD/VISA',
-        merchant_name: 'MR Quicky',
+        merchant_name: import.meta.env.VITE_MERCHANT_NAME,
       };
 
       const checkoutUrl = `https://sandbox.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
 
       // Save the QR code and initiate payment
-      await axios.post('http://localhost:3000/api/qr-codes/create', {
+      await axios.post(`${backendUrl}/api/qr-codes/create`, {
         ...formData,
         user_id: userId,
         branch_id: branchId,
@@ -132,7 +136,7 @@ const AddQr = () => {
   const generateTimestamp = () => Math.floor(Date.now() / 1000);
 
   const generateSignature = (amount, invoice_number, nonce, timestamp) => {
-    const secretKey = '098f6bcd4621d373cade4e832627b4f6';
+    const secretKey = import.meta.env.VITE_MERCHANT_SECRET;
     const merchantId = 'merchant1234';
     const currency = 'PHP';
 
@@ -148,7 +152,7 @@ const AddQr = () => {
 
   const checkInvoiceNumberExists = async (invoice_number) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/qr-codes/check-invoice?invoice_number=${invoice_number}`);
+      const response = await axios.get(`${backendUrl}/api/qr-codes/check-invoice?invoice_number=${invoice_number}`);
       return response.data.exists; // Backend should return { exists: true/false }
     } catch (error) {
       console.error('Error checking invoice number:', error);

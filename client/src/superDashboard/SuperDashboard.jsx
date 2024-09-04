@@ -92,7 +92,6 @@ const SuperDashboard = () => {
           {/* Navigation links for larger screens */}
           <nav className="nav-links">
             <Link to="/super-dashboard">Dashboard</Link>
-            <Link to="/super-dashboard/transaction">Transactions</Link>
             <Link to="/super-dashboard/manage-branches">Manage Branches</Link>
             <Link to="/super-dashboard/manage-users">Manage Users</Link>
             <Link to="/super-dashboard/manage-qr">Qr list</Link>

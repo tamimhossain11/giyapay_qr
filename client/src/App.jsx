@@ -60,6 +60,7 @@ function App() {
           }
         >
           <Route path="" element={<OverView />} />
+          <Route path="manage-qr" element={<ManageQr />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

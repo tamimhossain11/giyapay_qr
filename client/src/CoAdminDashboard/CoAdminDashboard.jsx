@@ -89,7 +89,7 @@ const CoAdminDashboard = () => {
 
           <nav className="nav-links">
             <Link to="/co-admin-dashboard">Dashboard</Link>
-            <Link to="/co-admin-dashboard/transaction">Transaction</Link>
+            <Link to="/co-admin-dashboard/manage-qr">Qr List</Link>
           </nav>
 
           <IconButton
@@ -156,11 +156,11 @@ const CoAdminDashboard = () => {
           <ListItem
             button
             component={Link}
-            to="/co-admin-dashboard/transaction"
+            to="/co-admin-dashboard/manage-qr"
             onClick={handleDrawerToggle}
             className="drawer-menu-item"
           >
-            <ListItemText primary="Transaction" />
+            <ListItemText primary="Qr list" />
           </ListItem>
           <ListItem
             button

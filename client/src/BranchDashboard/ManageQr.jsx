@@ -44,39 +44,40 @@ const ManageQr = () => {
   });
 
   useEffect(() => {
-    const fetchQrCodes = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const userResponse = await axios.get('http://localhost:3000/users/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const user = userResponse.data;
-  
-        const qrCodeResponse = await axios.get('http://localhost:3000/api/qr-codes/get', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
-          ...qr,
-          user_name: qr.user ? qr.user.username : 'Unknown User',
-          branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
-        }));
-  
-        if (user.branch_id) {
-          const filteredQrCodes = formattedQrCodes.filter((qr) => qr.branch_id === user.branch_id);
-          setQrCodes(filteredQrCodes);
-          setFilteredQrCodes(filteredQrCodes);
-        } else {
-          setQrCodes(formattedQrCodes);
-          setFilteredQrCodes(formattedQrCodes);
-        }
-      } catch (error) {
-        console.error('Error fetching QR codes or user data:', error);
+  const fetchQrCodes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userResponse = await axios.get('http://localhost:3000/users/profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const user = userResponse.data;
+
+      const qrCodeResponse = await axios.get('http://localhost:3000/api/qr-codes/get', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
+        ...qr,
+        user_name: qr.user ? qr.user.username : 'Unknown User',
+        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+      }));
+
+      if (user.branch_id) {
+        const filteredQrCodes = formattedQrCodes.filter((qr) => qr.branch_id === user.branch_id);
+        setQrCodes(filteredQrCodes);
+        setFilteredQrCodes(filteredQrCodes);
+      } else {
+        setQrCodes(formattedQrCodes);
+        setFilteredQrCodes(formattedQrCodes);
       }
-    };
-  
-    fetchQrCodes();
-  }, []);  
+    } catch (error) {
+      console.error('Error fetching QR codes or user data:', error);
+    }
+  };
+
+  fetchQrCodes();
+}, []);
+
 
   useEffect(() => {
     let results = qrCodes;
@@ -245,13 +246,7 @@ const ManageQr = () => {
               {/* Add more options here */}
             </Select>
           </FormControl>
-          <TextField
-            label="Reference No"
-            variant="outlined"
-            fullWidth
-            value={referenceFilter}
-            onChange={(e) => setReferenceFilter(e.target.value)}
-          />
+
           <TextField
             label="Start Date"
             type="date"

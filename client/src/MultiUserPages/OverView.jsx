@@ -96,6 +96,7 @@ const OverView = () => {
             <p className="card-text">Total: {qrTotal}</p>
           </div>
         </div>
+         {/* 
         <div className="col-md-4">
           <div className="card shadow-sm text-center p-3 mb-4">
             <FaDollarSign size={50} className="icon text-warning mb-3" />
@@ -105,6 +106,7 @@ const OverView = () => {
         </div>
       </div>
       <div className="row">
+       */}
         <div className="col-md-4">
           <div className="card shadow-sm text-center p-3 mb-4">
             <FaUser size={50} className="icon text-primary mb-3" />

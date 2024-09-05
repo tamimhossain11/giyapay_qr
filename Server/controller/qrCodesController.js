@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'; 
 import models from '../model/index.js';
 const { QrCode, User, Branch } = models;
 
@@ -168,62 +169,46 @@ const checkInvoice = async (req, res) => {
     }
   };  
 
-//Filter
-const getFilteredQrCodes = async (req, res) => {
+  const getFilteredQrCodes = async (req, res) => {
+    const { searchTerm, branchFilter, userFilter, startDate, endDate } = req.query;
+  
     try {
-      const { searchTerm, branchFilter, userFilter, referenceFilter, startDate, endDate } = req.query;
-  
-      // Building the query dynamically based on provided filters
-      const filterConditions = {};
-  
-      if (searchTerm) {
-        filterConditions.paymentReference = {
-          [Op.like]: `%${searchTerm}%`,
-        };
-      }
-  
-      if (branchFilter) {
-        filterConditions.branchId = branchFilter;
-      }
-  
-      if (userFilter) {
-        filterConditions.userId = userFilter;
-      }
-  
-      if (referenceFilter) {
-        filterConditions.paymentReference = {
-          [Op.like]: `%${referenceFilter}%`,
-        };
-      }
-  
-      if (startDate && endDate) {
-        filterConditions.createdAt = {
-          [Op.between]: [new Date(startDate), new Date(endDate)],
-        };
-      } else if (startDate) {
-        filterConditions.createdAt = {
-          [Op.gte]: new Date(startDate),
-        };
-      } else if (endDate) {
-        filterConditions.createdAt = {
-          [Op.lte]: new Date(endDate),
-        };
-      }
-  
-      // Fetch filtered QR codes with associated User and Branch details
       const qrCodes = await QrCode.findAll({
-        where: filterConditions,
+        where: {
+          ...(searchTerm && { payment_reference: { [Op.like]: `%${searchTerm}%` } }),
+          ...(startDate && endDate && {
+            createdAt: { [Op.between]: [startDate, endDate] }
+          })
+        },
         include: [
-          { model: Branch, attributes: ['name'] },
-          { model: User, attributes: ['firstName', 'lastName'] },
+          {
+            model: User,
+            as: 'user',
+            attributes: ['username'],
+            where: {
+              ...(userFilter && { username: { [Op.like]: `%${userFilter}%` } }),
+            },
+            include: [
+              {
+                model: Branch,
+                as: 'branch',
+                attributes: ['branch_name'],
+                where: {
+                  ...(branchFilter && { branch_name: { [Op.like]: `%${branchFilter}%` } }),
+                },
+              },
+            ],
+          },
         ],
+        attributes: ['created_at', 'updated_at' , 'amount' , 'payment_reference','status','description','id'], // Fetch these fields from QrCode
       });
   
-      res.json(qrCodes);
+      res.status(200).json(qrCodes);
     } catch (error) {
-      console.error('Error fetching filtered QR codes:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error('Error fetching filtered QR codes: ', error);
+      res.status(500).json({ error: 'Failed to fetch QR codes' });
     }
   };
-
+  
+  
 export { createQrCode, handleCallback, getAllQrCodes, getQrCodeById,checkInvoice,getFilteredQrCodes };

@@ -330,14 +330,6 @@ const ManageQr = () => {
                           <ViewIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleOpenDelete(qr)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -375,30 +367,17 @@ const ManageQr = () => {
           </Typography>
           {selectedQr && (
             <>
-              <QRCode value={selectedQr.qr_code} size={150} />
+              <QRCode value={selectedQr.qr_code} size={200} />
               <Typography variant="body1" mt={2}>
                 Payment Reference: {selectedQr.payment_reference}
               </Typography>
-              <Typography variant="body1" mt={1}>
-                Amount: {selectedQr.amount}
+              <Typography variant="body1">Amount: {selectedQr.amount}</Typography>
+              <Typography variant="body1">Status: {selectedQr.status}</Typography>
+              <Typography variant="body1">
+                Created At: {selectedQr.created_at ? new Date(selectedQr.created_at).toLocaleString() : 'N/A'}
               </Typography>
-              <Typography variant="body1" mt={1}>
-                Status: {selectedQr.status}
-              </Typography>
-              <Typography variant="body1" mt={1}>
-                User Name: {selectedQr.user_name || 'N/A'}
-              </Typography>
-              <Typography variant="body1" mt={1}>
-                Branch Name: {selectedQr.branch_name || 'N/A'}
-              </Typography>
-              <Typography variant="body1" mt={1}>
-                Description: {selectedQr.description || 'N/A'}
-              </Typography>
-              <Typography variant="body1" mt={1}>
-                Created At: {selectedQr.created_at}
-              </Typography>
-              <Typography variant="body1" mt={1}>
-                Updated At: {selectedQr.updated_at}
+              <Typography variant="body1">
+                Updated At: {selectedQr.updated_at ? new Date(selectedQr.updated_at).toLocaleString() : 'N/A'}
               </Typography>
               <Button
                 variant="contained"
@@ -414,53 +393,28 @@ const ManageQr = () => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
+        {/* Delete QR Code Confirmation Modal */}
       <Modal open={openDelete} onClose={handleCloseDelete}>
-        <Box
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            backgroundColor: 'white',
-            padding: 24,
-            boxShadow: 24,
-            outline: 'none',
-            borderRadius: '8px',
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Confirm Deletion
-          </Typography>
-          <Typography variant="body1" mt={2}>
-            Are you sure you want to delete this QR code with reference{' '}
-            {selectedQr?.payment_reference}?
-          </Typography>
-          <Box mt={2} display="flex" justifyContent="flex-end">
+        <Box style={styles.modalBox}>
+          <Typography variant="h6">Are you sure you want to delete this QR code?</Typography>
+          <Box mt={2}>
             <Button
               variant="contained"
-              color="error"
-              onClick={async () => {
-                try {
-                  const token = localStorage.getItem('token');
-                  await axios.delete(`${backendUrl}/api/qr-codes/${selectedQr.id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  setQrCodes(qrCodes.filter((qr) => qr.id !== selectedQr.id));
-                  setFilteredQrCodes(
-                    filteredQrCodes.filter((qr) => qr.id !== selectedQr.id)
-                  );
-                  handleCloseDelete();
-                } catch (error) {
-                  console.error('Error deleting QR code:', error);
-                }
+              color="primary"
+              onClick={() => {
+                // Handle delete logic here
+                handleCloseDelete();
               }}
-              style={{ marginRight: 8 }}
             >
-              Delete
+              Yes
             </Button>
-            <Button variant="contained" color="default" onClick={handleCloseDelete}>
-              Cancel
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCloseDelete}
+              style={{ marginLeft: '8px' }}
+            >
+              No
             </Button>
           </Box>
         </Box>

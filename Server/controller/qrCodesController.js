@@ -40,52 +40,55 @@ const createQrCode = async (req, res) => {
 
 const handleCallback = async (req, res) => {
   try {
-      console.log('Received callback request:', req.body);
+    console.log('Received callback request:', req.body);
 
-      const { nonce, refno, amount, signature, invoice_number } = req.body;
-      const callbackType = req.params.callbackType;
+    const { nonce, refno, amount, signature, invoice_number } = req.body;
+    const callbackType = req.params.callbackType;
 
-      if (!nonce || !refno || !amount || !signature || !invoice_number) {
-          console.error('Invalid data provided:', req.body);
-          return res.status(400).json({ message: 'Invalid data provided' });
-      }
+    if (!nonce || !refno || !amount || !signature || !invoice_number) {
+      console.error('Invalid data provided:', req.body);
+      return res.status(400).json({ message: 'Invalid data provided' });
+    }
 
-      const qrCode = await QrCode.findOne({ where: { invoice_number } });
+    // Find the QR code entry by invoice number
+    const qrCode = await QrCode.findOne({ where: { invoice_number } });
 
-      if (!qrCode) {
-          console.error('QR Code not found for invoice number:', invoice_number);
-          return res.status(404).json({ message: 'QR Code not found' });
-      }
+    if (!qrCode) {
+      console.error('QR Code not found for invoice number:', invoice_number);
+      return res.status(404).json({ message: 'QR Code not found' });
+    }
 
-      const updateData = {
-          amount,
-          payment_reference: refno,
-      };
+    const updateData = {
+      amount,
+      payment_reference: refno,
+    };
 
-      switch (callbackType) {
-          case 'success-callback':
-              updateData.status = 'Success';
-              break;
-          case 'error-callback':
-              updateData.status = 'Error';
-              break;
-          case 'cancel-callback':
-              updateData.status = 'Cancelled';
-              break;
-          default:
-              updateData.status = 'Unknown';
-              break;
-      }
+    switch (callbackType) {
+      case 'success-callback':
+        updateData.status = 'Success';
+        break;
+      case 'error-callback':
+        updateData.status = 'Error';
+        break;
+      case 'cancel-callback':
+        updateData.status = 'Cancelled';
+        break;
+      default:
+        updateData.status = 'Unknown';
+        break;
+    }
 
-      await qrCode.update(updateData);
+    // Update QR code and allow Sequelize to handle the updated_at timestamp
+    await qrCode.update(updateData);
 
-      console.log('QR Code updated successfully:', qrCode);
-      res.status(200).json({ message: 'QR Code updated successfully', qrCode });
+    console.log('QR Code updated successfully:', qrCode);
+    res.status(200).json({ message: 'QR Code updated successfully', qrCode });
   } catch (error) {
-      console.error('Error handling callback:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.error('Error handling callback:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 const getAllQrCodes = async (req, res) => {

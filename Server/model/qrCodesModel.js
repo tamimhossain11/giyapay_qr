@@ -36,14 +36,6 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
   nonce: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -57,14 +49,14 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  invoice_number: {   // Added new column
+  invoice_number: {
     type: DataTypes.STRING,
     allowNull: true,
   },
 }, {
   tableName: 'qr_codes',
-  timestamps: true, // Manages created_at and updated_at automatically
-  underscored: true, // Uses snake_case for column names
+  timestamps: true, 
+  underscored: true, 
 });
 
 export default QrCode;

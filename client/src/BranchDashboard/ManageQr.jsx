@@ -29,6 +29,7 @@ import {
 import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
+import { format } from 'date-fns';
 
 const ManageQr = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -58,17 +59,23 @@ const ManageQr = () => {
         });
         const user = userResponse.data;
         setUserType(localStorage.getItem('userType'));
-
+  
         const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+  
+        // Log the response to check fields
+        console.log("QR Codes Response:", qrCodeResponse.data);
+  
         const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
           ...qr,
           user_name: qr.user ? qr.user.username : 'Unknown User',
           branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+          // Update the field names to match the API response
+          created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
+          updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
         }));
-
+  
         if (user.branch_id) {
           const filteredQrCodes = formattedQrCodes.filter(
             (qr) => qr.branch_id === user.branch_id
@@ -83,9 +90,11 @@ const ManageQr = () => {
         console.error('Error fetching QR codes or user data:', error);
       }
     };
-
+  
     fetchQrCodes();
   }, [backendUrl]);
+  
+  
 
   useEffect(() => {
     let results = qrCodes;
@@ -237,7 +246,7 @@ const ManageQr = () => {
                 label="Branch Name"
               >
                 <MenuItem value="">All Branches</MenuItem>
-            
+                {/* Dynamically populate branch names */}
               </Select>
             </FormControl>
             <FormControl variant="outlined" fullWidth>
@@ -316,8 +325,12 @@ const ManageQr = () => {
                     <TableCell>{qr.user_name}</TableCell>
                     <TableCell>{qr.branch_name}</TableCell>
                     <TableCell>{qr.description}</TableCell>
-                    <TableCell>{new Date(qr.created_at).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(qr.updated_at).toLocaleString()}</TableCell>
+                    <TableCell>
+                      {qr.created_at ? new Date(qr.created_at).toLocaleString() : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {qr.updated_at ? new Date(qr.updated_at).toLocaleString() : 'N/A'}
+                    </TableCell>
                     <TableCell>
                       <Tooltip title="View">
                         <IconButton onClick={() => handleOpenView(qr)}>
@@ -335,6 +348,7 @@ const ManageQr = () => {
                   </TableRow>
                 ))}
             </TableBody>
+
           </Table>
         </TableContainer>
         <TablePagination
@@ -360,11 +374,12 @@ const ManageQr = () => {
               <Typography variant="body1">Amount: {selectedQr.amount}</Typography>
               <Typography variant="body1">Status: {selectedQr.status}</Typography>
               <Typography variant="body1">
-                Created At: {new Date(selectedQr.created_at).toLocaleDateString()}
+                Created At: {selectedQr.created_at ? new Date(selectedQr.created_at).toLocaleString() : 'N/A'}
               </Typography>
               <Typography variant="body1">
-                Updated At: {new Date(selectedQr.updated_at).toLocaleDateString()}
+                Updated At: {selectedQr.updated_at ? new Date(selectedQr.updated_at).toLocaleString() : 'N/A'}
               </Typography>
+
               <Button
                 variant="contained"
                 color="primary"

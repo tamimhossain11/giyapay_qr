@@ -50,7 +50,7 @@ const cleanUpBlacklistedTokens = async () => {
 
 setInterval(cleanUpBlacklistedTokens, 24 * 60 * 60 * 1000);
 
-//server
+//server listening
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });

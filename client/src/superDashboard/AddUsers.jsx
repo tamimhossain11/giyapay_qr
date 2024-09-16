@@ -13,6 +13,7 @@ const AddUser = () => {
   const [password, setPassword] = useState('');
   const [branchUser, setBranchUser] = useState(null);
   const [branches, setBranches] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -28,6 +29,14 @@ const AddUser = () => {
 
   const handleSave = async () => {
     try {
+      if (userType === 'Branch User' && branchUser) {
+        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${branchUser.id}`);
+        if (checkBranchResponse.data) {
+          setError('This branch is already assigned to another user');
+          return;
+        }
+      }
+
       const userData = {
         firstName,
         lastName,
@@ -45,11 +54,13 @@ const AddUser = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/super-dashboard/manage-users');
+  };
+
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Add User
-      </Typography>
+      <Typography variant="h4" gutterBottom>Add User</Typography>
 
       <FormControl fullWidth margin="normal">
         <InputLabel id="user-type-label">User Type</InputLabel>
@@ -118,9 +129,16 @@ const AddUser = () => {
         />
       )}
 
-      <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 3 }}>
-        Save
-      </Button>
+      {error && <Typography color="error">{error}</Typography>}
+
+      <Box mt={2} display="flex" justifyContent="space-between">
+        <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 3 }}>
+          Save
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
+          Cancel
+        </Button>
+      </Box>
     </Box>
   );
 };

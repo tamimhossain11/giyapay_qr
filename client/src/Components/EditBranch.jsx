@@ -40,6 +40,10 @@ const EditBranch = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/super-dashboard/manage-branches'); // Navigate to manage branches on cancel
+  };
+
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>
@@ -67,14 +71,23 @@ const EditBranch = () => {
           fullWidth
           margin="normal"
         />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Save Changes
-        </Button>
+        <Box mt={2} display="flex" justifyContent="space-between">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            Save Changes
+          </Button>
+          <Button
+            type="button"
+            variant="outlined"
+            color="secondary"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+        </Box>
       </form>
     </Box>
   );

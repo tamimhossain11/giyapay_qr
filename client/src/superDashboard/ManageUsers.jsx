@@ -115,7 +115,13 @@ const ManageUsers = () => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.user_type}</TableCell>
                   <TableCell>{user.status}</TableCell>
-                  <TableCell>{user.branch ? user.branch.branch_name : 'Bank'}</TableCell>
+                  <TableCell>
+                    {user.user_type === 'Co-Admin'
+                      ? 'Bank'
+                      : user.branch
+                      ? user.branch.branch_name
+                      : 'No Branch Assigned'}
+                  </TableCell>
                   <TableCell>
                     <Box display="flex" gap={1} flexDirection={isMobile ? 'column' : 'row'}>
                       <Button

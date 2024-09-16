@@ -59,4 +59,23 @@ router.get('/check-invoice/:invoice_number', checkInvoice);
 
 router.get('/filter', getFilteredQrCodes);
 
+
+router.get('/csv', async (req, res) => {
+    try {
+      const qrCodes = await QrCode.findAll(); // Fetch the QR codes from your database
+  
+      const fields = ['reference_no', 'branch_name', 'username', 'createdAt'];
+      const json2csvParser = new Parser({ fields });
+      const csv = json2csvParser.parse(qrCodes);
+  
+      const filePath = path.join(__dirname, 'qrcodes.csv');
+      fs.writeFileSync(filePath, csv);
+  
+      res.download(filePath);
+    } catch (error) {
+      console.error('Error generating CSV:', error);
+      res.status(500).send('Error generating CSV');
+    }
+  });
+
 export default router;

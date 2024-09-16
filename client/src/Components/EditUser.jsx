@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, MenuItem, Typography, Autocomplete } from '@mui/material';
+import { Button, TextField, MenuItem,Box, Typography, Autocomplete } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const EditUser = () => {
-  const { id } = useParams(); // Get user ID from URL parameters
-  const navigate = useNavigate(); // For navigation after update
-  const [user, setUser] = useState({}); // State to hold user data
-  const [branches, setBranches] = useState([]); // State to hold list of branches
-  const [selectedBranch, setSelectedBranch] = useState(null); // State to hold selected branch
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState({});
+  const [branches, setBranches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Fetch user data by ID
     const fetchUser = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${id}`);
-        setUser(response.data); // Set user data to state
-        setSelectedBranch(response.data.branch_id); // Set initial selected branch
+        setUser(response.data);
+        setSelectedBranch(response.data.branch_id);
       } catch (error) {
         console.error('Failed to fetch user:', error);
       }
     };
 
-    // Fetch all branches
     const fetchBranches = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
-        setBranches(response.data); // Set branches data to state
+        setBranches(response.data);
       } catch (error) {
         console.error('Failed to fetch branches:', error);
       }
@@ -34,29 +33,33 @@ const EditUser = () => {
 
     fetchUser();
     fetchBranches();
-  }, [id]); // Dependencies to trigger fetchUser and fetchBranches on component mount
+  }, [id]);
 
-  // Handle user update
   const handleUpdate = async () => {
     try {
+      // If the user type is "Branch User", validate if branch is already assigned
+      if (user.user_type === "Branch User" && selectedBranch) {
+        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
+        if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
+          setError("This branch is already assigned to another user");
+          return;
+        }
+      }
+
       const updatedUser = {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        username: user.username,
-        email: user.email,
-        user_type: user.user_type,
-        branch_id: selectedBranch,
+        ...user,
+        branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
       };
 
-      // Log payload to ensure correct structure
-      console.log('Payload being sent to the server:', updatedUser);
-
-      // Send PUT request to update user
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
-      navigate('/super-dashboard/manage-users'); // Redirect after successful update
+      navigate('/super-dashboard/manage-users');
     } catch (error) {
       console.error('Failed to update user:', error);
     }
+  };
+
+  const handleCancel = () => {
+    navigate('/super-dashboard/manage-users');
   };
 
   return (
@@ -101,14 +104,27 @@ const EditUser = () => {
         <MenuItem value="Co-Admin">Co-Admin</MenuItem>
         <MenuItem value="Branch User">Branch User</MenuItem>
       </TextField>
-      <Autocomplete
-        options={branches}
-        getOptionLabel={(option) => option.branch_name || option.name}
-        value={branches.find(branch => branch.id === selectedBranch) || null}
-        onChange={(event, newValue) => setSelectedBranch(newValue ? newValue.id : null)}
-        renderInput={(params) => <TextField {...params} label="Assign Branch" margin="normal" fullWidth />}
-      />
-      <Button variant="contained" color="primary" onClick={handleUpdate}>Update User</Button>
+
+      {user.user_type === 'Branch User' && (
+        <Autocomplete
+          options={branches}
+          getOptionLabel={(option) => option.branch_name}
+          value={branches.find(branch => branch.id === selectedBranch) || null}
+          onChange={(event, newValue) => setSelectedBranch(newValue ? newValue.id : null)}
+          renderInput={(params) => <TextField {...params} label="Assign Branch" margin="normal" fullWidth />}
+        />
+      )}
+
+      {error && <Typography color="error">{error}</Typography>}
+
+      <Box mt={2} display="flex" justifyContent="space-between">
+      <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 3 }}>
+        Update User
+      </Button>
+      <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
+          Cancel
+        </Button>
+        </Box>
     </div>
   );
 };

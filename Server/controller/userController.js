@@ -218,3 +218,56 @@ export const getCoAdminCount = async (req, res) => {
     res.status(500).json({ Status: false, Error: 'Internal server error' });
   }
 };
+
+
+// Controller to check if a branch is assigned to a user
+export const checkBranchAssignment = async (req, res) => {
+  const { branchId } = req.params;
+
+  try {
+    // Find if a user is already assigned to the given branchId
+    const user = await User.findOne({
+      where: { branch_id: branchId },
+    });
+
+    // If a user is found, return the user's details; otherwise, return null
+    if (user) {
+      return res.status(200).json(user);
+    } else {
+      return res.status(200).json(null); // No user is assigned to this branch
+    }
+  } catch (error) {
+    console.error('Error checking branch assignment:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+// Check if user is Co-Admin or already assigned to a branch
+export const checkUserTypeAndAssignment = async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the user is a Co-Admin
+    if (user.user_type === 'Co-Admin') {
+      return res.json({ isCoAdmin: true, alreadyAssigned: false });
+    }
+
+    // Check if the user is already assigned to a branch (if Branch User)
+    if (user.user_type === 'Branch User' && user.branch_id) {
+      return res.json({ isCoAdmin: false, alreadyAssigned: true });
+    }
+
+    res.json({ isCoAdmin: false, alreadyAssigned: false });
+  } catch (error) {
+    console.error('Error checking user type or assignment:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+

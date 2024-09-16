@@ -1,25 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Button,
-  Container,
-  Modal,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography,
-  IconButton,
-  Tooltip,
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
+  Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
+  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -48,17 +30,18 @@ const ManageQr = () => {
     endDate: '',
   });
   const [userType, setUserType] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchQrCodes = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const userResponse = await axios.get(`${backendUrl}/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const user = userResponse.data;
         setUserType(localStorage.getItem('userType'));
 
         const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
@@ -73,9 +56,9 @@ const ManageQr = () => {
           updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
         }));
 
-        if (user.branch_id) {
+        if (userResponse.data.branch_id) {
           const filteredQrCodes = formattedQrCodes.filter(
-            (qr) => qr.branch_id === user.branch_id
+            (qr) => qr.branch_id === userResponse.data.branch_id
           );
           setQrCodes(filteredQrCodes);
           setFilteredQrCodes(filteredQrCodes);
@@ -85,6 +68,8 @@ const ManageQr = () => {
         }
       } catch (error) {
         console.error('Error fetching QR codes or user data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -96,12 +81,13 @@ const ManageQr = () => {
       try {
         const response = await axios.get(`${backendUrl}/api/qr-codes/filter`, {
           params: {
-            searchTerm,             
-            branchFilter,           
-            userFilter,             
+            searchTerm,
+            branchFilter,
+            userFilter,
             startDate: dateFilter.startDate,
             endDate: dateFilter.endDate,
           },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
 
         const data = Array.isArray(response.data) ? response.data : [];
@@ -113,14 +99,18 @@ const ManageQr = () => {
     };
 
     fetchFilteredQrCodes();
-  }, [searchTerm, branchFilter, userFilter, dateFilter]);
+  }, [searchTerm, branchFilter, userFilter, dateFilter, backendUrl]);
 
   useEffect(() => {
     const fetchBranchesAndUsers = async () => {
       try {
         const [branchesResponse, usersResponse] = await Promise.all([
-          axios.get(`${backendUrl}/branches/all`),
-          axios.get(`${backendUrl}/users/all`),
+          axios.get(`${backendUrl}/branches/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          }),
+          axios.get(`${backendUrl}/users/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          }),
         ]);
 
         setBranches(branchesResponse.data);
@@ -169,29 +159,17 @@ const ManageQr = () => {
     });
   };
 
-  const styles = {
-    container: {
-      maxWidth: '100%',
-      padding: '0 16px',
-    },
-    tableContainer: {
-      width: '100%',
-      overflowX: 'auto',
-    },
-    table: {
-      minWidth: 700,
-    },
-    csvButton: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-    },
-    exportContainer: {
-      display: 'flex',
-      gap: '16px',
-      flexWrap: 'wrap',
-      marginBottom: '16px',
-    },
+  const handleDeleteQrCode = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${backendUrl}/api/qr-codes/delete/${selectedQr.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFilteredQrCodes(filteredQrCodes.filter(qr => qr.id !== selectedQr.id));
+      setOpenDelete(false);
+    } catch (error) {
+      console.error('Error deleting QR code:', error);
+    }
   };
 
   const headers = [
@@ -200,107 +178,132 @@ const ManageQr = () => {
     { label: 'Payment Reference', key: 'payment_reference' },
     { label: 'Amount', key: 'amount' },
     { label: 'Status', key: 'status' },
-    { label: 'User Name', key: 'user_name' },
-    { label: 'Branch Name', key: 'branch_name' },
     { label: 'Description', key: 'description' },
     { label: 'Created At', key: 'created_at' },
     { label: 'Updated At', key: 'updated_at' },
   ];
 
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
   return (
-    <Container style={styles.container}>
-      <Box mt={4}>
+    <Container maxWidth={false} disableGutters>
+      <Box mt={4} width="100%">
         <Typography variant="h4" gutterBottom>
           Manage QR Codes
         </Typography>
         {(userType === 'admin' || userType === 'Co-Admin') && (
-          <Box style={styles.exportContainer}>
-            <TextField
-              label="Search Payment Reference"
-              variant="outlined"
-              fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FormControl variant="outlined" fullWidth>
-              <InputLabel>Branch Name</InputLabel>
-              <Select
-                value={branchFilter}
-                onChange={(e) => setBranchFilter(e.target.value)}
-                label="Branch Name"
-              >
-                <MenuItem value="">All Branches</MenuItem>
-                {branches.map((branch) => (
-                  <MenuItem key={branch.id} value={branch.branch_name}>
-                    {branch.branch_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          <Box mb={2}>
+            {/* Filter Container */}
+            <Box display="flex" flexWrap="wrap" gap={2} width="100%">
+              {/* First Row */}
+              <Box display="flex" flexWrap="wrap" gap={2} width="100%">
+                <TextField
+                  label="Search Payment Reference"
+                  variant="outlined"
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  sx={{ flex: 1 }}
+                />
+                <TextField
+                  label="Start Date"
+                  type="date"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                  name="startDate"
+                  value={dateFilter.startDate}
+                  onChange={handleDateChange}
+                  sx={{ flex: 1 }}
+                />
+                <TextField
+                  label="End Date"
+                  type="date"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                  name="endDate"
+                  value={dateFilter.endDate}
+                  onChange={handleDateChange}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
 
-            <FormControl variant="outlined" fullWidth>
-              <InputLabel>User Name</InputLabel>
-              <Select
-                value={userFilter}
-                onChange={(e) => setUserFilter(e.target.value)}
-                label="User Name"
-              >
-                <MenuItem value="">All Users</MenuItem>
-                {users.map((user) => (
-                  <MenuItem key={user.id} value={user.username}>
-                    {user.username}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              {/* Second Row */}
+              <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
+                <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
+                  <InputLabel>Branch Name</InputLabel>
+                  <Select
+                    value={branchFilter}
+                    onChange={(e) => setBranchFilter(e.target.value)}
+                    label="Branch Name"
+                  >
+                    <MenuItem value="">All Branches</MenuItem>
+                    {branches.map((branch) => (
+                      <MenuItem key={branch.id} value={branch.branch_name}>
+                        {branch.branch_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
+                  <InputLabel>User Name</InputLabel>
+                  <Select
+                    value={userFilter}
+                    onChange={(e) => setUserFilter(e.target.value)}
+                    label="User Name"
+                  >
+                    <MenuItem value="">All Users</MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.username}>
+                        {user.username}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
 
-            <TextField
-              label="Start Date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              variant="outlined"
-              fullWidth
-              name="startDate"
-              value={dateFilter.startDate}
-              onChange={handleDateChange}
-            />
-            <TextField
-              label="End Date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              variant="outlined"
-              fullWidth
-              name="endDate"
-              value={dateFilter.endDate}
-              onChange={handleDateChange}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              style={styles.csvButton}
-              startIcon={<DownloadIcon />}
-            >
+            {/* Buttons */}
+            <Box mt={2} display="flex" gap={2}>
+              <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+                Apply Filters
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  setSearchTerm('');
+                  setBranchFilter('');
+                  setUserFilter('');
+                  setDateFilter({ startDate: '', endDate: '' });
+                }}
+              >
+                Clear Filters
+              </Button>
               <CSVLink
-                headers={headers}
                 data={filteredQrCodes}
-                filename="qr_codes.csv"
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                headers={headers}
+                filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
               >
-                Export CSV
+                <Button variant="contained" color="primary" startIcon={<DownloadIcon />}>
+                  Export to CSV
+                </Button>
               </CSVLink>
-            </Button>
+            </Box>
           </Box>
         )}
-        <TableContainer component={Paper} style={styles.tableContainer}>
-          <Table style={styles.table} aria-label="QR Code Table">
+        <TableContainer component={Paper}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
+                <TableCell>QR Code</TableCell>
                 <TableCell>Payment Reference</TableCell>
                 <TableCell>Amount</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>User Name</TableCell>
-                <TableCell>Branch Name</TableCell>
                 <TableCell>Description</TableCell>
                 <TableCell>Created At</TableCell>
                 <TableCell>Updated At</TableCell>
@@ -308,115 +311,62 @@ const ManageQr = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredQrCodes
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((qr) => (
-                  <TableRow key={qr.id}>
-                    <TableCell>{qr.id}</TableCell>
-                    <TableCell>{qr.payment_reference}</TableCell>
-                    <TableCell>{qr.amount}</TableCell>
-                    <TableCell>{qr.status}</TableCell>
-                    <TableCell>{qr.user.username || 'N/A'}</TableCell>
-                    <TableCell>{qr.branch_name || 'N/A'}</TableCell>
-                    <TableCell>{qr.description || 'N/A'}</TableCell>
-                    <TableCell>{qr.created_at}</TableCell>
-                    <TableCell>{qr.updated_at}</TableCell>
-                    <TableCell>
-                      <Tooltip title="View">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleOpenView(qr)}
-                        >
-                          <ViewIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr) => (
+                <TableRow key={qr.id}>
+                  <TableCell>{qr.id}</TableCell>
+                  <TableCell>
+                    <QRCode value={qr.qr_code} size={50} />
+                  </TableCell>
+                  <TableCell>{qr.payment_reference}</TableCell>
+                  <TableCell>{qr.amount}</TableCell>
+                  <TableCell>{qr.status}</TableCell>
+                  <TableCell>{qr.description}</TableCell>
+                  <TableCell>{qr.created_at}</TableCell>
+                  <TableCell>{qr.updated_at}</TableCell>
+                  <TableCell>
+                    <Tooltip title="View QR Code">
+                      <IconButton onClick={() => handleOpenView(qr)}>
+                        <ViewIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={filteredQrCodes.length}
+          rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Box>
-
-      {/* View QR Modal */}
       <Modal open={openView} onClose={handleCloseView}>
-        <Box
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            backgroundColor: 'white',
-            padding: 24,
-            boxShadow: 24,
-            outline: 'none',
-            borderRadius: '8px',
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            QR Code Details
-          </Typography>
+        <Box p={4} bgcolor="background.paper" borderRadius={1} width="90%" maxWidth="600px" mx="auto" mt={4}>
           {selectedQr && (
-            <>
-              <QRCode value={selectedQr.qr_code} size={200} />
-              <Typography variant="body1" mt={2}>
-                Payment Reference: {selectedQr.payment_reference}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                QR Code Details
               </Typography>
-              <Typography variant="body1">Amount: {selectedQr.amount}</Typography>
-              <Typography variant="body1">Status: {selectedQr.status}</Typography>
-              <Typography variant="body1">
-                Created At: {selectedQr.created_at ? new Date(selectedQr.created_at).toLocaleString() : 'N/A'}
-              </Typography>
-              <Typography variant="body1">
-                Updated At: {selectedQr.updated_at ? new Date(selectedQr.updated_at).toLocaleString() : 'N/A'}
-              </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleCloseView}
-                style={{ marginTop: 16 }}
-              >
+              <Box mb={2}>
+                <QRCode value={selectedQr.qr_code} size={200} />
+              </Box>
+              <Typography variant="body1"><strong>ID:</strong> {selectedQr.id}</Typography>
+              <Typography variant="body1"><strong>Payment Reference:</strong> {selectedQr.payment_reference}</Typography>
+              <Typography variant="body1"><strong>Amount:</strong> {selectedQr.amount}</Typography>
+              <Typography variant="body1"><strong>Status:</strong> {selectedQr.status}</Typography>
+              <Typography variant="body1"><strong>Description:</strong> {selectedQr.description}</Typography>
+              <Typography variant="body1"><strong>Created At:</strong> {selectedQr.created_at}</Typography>
+               <Typography variant="body1"><strong>Updated At:</strong> {selectedQr.updated_at}</Typography>
+              <Button variant="contained" color="primary" onClick={handleCloseView}>
                 Close
               </Button>
-            </>
+            </Box>
           )}
-        </Box>
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-        {/* Delete QR Code Confirmation Modal */}
-      <Modal open={openDelete} onClose={handleCloseDelete}>
-        <Box style={styles.modalBox}>
-          <Typography variant="h6">Are you sure you want to delete this QR code?</Typography>
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                // Handle delete logic here
-                handleCloseDelete();
-              }}
-            >
-              Yes
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleCloseDelete}
-              style={{ marginLeft: '8px' }}
-            >
-              No
-            </Button>
-          </Box>
         </Box>
       </Modal>
     </Container>

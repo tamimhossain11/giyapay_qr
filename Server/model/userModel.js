@@ -36,11 +36,14 @@ const User = sequelize.define('User', {
   branch_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    unique: true,
+    references: {
+      model: 'branches', // Name of the Branch model
+      key: 'id', // Key in the Branch model
+    },
   },
 }, {
   timestamps: true,
-  tableName: 'users'
+  tableName: 'users',
 });
 
 export default User;

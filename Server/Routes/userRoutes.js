@@ -9,10 +9,14 @@ import {
   getSingleUser,
   deleteUser,
   getBranchUserCount,
-  getCoAdminCount
+  getCoAdminCount,
+  checkBranchAssignment,
+  checkUserTypeAndAssignment
 } from '../controller/userController.js';
 
 const router = express.Router();
+
+router.get('/branch/:branchId', checkBranchAssignment);
 
 // Define user routes and attach appropriate controller functions
 router.get('/profile', authenticateToken, getProfile);
@@ -31,5 +35,7 @@ router.get('/co-admin-count', (req, res, next) => {
   console.log('Received request for co-admin count');
   getCoAdminCount(req, res, next);
 });
+
+router.post('/check-user-type', checkUserTypeAndAssignment);
 
 export default router;

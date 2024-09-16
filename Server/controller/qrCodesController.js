@@ -1,42 +1,42 @@
-import { Op } from 'sequelize'; 
+import { Op } from 'sequelize';
 import models from '../model/index.js';
 const { QrCode, User, Branch } = models;
 
 const createQrCode = async (req, res) => {
-    try {
-        const { branch_id, amount, qr_code, invoice_number, payment_channel, signature, nonce, description } = req.body;
+  try {
+    const { branch_id, amount, qr_code, invoice_number, payment_channel, signature, nonce, description } = req.body;
 
-        if (!branch_id || !amount || !qr_code || !invoice_number || !payment_channel || !signature || !nonce || !description) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        const branch = await Branch.findByPk(branch_id);
-        if (!branch) {
-            return res.status(404).json({ error: 'Branch not found' });
-        }
-
-        const user = await User.findOne({ where: { branch_id: branch.id } });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found for this branch' });
-        }
-
-        const qrCode = await QrCode.create({
-            branch_id,
-            user_id: user.id,
-            amount,
-            qr_code,
-            invoice_number,
-            payment_channel,
-            signature,
-            nonce,
-            description,
-        });
-
-        res.status(201).json({ message: 'QR code created successfully', qrCode });
-    } catch (error) {
-        console.error('Error creating QR code:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    if (!branch_id || !amount || !qr_code || !invoice_number || !payment_channel || !signature || !nonce || !description) {
+      return res.status(400).json({ error: 'All fields are required' });
     }
+
+    const branch = await Branch.findByPk(branch_id);
+    if (!branch) {
+      return res.status(404).json({ error: 'Branch not found' });
+    }
+
+    const user = await User.findOne({ where: { branch_id: branch.id } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found for this branch' });
+    }
+
+    const qrCode = await QrCode.create({
+      branch_id,
+      user_id: user.id,
+      amount,
+      qr_code,
+      invoice_number,
+      payment_channel,
+      signature,
+      nonce,
+      description,
+    });
+
+    res.status(201).json({ message: 'QR code created successfully', qrCode });
+  } catch (error) {
+    console.error('Error creating QR code:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 const handleCallback = async (req, res) => {
@@ -66,10 +66,10 @@ const handleCallback = async (req, res) => {
 
     switch (callbackType) {
       case 'success-callback':
-        updateData.status = 'Success';
+        updateData.status = 'Paid';
         break;
       case 'error-callback':
-        updateData.status = 'Error';
+        updateData.status = 'Failed';
         break;
       case 'cancel-callback':
         updateData.status = 'Cancelled';
@@ -93,122 +93,140 @@ const handleCallback = async (req, res) => {
 
 
 const getAllQrCodes = async (req, res) => {
-    try {
-        const qrCodes = await QrCode.findAll({
-            include: [
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'first_name', 'last_name', 'username'],
-                },
-                {
-                    model: Branch,
-                    as: 'branch',
-                    attributes: ['id', 'branch_name'],
-                },
-            ],
-        });
-
-        res.json(qrCodes);
-    } catch (error) {
-        console.error('Error fetching QR codes:', error);
-        res.status(500).json({ error: 'Error fetching QR codes' });
-    }
+  try {
+    const qrCodes = await QrCode.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'username', 'branch_id'],
+          include: {
+            model: Branch,
+            as: 'branch',
+            attributes: ['branch_name'],
+          },
+        },
+      ],
+    });    
+    res.json(qrCodes);
+  } catch (error) {
+    console.error('Error fetching QR codes:', error);
+    res.status(500).json({ error: 'Error fetching QR codes' });
+  }
 };
 
+
 const getQrCodeById = async (req, res) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        const qrCode = await QrCode.findByPk(id, {
-            include: [
-                {
-                    model: User,
-                    as: 'user',
-                    attributes: ['id', 'first_name', 'last_name', 'username'],
-                },
-                {
-                    model: Branch,
-                    as: 'branch',
-                    attributes: ['id', 'branch_name'],
-                },
-            ],
-        });
+    // Add default conditions or empty objects if no conditions are passed
+    const userConditions = {}; // Apply user conditions if needed
+    const branchConditions = {}; // Apply branch conditions if needed
 
-        if (!qrCode) {
-            return res.status(404).json({ message: 'QR Code not found' });
-        }
+    const qrCode = await QrCode.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['username'],
+          where: Object.keys(userConditions).length > 0 ? userConditions : undefined, // Apply user filter if provided
+          required: false // Ensure that the association is optional and will not block the result
+        },
+        {
+          model: Branch,
+          as: 'branch',
+          attributes: ['branch_name'],
+          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, // Apply branch filter if provided
+          required: false // Ensure the association is optional
+        },
+      ],
+    });
 
-        res.json(qrCode);
-    } catch (error) {
-        console.error('Error fetching QR code:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    if (!qrCode) {
+      return res.status(404).json({ message: 'QR Code not found' });
     }
+
+    res.json(qrCode);
+  } catch (error) {
+    console.error('Error fetching QR code:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 //check_invoice
 
 const checkInvoice = async (req, res) => {
-    try {
-      const { invoice_number } = req.params;
-  
-      if (!invoice_number) {
-        return res.status(400).json({ error: 'Invoice number is required' });
-      }
-  
-      const qrCode = await QrCode.findOne({ where: { invoice_number } });
-  
-      if (!qrCode) {
-        return res.status(404).json({ status: false });
-      }
-  
-      res.json({ status: true });
-    } catch (error) {
-      console.error('Error checking invoice:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  };  
+  try {
+    const { invoice_number } = req.params;
 
-  const getFilteredQrCodes = async (req, res) => {
-    const { searchTerm, branchFilter, userFilter, startDate, endDate } = req.query;
-  
-    try {
-      const qrCodes = await QrCode.findAll({
-        where: {
-          ...(searchTerm && { payment_reference: { [Op.like]: `%${searchTerm}%` } }),
-          ...(startDate && endDate && {
-            createdAt: { [Op.between]: [startDate, endDate] }
-          })
-        },
-        include: [
-          {
-            model: User,
-            as: 'user',
-            attributes: ['username'],
-            where: {
-              ...(userFilter && { username: { [Op.like]: `%${userFilter}%` } }),
-            },
-            include: [
-              {
-                model: Branch,
-                as: 'branch',
-                attributes: ['branch_name'],
-                where: {
-                  ...(branchFilter && { branch_name: { [Op.like]: `%${branchFilter}%` } }),
-                },
-              },
-            ],
-          },
-        ],
-        attributes: ['created_at', 'updated_at' , 'amount' , 'payment_reference','status','description','id'], // Fetch these fields from QrCode
-      });
-  
-      res.status(200).json(qrCodes);
-    } catch (error) {
-      console.error('Error fetching filtered QR codes: ', error);
-      res.status(500).json({ error: 'Failed to fetch QR codes' });
+    if (!invoice_number) {
+      return res.status(400).json({ error: 'Invoice number is required' });
     }
-  };
-  
-  
-export { createQrCode, handleCallback, getAllQrCodes, getQrCodeById,checkInvoice,getFilteredQrCodes };
+
+    const qrCode = await QrCode.findOne({ where: { invoice_number } });
+
+    if (!qrCode) {
+      return res.status(404).json({ status: false });
+    }
+
+    res.json({ status: true });
+  } catch (error) {
+    console.error('Error checking invoice:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getFilteredQrCodes = async (req, res) => {
+  const { searchTerm, branchFilter, userFilter, startDate, endDate } = req.query;
+
+  try {
+    // Prepare general conditions for the main QrCode model
+    const whereConditions = {
+      ...(searchTerm && { payment_reference: { [Op.like]: `%${searchTerm}%` } }),
+      ...(startDate && endDate && {
+        createdAt: { [Op.between]: [startDate, endDate] },
+      }),
+    };
+
+    // Prepare optional user filter
+    const userConditions = {
+      ...(userFilter && { username: { [Op.like]: `%${userFilter}%` } }),
+    };
+
+    // Prepare optional branch filter
+    const branchConditions = {
+      ...(branchFilter && { branch_name: { [Op.like]: `%${branchFilter}%` } }),
+    };
+
+    // Fetch all QR codes, including associated User and Branch data
+    const qrCodes = await QrCode.findAll({
+      where: whereConditions, // General conditions for QrCode
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['username'],
+          where: Object.keys(userConditions).length > 0 ? userConditions : undefined, // Apply user filter if provided
+        },
+        {
+          model: Branch,
+          as: 'branch',
+          attributes: ['branch_name'], // Always include branch_name, even if no filter is applied
+          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, // Apply branch filter if provided
+        },
+      ],
+      attributes: ['created_at', 'updated_at', 'amount', 'payment_reference', 'status', 'description', 'id'], // Fields from QrCode
+    });
+
+    // Send the data back as JSON
+    res.status(200).json(qrCodes);
+  } catch (error) {
+    console.error('Error fetching QR codes: ', error);
+    res.status(500).json({ error: 'Failed to fetch QR codes' });
+  }
+};
+
+
+
+export { createQrCode, handleCallback, getAllQrCodes, getQrCodeById, checkInvoice, getFilteredQrCodes };

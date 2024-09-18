@@ -96,6 +96,7 @@ const ManageUsers = () => {
           <Table size={isMobile ? 'small' : 'medium'}>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>First Name</TableCell>
                 <TableCell>Last Name</TableCell>
                 <TableCell>Username</TableCell>
@@ -109,6 +110,7 @@ const ManageUsers = () => {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell>
                   <TableCell>{user.first_name}</TableCell>
                   <TableCell>{user.last_name}</TableCell>
                   <TableCell>{user.username}</TableCell>

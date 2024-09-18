@@ -78,6 +78,7 @@ const ManageBranches = () => {
               <Table size={isTabletOrMobile ? 'small' : 'medium'}>
                 <TableHead>
                   <TableRow>
+                  <TableCell>ID</TableCell>
                     <TableCell>Branch Name</TableCell>
                     <TableCell>Bank Name</TableCell>
                     <TableCell>Bank Branch</TableCell>
@@ -87,6 +88,7 @@ const ManageBranches = () => {
                 <TableBody>
                   {branches.map((branch) => (
                     <TableRow key={branch.id}>
+                    <TableCell>{branch.id}</TableCell>
                       <TableCell>{branch.branch_name}</TableCell>
                       <TableCell>{branch.bank_name}</TableCell>
                       <TableCell>{branch.bank_branch}</TableCell>

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import logo from '../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
-import LoginButton from '../Mui/LoginButton'
+import LoginButton from '../Mui/LoginButton';
 import Button from '@mui/material/Button';
 
 const Login = () => {
@@ -22,6 +22,16 @@ const Login = () => {
         } else {
             setIsLoggedIn(false);
         }
+
+        const checkTokenExpiration = setInterval(() => {
+            const token = localStorage.getItem('token');
+            const expirationTime = localStorage.getItem('expirationTime');
+            if (token && expirationTime && Date.now() >= expirationTime) {
+                handleLogout();
+            }
+        }, 60000); // Check every minute
+
+        return () => clearInterval(checkTokenExpiration);
     }, []);
 
     const handleSubmit = async (event) => {
@@ -36,9 +46,6 @@ const Login = () => {
                 localStorage.setItem("token", result.data.token);
                 localStorage.setItem("userType", decodedToken.userType);
                 localStorage.setItem("expirationTime", expirationTime);
-                setTimeout(() => {
-                    handleLogout();
-                }, expirationTime - Date.now());
 
                 setIsLoggedIn(true);
 
@@ -66,8 +73,6 @@ const Login = () => {
         setIsLoggedIn(false);
         navigate('/');
     };
-
-    
 
     return (
         <div className="login-page">

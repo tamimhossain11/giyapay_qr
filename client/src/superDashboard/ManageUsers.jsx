@@ -119,8 +119,8 @@ const ManageUsers = () => {
                     {user.user_type === 'Co-Admin'
                       ? 'Bank'
                       : user.branch
-                      ? user.branch.branch_name
-                      : 'No Branch Assigned'}
+                        ? user.branch.branch_name
+                        : 'No Branch Assigned'}
                   </TableCell>
                   <TableCell>
                     <Box display="flex" gap={1} flexDirection={isMobile ? 'column' : 'row'}>
@@ -143,17 +143,18 @@ const ManageUsers = () => {
                       </Button>
                       <Button
                         variant="contained"
-                        color={user.status === 'Active' ? 'warning' : 'success'}
+                        color={user.status === 'Active' ? 'success' : 'inherit'}
                         onClick={() => toggleStatus(user.id, user.status)}
                         sx={{ maxWidth: '150px' }}
                       >
-                        {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        {user.status === 'Active' ? 'Active' : 'Inactive'}
                       </Button>
                     </Box>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+
           </Table>
         </Box>
       )}

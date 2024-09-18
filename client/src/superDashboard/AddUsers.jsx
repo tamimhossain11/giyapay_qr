@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, MenuItem, FormControl, Select, InputLabel, Box, Typography, Autocomplete } from '@mui/material';
+import { TextField, Button, MenuItem, FormControl, Select, InputLabel, Box, Typography, IconButton, InputAdornment, Autocomplete } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,6 +12,9 @@ const AddUser = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [branchUser, setBranchUser] = useState(null);
   const [branches, setBranches] = useState([]);
   const [error, setError] = useState('');
@@ -28,6 +32,12 @@ const AddUser = () => {
   }, []);
 
   const handleSave = async () => {
+    // Validate if password and confirm password match
+    if (password !== confirmPassword) {
+      setError('Passwords did not matched');
+      return;
+    }
+
     try {
       if (userType === 'Branch User' && branchUser) {
         const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${branchUser.id}`);
@@ -107,14 +117,49 @@ const AddUser = () => {
         onChange={(e) => setEmail(e.target.value)}
         required
       />
+
+      {/* Password Input with Toggle */}
       <TextField
         label="Password"
-        type="password"
+        type={showPassword ? 'text' : 'password'}
         fullWidth
         margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      {/* Confirm Password Input with Toggle */}
+      <TextField
+        label="Confirm Password"
+        type={showConfirmPassword ? 'text' : 'password'}
+        fullWidth
+        margin="normal"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
 
       {userType === 'Branch User' && (

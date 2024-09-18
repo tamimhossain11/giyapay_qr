@@ -121,10 +121,9 @@ export const updateUserStatus = async (req, res) => {
   }
 };
 
-// Controller function to update user details
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
-  const { first_name, last_name, username, email, user_type, branch_id, status } = req.body;
+  const { first_name, last_name, username, email, user_type, branch_id, status, password } = req.body;
 
   try {
     const user = await User.findByPk(userId);
@@ -143,6 +142,13 @@ export const updateUser = async (req, res) => {
       }
     }
 
+    // If password is provided, hash it before saving
+    let hashedPassword;
+    if (password) {
+      const saltRounds = 10; // Number of hashing rounds
+      hashedPassword = await bcrypt.hash(password, saltRounds);
+    }
+
     // Update only provided fields
     const updatedFields = {
       ...(first_name && { first_name }),
@@ -151,7 +157,8 @@ export const updateUser = async (req, res) => {
       ...(email && { email }),
       ...(user_type && { user_type }),
       ...(branch_id !== undefined && { branch_id }),
-      ...(status !== undefined && { status })  // Include status only if it's defined
+      ...(status !== undefined && { status }), // Include status only if it's defined
+      ...(hashedPassword && { password: hashedPassword }), // Include hashed password if provided
     };
 
     await user.update(updatedFields);
@@ -162,7 +169,6 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the user' });
   }
 };
-
 // Controller function to get a single user
 export const getSingleUser = async (req, res) => {
   try {

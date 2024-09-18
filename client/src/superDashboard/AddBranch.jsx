@@ -25,26 +25,26 @@ const CreateBranch = () => {
 
     fetchUsers();
   }, []);
-
+  
   const handleSave = async () => {
     if (!branchName) {
       return setErrorMessage('Please provide a Branch Name.');
     }
-
-    if (branchUser) {
+  
+    if (branchUser && branchUser.id !== 'addLater') {
       try {
         // Check the user type and branch assignment
         const checkResponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/check-user-type`, {
           userId: branchUser.id,
         });
-
+  
         const { isCoAdmin, alreadyAssigned } = checkResponse.data;
-
+  
         if (isCoAdmin) {
           setErrorMessage('Sorry, the selected user is a Co-Admin and cannot be assigned to a branch.');
           return;
         }
-
+  
         if (alreadyAssigned) {
           setErrorMessage('This user is already assigned to another branch.');
           return;
@@ -55,28 +55,29 @@ const CreateBranch = () => {
         return;
       }
     }
-
+  
     try {
       // Proceed with branch creation if validations pass
       const branchData = {
         branchName,
         bankName,
         bankBranch,
-        branchUserId: branchUser ? branchUser.id : null,
+        branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null, // Save branchUserId only if valid user is selected
       };
-
+  
       if (id) {
         await axios.put(`${import.meta.env.VITE_BACKEND_URL}/branches/${id}`, branchData);
       } else {
         await axios.post(`${import.meta.env.VITE_BACKEND_URL}/branches`, branchData);
       }
-
+  
       navigate('/super-dashboard/manage-branches');
     } catch (error) {
       console.error('Failed to save branch:', error);
       setErrorMessage('An error occurred while saving the branch.');
     }
   };
+  
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-branches'); // Navigate to manage branches or another page
@@ -118,8 +119,10 @@ const CreateBranch = () => {
       />
 
       <Autocomplete
-        options={users}
-        getOptionLabel={(user) => `${user.first_name} ${user.last_name} (${user.username})`}
+        options={[...users, { first_name: '', last_name: '', username: 'Add later', id: 'addLater' }]}
+        getOptionLabel={(user) =>
+          user.id === 'addLater' ? 'Add later' : `${user.first_name} ${user.last_name} (${user.username})`
+        }
         value={branchUser}
         onChange={(event, newValue) => setBranchUser(newValue)}
         renderInput={(params) => (

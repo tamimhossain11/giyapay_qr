@@ -1,8 +1,8 @@
-import React from 'react';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Login from './Components/Login';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+
+import Login from './Components/Login';
 import SuperDashboard from './superDashboard/SuperDashboard';
 import OverView from './MultiUserPages/OverView';
 import PrivateRoute from './Components/PrivateRoute';
@@ -21,69 +21,81 @@ import CallbackResponsePage from './ClientPages/CallbackResponsePage';
 import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/callback/:callbackType" element={<CallbackResponsePage />} />
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const expirationTime = localStorage.getItem('expirationTime');
 
-        {/*Super Admin routes */}
-        <Route
-          path="/super-dashboard/*"
-          element={
-            <PrivateRoute expectedUserType="admin">
-              <SuperDashboard />
-            </PrivateRoute>
-          }
-        >
-          <Route path="" element={<OverView />} />
-          <Route path="manage-branches" element={<BranchManagement />} />
-          <Route path="manage-branches/add" element={<AddBranchForm />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="manage-users" element={<ManageUsers />} />
-          <Route path="manage-users/add" element={<AddUser />} />
-          <Route path="edit-users/:id" element={<EditUser />} />
-          <Route path="edit-branch/:id" element={<EditBranch />} />
-          <Route path="manage-qr" element={<ManageQr />} />
-          <Route path="admin/add" element={<AddAdmin />} />
+        if (token && expirationTime && Date.now() >= parseInt(expirationTime, 10)) {
+            // Token has expired
+            localStorage.removeItem('token');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('expirationTime');
+            window.location.href = '/'; // Redirect to login
+        }
+    }, []);
 
-        </Route>
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Login />} />
+                <Route path="/callback/:callbackType" element={<CallbackResponsePage />} />
 
-        {/* Co-Admin routes */}
-        <Route
-          path="/co-admin-dashboard/*"
-          element={
-            <PrivateRoute expectedUserType="Co-Admin">
-              <CoAdminDashboard />
-            </PrivateRoute>
-          }
-        >
-          <Route path="" element={<OverView />} />
-          <Route path="manage-qr" element={<ManageQr />} />
-          <Route path="profile" element={<ProfilePage />} />
-        </Route>
+                {/*Super Admin routes */}
+                <Route
+                    path="/super-dashboard/*"
+                    element={
+                        <PrivateRoute expectedUserType="admin">
+                            <SuperDashboard />
+                        </PrivateRoute>
+                    }
+                >
+                    <Route path="" element={<OverView />} />
+                    <Route path="manage-branches" element={<BranchManagement />} />
+                    <Route path="manage-branches/add" element={<AddBranchForm />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="manage-users" element={<ManageUsers />} />
+                    <Route path="manage-users/add" element={<AddUser />} />
+                    <Route path="edit-users/:id" element={<EditUser />} />
+                    <Route path="edit-branch/:id" element={<EditBranch />} />
+                    <Route path="manage-qr" element={<ManageQr />} />
+                    <Route path="admin/add" element={<AddAdmin />} />
+                </Route>
 
-        {/* Branch User routes */}
-        <Route
-          path="/branch-dashboard/*"
-          element={
-            <PrivateRoute expectedUserType="Branch User">
-              <BranchDashboard />
-            </PrivateRoute>
-          }
-        >
-          <Route path="" element={<ManageQr />} />
-          <Route path="manage-qr" element={<ManageQr />} />
-          <Route path="add-qr" element={<AddQr />} />
-          <Route path="profile" element={<ProfilePage />} />
-        </Route>
+                {/* Co-Admin routes */}
+                <Route
+                    path="/co-admin-dashboard/*"
+                    element={
+                        <PrivateRoute expectedUserType="Co-Admin">
+                            <CoAdminDashboard />
+                        </PrivateRoute>
+                    }
+                >
+                    <Route path="" element={<OverView />} />
+                    <Route path="manage-qr" element={<ManageQr />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                </Route>
 
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
-  );
+                {/* Branch User routes */}
+                <Route
+                    path="/branch-dashboard/*"
+                    element={
+                        <PrivateRoute expectedUserType="Branch User">
+                            <BranchDashboard />
+                        </PrivateRoute>
+                    }
+                >
+                    <Route path="" element={<ManageQr />} />
+                    <Route path="manage-qr" element={<ManageQr />} />
+                    <Route path="add-qr" element={<AddQr />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                </Route>
+
+                {/* Fallback route */}
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;

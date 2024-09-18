@@ -216,7 +216,7 @@ const getFilteredQrCodes = async (req, res) => {
           where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, // Apply branch filter if provided
         },
       ],
-      attributes: ['created_at', 'updated_at', 'amount', 'payment_reference', 'status', 'description', 'id'], // Fields from QrCode
+      attributes: ['createdAt', 'updatedAt', 'amount', 'payment_reference', 'status', 'description','qr_code', 'id'], // Fields from QrCode
     });
 
     // Send the data back as JSON

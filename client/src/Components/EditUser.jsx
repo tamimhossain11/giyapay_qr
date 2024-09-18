@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, MenuItem,Box, Typography, Autocomplete } from '@mui/material';
+import { Button, TextField, MenuItem, Box, Typography, Autocomplete, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -10,6 +11,9 @@ const EditUser = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [error, setError] = useState('');
+  const [newPassword, setNewPassword] = useState(''); // Store new password
+  const [showPasswordField, setShowPasswordField] = useState(false); // Control visibility of password field
+  const [showPassword, setShowPassword] = useState(false); // Control password visibility
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,30 +40,35 @@ const EditUser = () => {
   }, [id]);
 
   const handleUpdate = async () => {
-    try {
-      // If the user type is "Branch User", validate if branch is already assigned
-      if (user.user_type === "Branch User" && selectedBranch) {
-        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
-        if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
-          setError("This branch is already assigned to another user");
-          return;
-        }
+  try {
+    // Only validate the branch if the branch has been changed
+    if (user.user_type === "Branch User" && selectedBranch !== user.branch_id) {
+      const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
+      if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
+        setError("This branch is already assigned to another user");
+        return;
       }
-
-      const updatedUser = {
-        ...user,
-        branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
-      };
-
-      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
-      navigate('/super-dashboard/manage-users');
-    } catch (error) {
-      console.error('Failed to update user:', error);
     }
-  };
+
+    const updatedUser = {
+      ...user,
+      branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
+      ...(newPassword && { password: newPassword }), // Include password only if it's filled
+    };
+
+    await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
+    navigate('/super-dashboard/manage-users');
+  } catch (error) {
+    console.error('Failed to update user:', error);
+  }
+};
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-users');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -115,16 +124,41 @@ const EditUser = () => {
         />
       )}
 
+      <Box mt={2}>
+        <Typography variant="body1">
+          Do you want to update the password? <Button onClick={() => setShowPasswordField(!showPasswordField)}>Click here</Button>
+        </Typography>
+        {showPasswordField && (
+          <TextField
+            label="New Password"
+            type={showPassword ? 'text' : 'password'}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={togglePasswordVisibility}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        )}
+      </Box>
+
       {error && <Typography color="error">{error}</Typography>}
 
       <Box mt={2} display="flex" justifyContent="space-between">
-      <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 3 }}>
-        Update User
-      </Button>
-      <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
+        <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 3 }}>
+          Update User
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
           Cancel
         </Button>
-        </Box>
+      </Box>
     </div>
   );
 };

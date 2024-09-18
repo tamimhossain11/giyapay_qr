@@ -7,6 +7,7 @@ import {
   Delete as DeleteIcon,
   Visibility as ViewIcon,
   Download as DownloadIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import { CSVLink } from 'react-csv';
@@ -72,7 +73,6 @@ const ManageQr = () => {
         setLoading(false);
       }
     };
-
     fetchQrCodes();
   }, [backendUrl]);
 
@@ -91,7 +91,18 @@ const ManageQr = () => {
         });
 
         const data = Array.isArray(response.data) ? response.data : [];
-        setFilteredQrCodes(data);
+
+        // Ensure that after filtering, the qr_code field exists in the filtered data
+        const formattedQrCodes = data.map((qr) => ({
+          ...qr,
+          user_name: qr.user ? qr.user.username : 'Unknown User',
+          branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+          created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
+          updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
+          qr_code: qr.qr_code,  // Keep qr_code after filtering
+        }));
+
+        setFilteredQrCodes(formattedQrCodes);
       } catch (error) {
         console.error('Error fetching filtered QR codes:', error);
         setFilteredQrCodes([]);
@@ -142,16 +153,6 @@ const ManageQr = () => {
     setSelectedQr(null);
   };
 
-  const handleOpenDelete = (qr) => {
-    setSelectedQr(qr);
-    setOpenDelete(true);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-    setSelectedQr(null);
-  };
-
   const handleDateChange = (event) => {
     setDateFilter({
       ...dateFilter,
@@ -159,18 +160,6 @@ const ManageQr = () => {
     });
   };
 
-  const handleDeleteQrCode = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${backendUrl}/api/qr-codes/delete/${selectedQr.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFilteredQrCodes(filteredQrCodes.filter(qr => qr.id !== selectedQr.id));
-      setOpenDelete(false);
-    } catch (error) {
-      console.error('Error deleting QR code:', error);
-    }
-  };
 
   const headers = [
     { label: 'ID', key: 'id' },
@@ -186,6 +175,32 @@ const ManageQr = () => {
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
+
+  //refresh table
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
+        ...qr,
+        user_name: qr.user ? qr.user.username : 'Unknown User',
+        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+        created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
+        updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
+      }));
+      setQrCodes(formattedQrCodes);
+      setFilteredQrCodes(formattedQrCodes);
+    } catch (error) {
+      console.error('Error refreshing QR codes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <Container maxWidth={false} disableGutters>
@@ -279,10 +294,12 @@ const ManageQr = () => {
                   setBranchFilter('');
                   setUserFilter('');
                   setDateFilter({ startDate: '', endDate: '' });
+                  setPage(0); // Reset page to 0 when clearing filters
                 }}
               >
                 Clear Filters
               </Button>
+
               <CSVLink
                 data={filteredQrCodes}
                 headers={headers}
@@ -292,6 +309,11 @@ const ManageQr = () => {
                   Export to CSV
                 </Button>
               </CSVLink>
+              <Tooltip title="Get Latest Data">
+                <IconButton color="primary" onClick={handleRefresh}>
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
         )}
@@ -320,7 +342,9 @@ const ManageQr = () => {
                   <TableCell>{qr.payment_reference}</TableCell>
                   <TableCell>{qr.amount}</TableCell>
                   <TableCell>{qr.status}</TableCell>
-                  <TableCell>{qr.description}</TableCell>
+                  <TableCell style={{ whiteSpace: 'pre-wrap' }}>
+                    {qr.description}
+                  </TableCell>
                   <TableCell>{qr.created_at}</TableCell>
                   <TableCell>{qr.updated_at}</TableCell>
                   <TableCell>
@@ -333,6 +357,7 @@ const ManageQr = () => {
                 </TableRow>
               ))}
             </TableBody>
+
           </Table>
         </TableContainer>
         <TablePagination
@@ -346,29 +371,67 @@ const ManageQr = () => {
         />
       </Box>
       <Modal open={openView} onClose={handleCloseView}>
-        <Box p={4} bgcolor="background.paper" borderRadius={1} width="90%" maxWidth="600px" mx="auto" mt={4}>
+        <Box
+          p={4}
+          bgcolor="background.paper"
+          borderRadius={2}
+          width="90%"
+          maxWidth="600px"
+          mx="auto"
+          mt={4}
+          style={{ outline: 'none' }} // Remove default outline
+        >
           {selectedQr && (
             <Box>
               <Typography variant="h6" gutterBottom>
                 QR Code Details
               </Typography>
-              <Box mb={2}>
+              <Box mb={3} display="flex" justifyContent="center">
                 <QRCode value={selectedQr.qr_code} size={200} />
               </Box>
-              <Typography variant="body1"><strong>ID:</strong> {selectedQr.id}</Typography>
-              <Typography variant="body1"><strong>Payment Reference:</strong> {selectedQr.payment_reference}</Typography>
-              <Typography variant="body1"><strong>Amount:</strong> {selectedQr.amount}</Typography>
-              <Typography variant="body1"><strong>Status:</strong> {selectedQr.status}</Typography>
-              <Typography variant="body1"><strong>Description:</strong> {selectedQr.description}</Typography>
-              <Typography variant="body1"><strong>Created At:</strong> {selectedQr.created_at}</Typography>
-               <Typography variant="body1"><strong>Updated At:</strong> {selectedQr.updated_at}</Typography>
-              <Button variant="contained" color="primary" onClick={handleCloseView}>
-                Close
-              </Button>
+              <Box mb={2}>
+                <Typography variant="body1" gutterBottom>
+                  <strong>ID:</strong> {selectedQr.id}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Payment Reference:</strong> {selectedQr.payment_reference}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Amount:</strong> {selectedQr.amount}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Status:</strong> {selectedQr.status}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  gutterBottom
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    backgroundColor: '#f5f5f5',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: '1px solid #ddd',
+                  }}
+                >
+                  <strong>Description:</strong> {selectedQr.description}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Created At:</strong> {selectedQr.created_at}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Updated At:</strong> {selectedQr.updated_at}
+                </Typography>
+                <Box mt={2} display="flex" justifyContent="flex-end">
+                  <Button variant="contained" color="primary" onClick={handleCloseView}>
+                    Close
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           )}
         </Box>
       </Modal>
+
     </Container>
   );
 };

@@ -2,16 +2,28 @@ import React, { useState, useEffect } from 'react';
 import '../css/login.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import logo from '../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
 import LoginButton from '../Mui/LoginButton';
 import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Login = () => {
     const [values, setValues] = useState({ email: '', password: '' });
     const [error, setError] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,6 +48,7 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true); // Start loading
 
         try {
             const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, values);
@@ -48,6 +61,9 @@ const Login = () => {
                 localStorage.setItem("expirationTime", expirationTime);
 
                 setIsLoggedIn(true);
+                setSnackbarMessage('Login successful!');
+                setSnackbarSeverity('success');
+                setSnackbarOpen(true);
 
                 // Redirect based on user type
                 if (decodedToken.userType === 'admin') {
@@ -59,10 +75,18 @@ const Login = () => {
                 }
             } else {
                 setError(result.data.error || 'Login failed');
+                setSnackbarMessage(result.data.error || 'Login failed');
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
             }
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.error || 'Login failed');
+            setSnackbarMessage(err.response?.data?.error || 'Login failed');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -124,20 +148,27 @@ const Login = () => {
                                     <input type="checkbox" className="form-check-input" id="rememberMe" />
                                     <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
                                 </div>
-                                <LoginButton
-                                    type="submit"
-                                    fullWidth
-                                    sx={{ mt: 2 }}
-                                    className="login-button"
-                                >
-                                    SIGN IN
-                                </LoginButton>
+                                <Box sx={{ position: 'relative', mt: 2 }}>
+                                    <LoginButton
+                                        type="submit"
+                                        fullWidth
+                                        disabled={loading}
+                                        className="login-button"
+                                    >
+                                        {loading ? <CircularProgress size={24} /> : 'SIGN IN'}
+                                    </LoginButton>
+                                </Box>
                             </form>
                             {error && <div className="error">{error}</div>}
                         </div>
                     )}
                 </div>
             </div>
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={() => setSnackbarOpen(false)}>
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

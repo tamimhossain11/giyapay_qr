@@ -40,28 +40,38 @@ const EditUser = () => {
   }, [id]);
 
   const handleUpdate = async () => {
-  try {
-    // Only validate the branch if the branch has been changed
-    if (user.user_type === "Branch User" && selectedBranch !== user.branch_id) {
-      const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
-      if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
-        setError("This branch is already assigned to another user");
-        return;
+    try {
+      if (user.user_type === "Branch User" && selectedBranch !== user.branch_id) {
+        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
+        if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
+          setError("This branch is already assigned to another user");
+          return;
+        }
       }
+  
+      // Build the updated user object
+      const updatedUser = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username,
+        email: user.email,
+        user_type: user.user_type,
+        branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
+        status: user.status,
+      };
+  
+      // Only include the password if the user explicitly updated it
+      if (newPassword && newPassword.trim()) {
+        updatedUser.password = newPassword;
+      }
+  
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
+      navigate('/super-dashboard/manage-users');
+    } catch (error) {
+      console.error('Failed to update user:', error);
     }
-
-    const updatedUser = {
-      ...user,
-      branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
-      ...(newPassword && { password: newPassword }), // Include password only if it's filled
-    };
-
-    await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
-    navigate('/super-dashboard/manage-users');
-  } catch (error) {
-    console.error('Failed to update user:', error);
-  }
-};
+  };
+  
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-users');

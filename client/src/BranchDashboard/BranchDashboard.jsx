@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -9,12 +9,13 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
 } from "@mui/material";
-import {
-  AccountCircle,
-  Menu as MenuIcon,
-  Close as CloseIcon,
-} from "@mui/icons-material";
+import { AccountCircle, Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import axios from "axios";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../css/dashboard.css";
@@ -23,9 +24,21 @@ const BranchDashboard = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false); // For controlling modal visibility
   const isMenuOpen = Boolean(anchorEl);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expirationTime = localStorage.getItem("expirationTime");
+
+    const currentTime = Date.now();
+    if (expirationTime && currentTime >= expirationTime) {
+      // Token is expired, show modal and log out
+      setSessionExpired(true);  // Show session timeout modal
+    } else if (!token) {
+      navigate("/"); // No token, redirect to login
+    }
+  }, [navigate]);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -39,7 +52,7 @@ const BranchDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${backendUrl}/auth/logout`,
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
         {},
         {
           headers: {
@@ -48,16 +61,23 @@ const BranchDashboard = () => {
         }
       );
 
+      // Clear local storage
       localStorage.removeItem("token");
-      localStorage.removeItem("userType");
-      localStorage.removeItem("valid");
+      localStorage.removeItem("expirationTime");
 
-      console.log("Logout successful");
-      navigate("/"); // Redirect to the login page after logout
+      navigate("/"); // Redirect to login page
     } catch (error) {
       console.error("Error during logout:", error);
     }
     handleMenuClose();
+  };
+
+  const fallbackLogout = () => {
+    // Clear session details regardless of token state
+    localStorage.removeItem("token");
+    localStorage.removeItem("expirationTime");
+
+    navigate("/"); // Redirect to login
   };
 
   const handleProfileView = () => {
@@ -69,8 +89,19 @@ const BranchDashboard = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleRouteClick = (route) => {
+    const expirationTime = localStorage.getItem("expirationTime");
+    const currentTime = Date.now();
+
+    if (currentTime >= expirationTime) {
+      handleLogout(); // Log out if expired
+    } else {
+      navigate(route); // Navigate to route
+    }
+  };
+
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${sessionExpired ? 'blurred-background' : ''}`}>
       <header className="dashboard-header">
         <div className="header-content">
           <IconButton
@@ -90,8 +121,8 @@ const BranchDashboard = () => {
           </Link>
 
           <nav className="nav-links">
-            <Link to="/branch-dashboard/manage-qr">Manage Qr</Link>
-            <Link to="/branch-dashboard/add-qr">Add Qr</Link>
+            <Link to="/branch-dashboard/manage-qr" onClick={() => handleRouteClick("/branch-dashboard/manage-qr")}> Manage Qr</Link>
+            <Link to="/branch-dashboard/add-qr" onClick={() => handleRouteClick("/branch-dashboard/add-qr")}>Add Qr</Link>
           </nav>
 
           <IconButton
@@ -101,6 +132,7 @@ const BranchDashboard = () => {
             aria-haspopup="true"
             onClick={handleProfileMenuOpen}
             color="inherit"
+            className="profile-icon"
             sx={{ display: { xs: "none", md: "flex" } }}
           >
             <AccountCircle fontSize="large" />
@@ -120,7 +152,6 @@ const BranchDashboard = () => {
           </Menu>
         </div>
       </header>
-
       <Drawer
         anchor="top"
         open={mobileOpen}
@@ -137,59 +168,53 @@ const BranchDashboard = () => {
         }}
       >
         <IconButton
-          edge="end"
+          edge="start"  // Changed from "end" to "start" to position the icon on the left
           aria-label="close drawer"
           onClick={handleDrawerToggle}
           className="drawer-close-icon"
+          sx={{ alignSelf: "flex-start" }}  // Style to ensure the icon is aligned to the left
         >
           <CloseIcon />
         </IconButton>
         <Divider />
         <List>
-          <ListItem
-            button
-            component={Link}
-            to="/branch-dashboard/manage-qr"
-            onClick={handleDrawerToggle}
-            className="drawer-menu-item"
-          >
-            <ListItemText primary="Manage Qr" />
+          <ListItem button onClick={() => { handleRouteClick("/branch-dashboard/manage-qr"); handleDrawerToggle(); }}>
+            <ListItemText primary="Manage QR" />
           </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/branch-dashboard/add-qr"
-            onClick={handleDrawerToggle}
-            className="drawer-menu-item"
-          >
+          <ListItem button onClick={() => { handleRouteClick("/branch-dashboard/add-qr"); handleDrawerToggle(); }}>
             <ListItemText primary="Add Qr" />
           </ListItem>
-          <ListItem
-            button
-            onClick={() => {
-              handleProfileView();
-              handleDrawerToggle();
-            }}
-            className="drawer-menu-item"
-          >
+          <ListItem button onClick={() => { handleProfileView(); handleDrawerToggle(); }}>
             <ListItemText primary="View Profile" />
           </ListItem>
-          <ListItem
-            button
-            onClick={() => {
-              handleLogout();
-              handleDrawerToggle();
-            }}
-            className="drawer-menu-item"
-          >
+          <ListItem button onClick={() => { handleLogout(); handleDrawerToggle(); }}>
             <ListItemText primary="Logout" />
           </ListItem>
         </List>
       </Drawer>
 
-      <main className="dashboard-content">
+
+      {/* Session Timeout Modal */}
+      <Dialog
+        open={sessionExpired}
+        onClose={fallbackLogout}
+        aria-labelledby="session-timeout-dialog"
+        className="modal-overlay"
+      >
+        <DialogTitle id="session-timeout-dialog">Session Expired</DialogTitle>
+        <DialogContent>
+          Your session has expired. Please log in again.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={fallbackLogout} color="primary" variant="contained">
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <div className="dashboard-content">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 };

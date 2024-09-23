@@ -55,6 +55,25 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* This class will apply the blur to the background */
+.blurred-background {
+  filter: blur(8px);
+  pointer-events: none; /* Disable interaction with the blurred background */
+  transition: filter 0.3s ease;
+}
+
+/* Ensures the modal is unaffected by the blur */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.5); /* Add an overlay behind the modal */
+}
+
+
 /* Media queries for responsive design */
 @media (max-width: 900px) {
   .nav-links {

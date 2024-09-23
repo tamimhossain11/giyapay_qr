@@ -2,40 +2,35 @@ import jwt from 'jsonwebtoken';
 import BlacklistedToken from '../model/blacklistedTokenModel.js';
 
 export const authenticateToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.sendStatus(401);
-
-  try {
-    const blacklisted = await BlacklistedToken.findOne({ where: { token } });
-    if (blacklisted) {
-      console.error('Token is blacklisted');
-      return res.sendStatus(403);
+    if (!token) {
+        return res.status(401).json({ error: 'Token is missing' });
     }
 
-    const secretKey = process.env.JWT_SECRET;
-    if (!secretKey) {
-      console.error('JWT secret key is not defined in environment variables');
-      return res.sendStatus(500);
-    }
-
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        if (err.name === 'TokenExpiredError') {
-          console.warn('Token has expired');
-          return res.sendStatus(401);
-        } else {
-          console.error('Error verifying token:', err);
-          return res.sendStatus(403);
+    try {
+        // Check if the token is blacklisted (for logout functionality)
+        const isBlacklisted = await BlacklistedToken.findOne({ where: { token } });
+        if (isBlacklisted) {
+            return res.status(403).json({ error: 'Token has been blacklisted' });
         }
-      }
-      req.user = user;
-      req.token = token;
-      next();
-    });
-  } catch (error) {
-    console.error('Error verifying token:', error);
-    res.sendStatus(500);
-  }
+
+        // Verify token and check expiration
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+            if (err) {
+                if (err.name === 'TokenExpiredError') {
+                    return res.status(401).json({ error: 'Token expired' });
+                }
+                return res.status(403).json({ error: 'Invalid token' });
+            }
+
+            req.user = user;
+            req.token = token;
+            next();
+        });
+    } catch (error) {
+        console.error('Token authentication error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };

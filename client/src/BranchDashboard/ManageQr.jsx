@@ -182,9 +182,15 @@ const ManageQr = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      const userResponse = await axios.get(`${backendUrl}/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserType(localStorage.getItem('userType'));
+
       const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
         ...qr,
         user_name: qr.user ? qr.user.username : 'Unknown User',
@@ -192,8 +198,18 @@ const ManageQr = () => {
         created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
         updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
       }));
-      setQrCodes(formattedQrCodes);
-      setFilteredQrCodes(formattedQrCodes);
+
+      // Filter QR codes based on user type
+      if (userResponse.data.branch_id) {
+        const filteredQrCodes = formattedQrCodes.filter(
+          (qr) => qr.branch_id === userResponse.data.branch_id
+        );
+        setQrCodes(filteredQrCodes);
+        setFilteredQrCodes(filteredQrCodes);
+      } else {
+        setQrCodes(formattedQrCodes);
+        setFilteredQrCodes(formattedQrCodes);
+      }
     } catch (error) {
       console.error('Error refreshing QR codes:', error);
     } finally {
@@ -309,15 +325,15 @@ const ManageQr = () => {
                   Export to CSV
                 </Button>
               </CSVLink>
-              <Tooltip title="Get Latest Data">
-                <IconButton color="primary" onClick={handleRefresh}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
             </Box>
           </Box>
         )}
         <TableContainer component={Paper}>
+          <Tooltip title="Get Latest Data">
+            <IconButton color="primary" onClick={handleRefresh}>
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
           <Table>
             <TableHead>
               <TableRow>

@@ -129,7 +129,6 @@ export const updateUser = async (req, res) => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      console.log(`User with ID ${userId} not found`);
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -142,14 +141,7 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // If password is provided, hash it before saving
-    let hashedPassword;
-    if (password) {
-      const saltRounds = 10; // Number of hashing rounds
-      hashedPassword = await bcrypt.hash(password, saltRounds);
-    }
-
-    // Update only provided fields
+    // Only update fields that are provided in the request body
     const updatedFields = {
       ...(first_name && { first_name }),
       ...(last_name && { last_name }),
@@ -157,18 +149,28 @@ export const updateUser = async (req, res) => {
       ...(email && { email }),
       ...(user_type && { user_type }),
       ...(branch_id !== undefined && { branch_id }),
-      ...(status !== undefined && { status }), // Include status only if it's defined
-      ...(hashedPassword && { password: hashedPassword }), // Include hashed password if provided
+      ...(status !== undefined && { status }),
     };
+
+    // Password should only be updated if it's provided and non-empty
+    if (password && password.trim() !== '') {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      updatedFields.password = hashedPassword;
+    }
 
     await user.update(updatedFields);
 
-    res.status(200).json({ message: 'User updated successfully' });
+    res.status(200).json({ message: 'User updated successfully', user });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ error: 'An error occurred while updating the user' });
   }
 };
+
+
+
+
 // Controller function to get a single user
 export const getSingleUser = async (req, res) => {
   try {

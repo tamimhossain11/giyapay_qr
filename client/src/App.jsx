@@ -23,16 +23,29 @@ import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
 function App() {
     useEffect(() => {
         const token = localStorage.getItem('token');
-        const expirationTime = localStorage.getItem('expirationTime');
-
-        if (token && expirationTime && Date.now() >= parseInt(expirationTime, 10)) {
-            // Token has expired
-            localStorage.removeItem('token');
-            localStorage.removeItem('userType');
-            localStorage.removeItem('expirationTime');
-            window.location.href = '/'; // Redirect to login
+    
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+    
+                // Check if the token has expired
+                if (Date.now() >= decodedToken.exp * 1000) {
+                    // Token has expired, clear storage and redirect
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('expirationTime');
+                    window.location.href = '/'; // Redirect to login
+                }
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                // Invalidate session on token decoding error
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('expirationTime');
+                window.location.href = '/'; // Redirect to login
+            }
         }
-    }, []);
+    }, []);    
 
     return (
         <BrowserRouter>

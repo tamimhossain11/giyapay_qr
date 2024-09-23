@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({
             id: user.id,
             userType: user.user_type || 'admin',
-        }, JWT_SECRET, { expiresIn: '1h' });
+        }, JWT_SECRET, { expiresIn: '30m' });
 
         res.json({
             token,
@@ -60,20 +60,22 @@ router.post('/login', async (req, res) => {
 
 
 // Logout route
-router.post('/logout', authenticateToken, async (req, res) => {
-    const token = req.token;
+router.post('/logout', async (req, res) => {
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
 
     if (!token) {
         return res.status(400).json({ error: 'Token is required' });
     }
 
     try {
+        // Decode the token without verification (use jwt.decode instead of jwt.verify)
         const decoded = jwt.decode(token);
-        const expirationDate = decoded && new Date(decoded.exp * 1000);
+        const expirationDate = decoded ? new Date(decoded.exp * 1000) : new Date();
 
+        // Blacklist the token
         await BlacklistedToken.create({
             token,
-            expirationDate: expirationDate || new Date()
+            expirationDate
         });
 
         console.log('Logout successful');

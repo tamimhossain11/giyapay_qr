@@ -121,8 +121,8 @@ const getQrCodeById = async (req, res) => {
     const { id } = req.params;
 
     // Add default conditions or empty objects if no conditions are passed
-    const userConditions = {}; // Apply user conditions if needed
-    const branchConditions = {}; // Apply branch conditions if needed
+    const userConditions = {}; 
+    const branchConditions = {};
 
     const qrCode = await QrCode.findByPk(id, {
       include: [
@@ -130,15 +130,15 @@ const getQrCodeById = async (req, res) => {
           model: User,
           as: 'user',
           attributes: ['username'],
-          where: Object.keys(userConditions).length > 0 ? userConditions : undefined, // Apply user filter if provided
-          required: false // Ensure that the association is optional and will not block the result
+          where: Object.keys(userConditions).length > 0 ? userConditions : undefined,
+          required: false 
         },
         {
           model: Branch,
           as: 'branch',
           attributes: ['branch_name'],
-          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, // Apply branch filter if provided
-          required: false // Ensure the association is optional
+          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined,
+          required: false 
         },
       ],
     });
@@ -201,22 +201,22 @@ const getFilteredQrCodes = async (req, res) => {
 
     // Fetch all QR codes, including associated User and Branch data
     const qrCodes = await QrCode.findAll({
-      where: whereConditions, // General conditions for QrCode
+      where: whereConditions, 
       include: [
         {
           model: User,
           as: 'user',
           attributes: ['username'],
-          where: Object.keys(userConditions).length > 0 ? userConditions : undefined, // Apply user filter if provided
+          where: Object.keys(userConditions).length > 0 ? userConditions : undefined, 
         },
         {
           model: Branch,
           as: 'branch',
-          attributes: ['branch_name'], // Always include branch_name, even if no filter is applied
-          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, // Apply branch filter if provided
+          attributes: ['branch_name'], 
+          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined, 
         },
       ],
-      attributes: ['createdAt', 'updatedAt', 'amount', 'payment_reference', 'status', 'description','qr_code', 'id'], // Fields from QrCode
+      attributes: ['createdAt', 'updatedAt', 'amount', 'payment_reference', 'status', 'description','qr_code', 'id'], 
     });
 
     // Send the data back as JSON

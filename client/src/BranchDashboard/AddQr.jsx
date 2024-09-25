@@ -146,7 +146,7 @@ const AddQr = () => {
   };
 
   const isValidInvoiceNumber = (invoice_number) => {
-    const regex = /^[a-zA-Z0-9]+$/; // Only letters and numbers
+    const regex = /^[a-zA-Z0-9]+$/; 
     return regex.test(invoice_number);
   };
 
@@ -158,7 +158,7 @@ const AddQr = () => {
     
     try {
       const response = await axios.get(url);
-      return response.data.status; // Backend should return { status: true/false }
+      return response.data.status; 
     } catch (error) {
       console.error('Error checking invoice number:', error.response ? error.response.data : error.message);
       return false;

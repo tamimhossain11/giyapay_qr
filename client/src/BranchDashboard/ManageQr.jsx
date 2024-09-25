@@ -99,7 +99,7 @@ const ManageQr = () => {
           branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
           created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
           updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
-          qr_code: qr.qr_code,  // Keep qr_code after filtering
+          qr_code: qr.qr_code,
         }));
 
         setFilteredQrCodes(formattedQrCodes);
@@ -310,7 +310,7 @@ const ManageQr = () => {
                   setBranchFilter('');
                   setUserFilter('');
                   setDateFilter({ startDate: '', endDate: '' });
-                  setPage(0); // Reset page to 0 when clearing filters
+                  setPage(0);
                 }}
               >
                 Clear Filters
@@ -395,7 +395,7 @@ const ManageQr = () => {
           maxWidth="600px"
           mx="auto"
           mt={4}
-          style={{ outline: 'none' }} // Remove default outline
+          style={{ outline: 'none' }}
         >
           {selectedQr && (
             <Box>

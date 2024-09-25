@@ -7,12 +7,12 @@ import { FaUser, FaQrcode, FaBuilding } from 'react-icons/fa';
 const OverView = () => {
   const [adminTotal, setAdminTotal] = useState(0);
   const [qrTotal, setQrTotal] = useState(0);
-  const [branchTotal, setBranchTotal] = useState(0); // State for branch count
+  const [branchTotal, setBranchTotal] = useState(0); 
 
   useEffect(() => {
     adminCount();
     qrCount();
-    branchCount(); // Fetch branch count
+    branchCount();
   }, []);
 
   const adminCount = async () => {

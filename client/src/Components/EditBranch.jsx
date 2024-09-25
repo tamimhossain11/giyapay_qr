@@ -34,14 +34,14 @@ const EditBranch = () => {
         bank_name: bankName,
         bank_branch: bankBranch,
       });
-      navigate('/super-dashboard/manage-branches'); // Navigate after successful edit
+      navigate('/super-dashboard/manage-branches');
     } catch (error) {
       console.error('Failed to update branch:', error);
     }
   };
 
   const handleCancel = () => {
-    navigate('/super-dashboard/manage-branches'); // Navigate to manage branches on cancel
+    navigate('/super-dashboard/manage-branches');
   };
 
   return (

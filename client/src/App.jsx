@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
-
+import { jwtDecode } from 'jwt-decode';
 import Login from './Components/Login';
 import SuperDashboard from './superDashboard/SuperDashboard';
 import OverView from './MultiUserPages/OverView';
@@ -19,33 +18,31 @@ import EditUser from './Components/EditUser';
 import EditBranch from './Components/EditBranch';
 import CallbackResponsePage from './ClientPages/CallbackResponsePage';
 import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
+import NotFound from './Components/NotFound';
 
 function App() {
     useEffect(() => {
         const token = localStorage.getItem('token');
-    
+
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-    
-                // Check if the token has expired
                 if (Date.now() >= decodedToken.exp * 1000) {
-                    // Token has expired, clear storage and redirect
                     localStorage.removeItem('token');
                     localStorage.removeItem('userType');
                     localStorage.removeItem('expirationTime');
-                    window.location.href = '/'; // Redirect to login
+                    window.location.href = '/';
                 }
             } catch (error) {
                 console.error('Error decoding token:', error);
-                // Invalidate session on token decoding error
+
                 localStorage.removeItem('token');
                 localStorage.removeItem('userType');
                 localStorage.removeItem('expirationTime');
-                window.location.href = '/'; // Redirect to login
+                window.location.href = '/';
             }
         }
-    }, []);    
+    }, []);
 
     return (
         <BrowserRouter>
@@ -104,8 +101,8 @@ function App() {
                     <Route path="profile" element={<ProfilePage />} />
                 </Route>
 
-                {/* Fallback route */}
-                <Route path="*" element={<Navigate to="/" />} />
+                {/* 404 route */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );

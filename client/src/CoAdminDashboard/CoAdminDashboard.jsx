@@ -24,7 +24,7 @@ const CoAdminDashboard = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false); // For controlling modal visibility
+  const [sessionExpired, setSessionExpired] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
@@ -33,10 +33,9 @@ const CoAdminDashboard = () => {
 
     const currentTime = Date.now();
     if (expirationTime && currentTime >= expirationTime) {
-      // Token is expired, show modal and log out
-      setSessionExpired(true);  // Show session timeout modal
+      setSessionExpired(true);
     } else if (!token) {
-      navigate("/"); // No token, redirect to login
+      navigate("/");
     }
   }, [navigate]);
 
@@ -61,11 +60,10 @@ const CoAdminDashboard = () => {
         }
       );
 
-      // Clear local storage
       localStorage.removeItem("token");
       localStorage.removeItem("expirationTime");
 
-      navigate("/"); // Redirect to login page
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -73,11 +71,11 @@ const CoAdminDashboard = () => {
   };
 
   const fallbackLogout = () => {
-    // Clear session details regardless of token state
+
     localStorage.removeItem("token");
     localStorage.removeItem("expirationTime");
 
-    navigate("/"); // Redirect to login
+    navigate("/");
   };
 
   const handleProfileView = () => {
@@ -94,9 +92,9 @@ const CoAdminDashboard = () => {
     const currentTime = Date.now();
 
     if (currentTime >= expirationTime) {
-      handleLogout(); // Log out if expired
+      handleLogout();
     } else {
-      navigate(route); // Navigate to route
+      navigate(route);
     }
   };
 
@@ -121,7 +119,7 @@ const CoAdminDashboard = () => {
           </Link>
 
           <nav className="nav-links">
-          <Link to="/co-admin-dashboard" onClick={() => handleRouteClick("/co-admin-dashboard")}>Dashboard</Link>
+            <Link to="/co-admin-dashboard" onClick={() => handleRouteClick("/co-admin-dashboard")}>Dashboard</Link>
             <Link to="/co-admin-dashboard/manage-qr" onClick={() => handleRouteClick("/co-admin-dashboard/manage-qr")}> Manage Qr</Link>
           </nav>
 
@@ -168,17 +166,17 @@ const CoAdminDashboard = () => {
         }}
       >
         <IconButton
-          edge="start"  // Changed from "end" to "start" to position the icon on the left
+          edge="start"
           aria-label="close drawer"
           onClick={handleDrawerToggle}
           className="drawer-close-icon"
-          sx={{ alignSelf: "flex-start" }}  // Style to ensure the icon is aligned to the left
+          sx={{ alignSelf: "flex-start" }}
         >
           <CloseIcon />
         </IconButton>
         <Divider />
         <List>
-        <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard"); handleDrawerToggle(); }}>
+          <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard"); handleDrawerToggle(); }}>
             <ListItemText primary="Dashboard" />
           </ListItem>
           <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard/manage-qr"); handleDrawerToggle(); }}>

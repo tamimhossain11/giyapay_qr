@@ -11,9 +11,9 @@ const EditUser = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [error, setError] = useState('');
-  const [newPassword, setNewPassword] = useState(''); // Store new password
-  const [showPasswordField, setShowPasswordField] = useState(false); // Control visibility of password field
-  const [showPassword, setShowPassword] = useState(false); // Control password visibility
+  const [newPassword, setNewPassword] = useState(''); 
+  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,7 +56,7 @@ const EditUser = () => {
         username: user.username,
         email: user.email,
         user_type: user.user_type,
-        branch_id: user.user_type === "Branch User" ? selectedBranch : null, // Only assign branch if it's a Branch User
+        branch_id: user.user_type === "Branch User" ? selectedBranch : null, 
         status: user.status,
       };
   

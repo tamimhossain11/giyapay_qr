@@ -15,7 +15,7 @@ const {
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     host: DB_HOST,
-    port: parseInt(DB_PORT, 10), // Ensure the port is an integer
+    port: parseInt(DB_PORT, 10), 
     dialect: DB_DIALECT,
     logging: false,
 });

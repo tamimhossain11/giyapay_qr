@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const ManageBranches = () => {
   const [branches, setBranches] = useState([]);
-  const [loading, setLoading] = useState(true);  // Add loading state
+  const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState(null);
   const isTabletOrMobile = useMediaQuery('(max-width: 900px)');
@@ -20,7 +20,7 @@ const ManageBranches = () => {
       } catch (error) {
         console.error('Failed to fetch branches:', error);
       } finally {
-        setLoading(false);  // Stop loading after data is fetched
+        setLoading(false);
       }
     };
 
@@ -78,7 +78,7 @@ const ManageBranches = () => {
               <Table size={isTabletOrMobile ? 'small' : 'medium'}>
                 <TableHead>
                   <TableRow>
-                  <TableCell>ID</TableCell>
+                    <TableCell>ID</TableCell>
                     <TableCell>Branch Name</TableCell>
                     <TableCell>Bank Name</TableCell>
                     <TableCell>Bank Branch</TableCell>
@@ -88,7 +88,7 @@ const ManageBranches = () => {
                 <TableBody>
                   {branches.map((branch) => (
                     <TableRow key={branch.id}>
-                    <TableCell>{branch.id}</TableCell>
+                      <TableCell>{branch.id}</TableCell>
                       <TableCell>{branch.branch_name}</TableCell>
                       <TableCell>{branch.bank_name}</TableCell>
                       <TableCell>{branch.bank_branch}</TableCell>

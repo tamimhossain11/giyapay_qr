@@ -242,7 +242,7 @@ export const checkBranchAssignment = async (req, res) => {
     if (user) {
       return res.status(200).json(user);
     } else {
-      return res.status(200).json(null); // No user is assigned to this branch
+      return res.status(200).json(null); 
     }
   } catch (error) {
     console.error('Error checking branch assignment:', error);

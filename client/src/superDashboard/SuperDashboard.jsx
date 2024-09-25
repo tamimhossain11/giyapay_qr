@@ -24,7 +24,7 @@ const SuperDashboard = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false); // For controlling modal visibility
+  const [sessionExpired, setSessionExpired] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
@@ -33,10 +33,9 @@ const SuperDashboard = () => {
 
     const currentTime = Date.now();
     if (expirationTime && currentTime >= expirationTime) {
-      // Token is expired, show modal and log out
-      setSessionExpired(true);  // Show session timeout modal
+      setSessionExpired(true);
     } else if (!token) {
-      navigate("/"); // No token, redirect to login
+      navigate("/");
     }
   }, [navigate]);
 
@@ -65,7 +64,7 @@ const SuperDashboard = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("expirationTime");
 
-      navigate("/"); // Redirect to login page
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -73,11 +72,11 @@ const SuperDashboard = () => {
   };
 
   const fallbackLogout = () => {
-    // Clear session details regardless of token state
+
     localStorage.removeItem("token");
     localStorage.removeItem("expirationTime");
 
-    navigate("/"); // Redirect to login
+    navigate("/");
   };
 
   const handleProfileView = () => {
@@ -94,9 +93,9 @@ const SuperDashboard = () => {
     const currentTime = Date.now();
 
     if (currentTime >= expirationTime) {
-      handleLogout(); // Log out if expired
+      handleLogout();
     } else {
-      navigate(route); // Navigate to route
+      navigate(route);
     }
   };
 
@@ -174,11 +173,11 @@ const SuperDashboard = () => {
         }}
       >
         <IconButton
-          edge="start"  // Changed from "end" to "start" to position the icon on the left
+          edge="start"
           aria-label="close drawer"
           onClick={handleDrawerToggle}
           className="drawer-close-icon"
-          sx={{ alignSelf: "flex-start" }}  // Style to ensure the icon is aligned to the left
+          sx={{ alignSelf: "flex-start" }}
         >
           <CloseIcon />
         </IconButton>

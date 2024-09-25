@@ -13,7 +13,7 @@ const CallbackResponsePage = () => {
     const params = new URLSearchParams(location.search);
     const nonce = params.get('nonce');
     const refno = params.get('refno');
-    const amountInCents = params.get('amount'); // Assuming amount is in cents
+    const amountInCents = params.get('amount');
     const signature = params.get('signature');
     const invoice_number = params.get('invoice_number');
     const error = params.get('error');
@@ -21,18 +21,18 @@ const CallbackResponsePage = () => {
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
     } else if (nonce && refno && amountInCents && signature && invoice_number) {
-      const amount = (parseFloat(amountInCents) / 100).toFixed(2); // Convert to decimal format
+      const amount = (parseFloat(amountInCents) / 100).toFixed(2);
 
       axios
         .post(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/callback/${callbackType}`, {
           nonce,
           refno,
-          amount, // Send the formatted amount to the backend
+          amount,
           signature,
           invoice_number,
         })
         .then((response) => {
-          setTransactionDetails({ amount, refno }); // Save the formatted amount and reference number
+          setTransactionDetails({ amount, refno });
         })
         .catch((error) => {
           console.error('Error saving transaction:', error.response ? error.response.data : error.message);

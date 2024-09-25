@@ -23,7 +23,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,14 +41,14 @@ const Login = () => {
             if (token && expirationTime && Date.now() >= expirationTime) {
                 handleLogout();
             }
-        }, 60000); // Check every minute
+        }, 60000);
 
         return () => clearInterval(checkTokenExpiration);
     }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setLoading(true); // Start loading
+        setLoading(true); 
 
         try {
             const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, values);
@@ -86,7 +86,7 @@ const Login = () => {
             setSnackbarSeverity('error');
             setSnackbarOpen(true);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
     };
 
@@ -155,8 +155,9 @@ const Login = () => {
                                         disabled={loading}
                                         className="login-button"
                                     >
-                                        {loading ? <CircularProgress size={24} /> : 'SIGN IN'}
+                                        {loading ? <CircularProgress size={24} color="inherit" /> : 'SIGN IN'}
                                     </LoginButton>
+
                                 </Box>
                             </form>
                             {error && <div className="error">{error}</div>}

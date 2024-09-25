@@ -57,12 +57,11 @@ const CreateBranch = () => {
     }
   
     try {
-      // Proceed with branch creation if validations pass
       const branchData = {
         branchName,
         bankName,
         bankBranch,
-        branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null, // Save branchUserId only if valid user is selected
+        branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null, 
       };
   
       if (id) {
@@ -80,7 +79,7 @@ const CreateBranch = () => {
   
 
   const handleCancel = () => {
-    navigate('/super-dashboard/manage-branches'); // Navigate to manage branches or another page
+    navigate('/super-dashboard/manage-branches'); 
   };
 
   return (

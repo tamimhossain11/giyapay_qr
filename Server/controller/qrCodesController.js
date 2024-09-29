@@ -108,6 +108,14 @@ const handleCallback = async (req, res) => {
     await qrCode.update(updateData);
 
     console.log('QR Code updated successfully:', qrCode);
+
+    // Emit the update via Socket.IO
+    const io = req.app.get('socketio'); // Retrieve the Socket.IO instance from the app
+    // Emit the update via Socket.IO
+    io.emit('qr-code-updated', { qrCode });
+
+
+    // Respond with the updated QR code data
     res.status(200).json({ message: 'QR Code updated successfully', qrCode });
   } catch (error) {
     console.error('Error handling callback:', error);

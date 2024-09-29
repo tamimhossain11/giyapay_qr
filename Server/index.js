@@ -7,23 +7,29 @@ import userRoutes from './Routes/userRoutes.js';
 import adminRoutes from './Routes/adminRoutes.js';
 import branchesRoutes from './Routes/branchesRoutes.js';
 import BlacklistedToken from './model/blacklistedTokenModel.js';
-import qrCodesRoute from './Routes/qrCodesRoutes.js'
+import qrCodesRoute from './Routes/qrCodesRoutes.js';
 import bodyParser from 'body-parser';
 import http from 'http';
-import { Server } from 'socket.io'; 
+import { Server } from 'socket.io';
 
 const app = express();
-const server = http.createServer(app); 
-const io = new Server(server); 
+const server = http.createServer(app); // Bind HTTP server to Express
+const io = new Server(server, {
+  cors: {
+    origin: 'https://giyapay-qr.vercel.app', // Frontend address
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  }
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: 'https://giyapay-qr.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: 'https://giyapay-qr.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(express.json());
@@ -37,38 +43,37 @@ app.use('/api/qr-codes', qrCodesRoute);
 
 // Cleanup old blacklisted tokens
 const cleanUpBlacklistedTokens = async () => {
-    try {
-        const now = new Date();
-        await BlacklistedToken.destroy({
-            where: {
-                expirationDate: {
-                    [Sequelize.Op.lt]: now,
-                },
-            },
-        });
-        console.log('Old blacklisted tokens cleaned up successfully.');
-    } catch (error) {
-        console.error('Error cleaning up blacklisted tokens:', error);
-    }
+  try {
+    const now = new Date();
+    await BlacklistedToken.destroy({
+      where: {
+        expirationDate: {
+          [Sequelize.Op.lt]: now,
+        },
+      },
+    });
+    console.log('Old blacklisted tokens cleaned up successfully.');
+  } catch (error) {
+    console.error('Error cleaning up blacklisted tokens:', error);
+  }
 };
 
 setInterval(cleanUpBlacklistedTokens, 24 * 60 * 60 * 1000);
 
 // Socket.IO connection event
 io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+  console.log('A user connected:', socket.id);
 
-    // Store the io instance in app
-    app.set('socketio', io);
+  // Store the io instance in app
+  app.set('socketio', io);
 
-    // Handle disconnection
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 });
 
-
-//server listening
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Server listening
+server.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });

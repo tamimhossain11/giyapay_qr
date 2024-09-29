@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
+import { io } from 'socket.io-client';
 
 const ManageQr = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -32,49 +33,115 @@ const ManageQr = () => {
   });
   const [userType, setUserType] = useState('');
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  useEffect(() => {
-    const fetchQrCodes = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem('token');
-        const userResponse = await axios.get(`${backendUrl}/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUserType(localStorage.getItem('userType'));
+ // Initialize Socket.IO connection
+useEffect(() => {
+  const newSocket = io(backendUrl, {
+    auth: {
+      token: localStorage.getItem('token'),
+    },
+  });
 
-        const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  setSocket(newSocket);
 
-        const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
-          ...qr,
-          user_name: qr.user ? qr.user.username : 'Unknown User',
-          branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
-          created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
-          updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
-        }));
+  // Clean up the connection when the component unmounts
+  return () => {
+    if (newSocket) newSocket.disconnect();
+  };
+}, [backendUrl]);
 
-        if (userResponse.data.branch_id) {
-          const filteredQrCodes = formattedQrCodes.filter(
-            (qr) => qr.branch_id === userResponse.data.branch_id
-          );
-          setQrCodes(filteredQrCodes);
-          setFilteredQrCodes(filteredQrCodes);
-        } else {
-          setQrCodes(formattedQrCodes);
-          setFilteredQrCodes(formattedQrCodes);
-        }
-      } catch (error) {
-        console.error('Error fetching QR codes or user data:', error);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchQrCodes = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const userResponse = await axios.get(`${backendUrl}/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserType(localStorage.getItem('userType'));
+
+      const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
+        ...qr,
+        user_name: qr.user ? qr.user.username : 'Unknown User',
+        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+        created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
+        updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
+      }));
+
+      if (userResponse.data.branch_id) {
+        const filteredQrCodes = formattedQrCodes.filter(
+          (qr) => qr.branch_id === userResponse.data.branch_id
+        );
+        setQrCodes(filteredQrCodes);
+        setFilteredQrCodes(filteredQrCodes);
+      } else {
+        setQrCodes(formattedQrCodes);
+        setFilteredQrCodes(formattedQrCodes);
       }
-    };
-    fetchQrCodes();
-  }, [backendUrl]);
+    } catch (error) {
+      console.error('Error fetching QR codes or user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchQrCodes();
+
+  // Listen for QR code updates from the server
+  if (socket) {
+    socket.on('qr-code-updated', (data) => {
+      const newQrCode = data.qrCode; // Extract qrCode from the emitted data
+
+      setQrCodes((prevQrCodes) => {
+        const existingQr = prevQrCodes.find((qr) => qr.id === newQrCode.id);
+        if (existingQr) {
+          // If the QR code exists, update it
+          return prevQrCodes.map((qr) =>
+            qr.id === newQrCode.id ? { ...qr, ...newQrCode } : qr
+          );
+        } else {
+          // If the QR code does not exist, add it
+          return [...prevQrCodes, newQrCode];
+        }
+      });
+
+      setFilteredQrCodes((prevFiltered) => {
+        const existingFilteredQr = prevFiltered.find((qr) => qr.id === newQrCode.id);
+        if (existingFilteredQr) {
+          return prevFiltered.map((qr) =>
+            qr.id === newQrCode.id ? { ...qr, ...newQrCode } : qr
+          );
+        } else {
+          return [...prevFiltered, newQrCode];
+        }
+      });
+    });
+
+    socket.on('qr-code-deleted', (deletedQrCodeId) => {
+      setQrCodes((prevQrCodes) => prevQrCodes.filter((qr) => qr.id !== deletedQrCodeId));
+      setFilteredQrCodes((prevFiltered) =>
+        prevFiltered.filter((qr) => qr.id !== deletedQrCodeId)
+      );
+    });
+  }
+
+  // Cleanup event listeners on component unmount or socket change
+  return () => {
+    if (socket) {
+      socket.off('qr-code-updated');
+      socket.off('qr-code-deleted');
+    }
+  };
+}, [socket, backendUrl]);
+
+
 
   useEffect(() => {
     const fetchFilteredQrCodes = async () => {
@@ -175,48 +242,6 @@ const ManageQr = () => {
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
-
-  //refresh table
-
-  const handleRefresh = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const userResponse = await axios.get(`${backendUrl}/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUserType(localStorage.getItem('userType'));
-
-      const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
-        ...qr,
-        user_name: qr.user ? qr.user.username : 'Unknown User',
-        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
-        created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
-        updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
-      }));
-
-      // Filter QR codes based on user type
-      if (userResponse.data.branch_id) {
-        const filteredQrCodes = formattedQrCodes.filter(
-          (qr) => qr.branch_id === userResponse.data.branch_id
-        );
-        setQrCodes(filteredQrCodes);
-        setFilteredQrCodes(filteredQrCodes);
-      } else {
-        setQrCodes(formattedQrCodes);
-        setFilteredQrCodes(formattedQrCodes);
-      }
-    } catch (error) {
-      console.error('Error refreshing QR codes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
 
   return (
     <Container maxWidth={false} disableGutters>
@@ -329,11 +354,6 @@ const ManageQr = () => {
           </Box>
         )}
         <TableContainer component={Paper}>
-          <Tooltip title="Get Latest Data">
-            <IconButton color="primary" onClick={handleRefresh}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
           <Table>
             <TableHead>
               <TableRow>
@@ -349,8 +369,8 @@ const ManageQr = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr) => (
-                <TableRow key={qr.id}>
+              {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr, index) => (
+                <TableRow key={qr.id || `qr-${index}`}>
                   <TableCell>{qr.id}</TableCell>
                   <TableCell>
                     <QRCode value={qr.qr_code} size={50} />
@@ -373,7 +393,6 @@ const ManageQr = () => {
                 </TableRow>
               ))}
             </TableBody>
-
           </Table>
         </TableContainer>
         <TablePagination

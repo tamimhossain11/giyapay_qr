@@ -38,7 +38,7 @@ router.get('/count', async (req, res) => {
 
 // Callback
 const validateCallbackType = (req, res, next) => {
-    console.log('Validating callback type:', req.params.callbackType); // Debug log
+    console.log('Validating callback type:', req.params.callbackType); 
     const { callbackType } = req.params;
     const validTypes = ['success-callback', 'error-callback', 'cancel-callback'];
     if (!validTypes.includes(callbackType)) {
@@ -62,7 +62,7 @@ router.get('/filter', getFilteredQrCodes);
 
 router.get('/csv', async (req, res) => {
     try {
-      const qrCodes = await QrCode.findAll(); // Fetch the QR codes from your database
+      const qrCodes = await QrCode.findAll(); 
   
       const fields = ['reference_no', 'branch_name', 'username', 'createdAt'];
       const json2csvParser = new Parser({ fields });

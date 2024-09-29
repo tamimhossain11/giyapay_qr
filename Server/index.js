@@ -13,10 +13,10 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 const app = express();
-const server = http.createServer(app); // Bind HTTP server to Express
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://giyapay-qr.vercel.app', // Frontend address
+    origin: 'https://giyapay-qr.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   }

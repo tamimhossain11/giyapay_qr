@@ -109,13 +109,10 @@ const handleCallback = async (req, res) => {
 
     console.log('QR Code updated successfully:', qrCode);
 
-    // Emit the update via Socket.IO
-    const io = req.app.get('socketio'); // Retrieve the Socket.IO instance from the app
-    // Emit the update via Socket.IO
+    const io = req.app.get('socketio'); 
+
     io.emit('qr-code-updated', { qrCode });
 
-
-    // Respond with the updated QR code data
     res.status(200).json({ message: 'QR Code updated successfully', qrCode });
   } catch (error) {
     console.error('Error handling callback:', error);
@@ -176,7 +173,6 @@ const getFilteredQrCodes = async (req, res) => {
   const { searchTerm, branchFilter, userFilter, startDate, endDate } = req.query;
 
   try {
-    // Prepare general conditions for the main QrCode model
     const whereConditions = {
       ...(searchTerm && { payment_reference: { [Op.like]: `%${searchTerm}%` } }),
       ...(startDate && endDate && {
@@ -184,17 +180,15 @@ const getFilteredQrCodes = async (req, res) => {
       }),
     };
 
-    // Prepare optional user filter
+    
     const userConditions = {
       ...(userFilter && { username: { [Op.like]: `%${userFilter}%` } }),
     };
 
-    // Prepare optional branch filter
     const branchConditions = {
       ...(branchFilter && { branch_name: { [Op.like]: `%${branchFilter}%` } }),
     };
 
-    // Fetch all QR codes, including associated User and Branch data
     const qrCodes = await QrCode.findAll({
       where: whereConditions, 
       include: [
@@ -214,7 +208,6 @@ const getFilteredQrCodes = async (req, res) => {
       attributes: ['createdAt', 'updatedAt', 'amount', 'payment_reference', 'status', 'description','qr_code', 'id'], 
     });
 
-    // Send the data back as JSON
     res.status(200).json(qrCodes);
   } catch (error) {
     console.error('Error fetching QR codes: ', error);

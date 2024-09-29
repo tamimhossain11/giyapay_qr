@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl,
+  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -37,110 +37,117 @@ const ManageQr = () => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
- // Initialize Socket.IO connection
-useEffect(() => {
-  const newSocket = io(backendUrl, {
-    auth: {
-      token: localStorage.getItem('token'),
-    },
-  });
+  useEffect(() => {
+    const newSocket = io(backendUrl, {
+      auth: {
+        token: localStorage.getItem('token'),
+      },
+    });
 
-  setSocket(newSocket);
+    setSocket(newSocket);
 
-  // Clean up the connection when the component unmounts
-  return () => {
-    if (newSocket) newSocket.disconnect();
-  };
-}, [backendUrl]);
-
-useEffect(() => {
-  const fetchQrCodes = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const userResponse = await axios.get(`${backendUrl}/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUserType(localStorage.getItem('userType'));
-
-      const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
-        ...qr,
-        user_name: qr.user ? qr.user.username : 'Unknown User',
-        branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
-        created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
-        updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
-      }));
-
-      if (userResponse.data.branch_id) {
-        const filteredQrCodes = formattedQrCodes.filter(
-          (qr) => qr.branch_id === userResponse.data.branch_id
-        );
-        setQrCodes(filteredQrCodes);
-        setFilteredQrCodes(filteredQrCodes);
-      } else {
-        setQrCodes(formattedQrCodes);
-        setFilteredQrCodes(formattedQrCodes);
+    // Clean up the connection when the component unmounts
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
       }
-    } catch (error) {
-      console.error('Error fetching QR codes or user data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+  }, [backendUrl]);
 
-  fetchQrCodes();
+  useEffect(() => {
+    const fetchQrCodes = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const userResponse = await axios.get(`${backendUrl}/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserType(localStorage.getItem('userType'));
 
-  // Listen for QR code updates from the server
-  if (socket) {
-    socket.on('qr-code-updated', (data) => {
-      const newQrCode = data.qrCode; // Extract qrCode from the emitted data
+        const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setQrCodes((prevQrCodes) => {
-        const existingQr = prevQrCodes.find((qr) => qr.id === newQrCode.id);
-        if (existingQr) {
-          // If the QR code exists, update it
-          return prevQrCodes.map((qr) =>
-            qr.id === newQrCode.id ? { ...qr, ...newQrCode } : qr
+        const formattedQrCodes = qrCodeResponse.data.map((qr) => ({
+          ...qr,
+          user_name: qr.user ? qr.user.username : 'Unknown User',
+          branch_name: qr.branch ? qr.branch.branch_name : 'Unknown Branch',
+          created_at: qr.createdAt ? new Date(qr.createdAt).toLocaleString() : 'N/A',
+          updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
+        }));
+
+        if (userResponse.data.branch_id) {
+          const filteredQrCodes = formattedQrCodes.filter(
+            (qr) => qr.branch_id === userResponse.data.branch_id
           );
+          setQrCodes(filteredQrCodes);
+          setFilteredQrCodes(filteredQrCodes);
         } else {
-          // If the QR code does not exist, add it
-          return [...prevQrCodes, newQrCode];
+          setQrCodes(formattedQrCodes);
+          setFilteredQrCodes(formattedQrCodes);
         }
-      });
+      } catch (error) {
+        console.error('Error fetching QR codes or user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setFilteredQrCodes((prevFiltered) => {
-        const existingFilteredQr = prevFiltered.find((qr) => qr.id === newQrCode.id);
-        if (existingFilteredQr) {
-          return prevFiltered.map((qr) =>
-            qr.id === newQrCode.id ? { ...qr, ...newQrCode } : qr
-          );
-        } else {
-          return [...prevFiltered, newQrCode];
-        }
-      });
-    });
+    fetchQrCodes();
 
-    socket.on('qr-code-deleted', (deletedQrCodeId) => {
-      setQrCodes((prevQrCodes) => prevQrCodes.filter((qr) => qr.id !== deletedQrCodeId));
-      setFilteredQrCodes((prevFiltered) =>
-        prevFiltered.filter((qr) => qr.id !== deletedQrCodeId)
-      );
-    });
-  }
-
-  // Cleanup event listeners on component unmount or socket change
-  return () => {
+    // Listen for QR code updates from the server
     if (socket) {
-      socket.off('qr-code-updated');
-      socket.off('qr-code-deleted');
-    }
-  };
-}, [socket, backendUrl]);
+      socket.on('qr-code-updated', (data) => {
+        const newQrCode = data.qrCode;
+        const formattedQrCode = {
+          ...newQrCode,
+          created_at: newQrCode.createdAt ? new Date(newQrCode.createdAt).toLocaleString() : 'N/A',
+          updated_at: newQrCode.updatedAt ? new Date(newQrCode.updatedAt).toLocaleString() : 'N/A',
+        };
 
+        setQrCodes((prevQrCodes) => {
+          const existingQr = prevQrCodes.find((qr) => qr.id === formattedQrCode.id);
+          if (existingQr) {
+            // If the QR code exists, update it
+            return prevQrCodes.map((qr) =>
+              qr.id === formattedQrCode.id ? { ...qr, ...formattedQrCode } : qr
+            );
+          } else {
+            console.warn("Received QR code update for a non-existing entry:", newQrCode);
+            return prevQrCodes;
+          }
+        });
+
+        setFilteredQrCodes((prevFiltered) => {
+          const existingFilteredQr = prevFiltered.find((qr) => qr.id === formattedQrCode.id);
+          if (existingFilteredQr) {
+            return prevFiltered.map((qr) =>
+              qr.id === formattedQrCode.id ? { ...qr, ...formattedQrCode } : qr
+            );
+          } else {
+            return prevFiltered;
+          }
+        });
+      });
+
+      socket.on('qr-code-deleted', (deletedQrCodeId) => {
+        console.log("QR Code Deleted Event Received:", deletedQrCodeId);
+
+        setQrCodes((prevQrCodes) => prevQrCodes.filter((qr) => qr.id !== deletedQrCodeId));
+        setFilteredQrCodes((prevFiltered) =>
+          prevFiltered.filter((qr) => qr.id !== deletedQrCodeId)
+        );
+      });
+    }
+
+    // Cleanup event listeners on component unmount or socket change
+    return () => {
+      if (socket) {
+        socket.off('qr-code-updated');
+        socket.off('qr-code-deleted');
+      }
+    };
+  }, [socket, backendUrl]);
 
 
   useEffect(() => {
@@ -159,7 +166,6 @@ useEffect(() => {
 
         const data = Array.isArray(response.data) ? response.data : [];
 
-        // Ensure that after filtering, the qr_code field exists in the filtered data
         const formattedQrCodes = data.map((qr) => ({
           ...qr,
           user_name: qr.user ? qr.user.username : 'Unknown User',
@@ -240,7 +246,16 @@ useEffect(() => {
   ];
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (

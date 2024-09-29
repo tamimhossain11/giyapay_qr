@@ -10,7 +10,7 @@ const AddQr = () => {
     branch_name: '',
     invoice_number: '',
     amount: '',
-    user_name: '', // Added field for user name
+    user_name: '',
   });
   const [generatedQrCode, setGeneratedQrCode] = useState('');
   const [showFields, setShowFields] = useState(true);
@@ -30,20 +30,17 @@ const AddQr = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         const user = userResponse.data;
-  
-        // Log the user response to inspect the structure
-        console.log('User response:', user);
-  
+
         if (user && user.branch) {
           setFormData((prevData) => ({
             ...prevData,
             branch_name: user.branch.branch_name,
-            user_name: user.username, // Populate the user name
+            user_name: user.username,
           }));
-          setUserId(user.id); // Ensure user ID is set correctly
-          setBranchId(user.branch_id); // Ensure branch ID is set correctly
+          setUserId(user.id);
+          setBranchId(user.branch_id);
         } else {
           console.error('User does not have associated branch data');
         }
@@ -51,9 +48,9 @@ const AddQr = () => {
         console.error('Error fetching user or branch data:', error);
       }
     };
-  
+
     fetchUserAndBranchData();
-  }, [backendUrl]);  
+  }, [backendUrl]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -119,7 +116,7 @@ const AddQr = () => {
         signature,
         nonce,
         description: params.description,
-      });   
+      });
 
       setGeneratedQrCode(checkoutUrl);
       setShowFields(false);
@@ -147,17 +144,17 @@ const AddQr = () => {
   };
 
   const isValidInvoiceNumber = (invoice_number) => {
-    const regex = /^[a-zA-Z0-9]+$/; 
+    const regex = /^[a-zA-Z0-9]+$/;
     return regex.test(invoice_number);
   };
 
   const checkInvoiceNumberExists = async (invoice_number) => {
     const encodedInvoiceNumber = encodeURIComponent(invoice_number);
     const url = `${backendUrl}/api/qr-codes/check-invoice/${encodedInvoiceNumber}`;
-    
+
     try {
       const response = await axios.get(url);
-      return response.data.status; 
+      return response.data.status;
     } catch (error) {
       console.error('Error checking invoice number:', error.response ? error.response.data : error.message);
       return false;
@@ -182,7 +179,7 @@ const AddQr = () => {
             <TextField
               label="User"
               name="user_name"
-              value={formData.user_name} 
+              value={formData.user_name}
               fullWidth
               margin="normal"
               disabled
@@ -216,96 +213,96 @@ const AddQr = () => {
           </>
         ) : (
           <Box
-          sx={{
-            maxWidth: '600px',  // A bit wider for better readability
-            margin: 'auto',
-            padding: '32px',
-            borderRadius: '16px',
-            backgroundColor: '#f9f9f9',  // Light gray background for contrast
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12)',  // Softer shadow for elegance
-            textAlign: 'left',  // Align content to the left for better readability
-          }}
-        >
-          {/* Title */}
-          <Typography 
-            variant="h5" 
-            fontWeight="bold" 
-            gutterBottom
-            sx={{ color: '#333', marginBottom: '24px', textAlign: 'center' }}  // Centered header for focus
-          >
-            Transaction Details
-          </Typography>
-    
-          {/* Divider for structure */}
-          <Divider sx={{ marginBottom: '24px' }} />
-    
-          {/* Side-by-side layout */}
-          <Grid container spacing={2} sx={{ marginBottom: '24px' }}>
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                Branch Name:
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
-                {formData.branch_name}
-              </Typography>
-            </Grid>
-    
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                Invoice #:
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
-                {formData.invoice_number}
-              </Typography>
-            </Grid>
-    
-            <Grid item xs={6}>
-              <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                Amount (PHP):
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h4" color="primary" fontWeight="bold">
-                ₱{formData.amount}
-              </Typography>
-            </Grid>
-          </Grid>
-    
-          {/* QR Code Section */}
-          <Box 
             sx={{
-              display: 'flex', 
-              justifyContent: 'center', 
-              marginBottom: '24px'
+              maxWidth: '600px',
+              margin: 'auto',
+              padding: '32px',
+              borderRadius: '16px',
+              backgroundColor: '#f9f9f9',
+              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12)',
+              textAlign: 'left',
             }}
           >
-            <QRCode value={generatedQrCode} size={180} />
-          </Box>
-    
-          {/* Done Button */}
-          <Box mt={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleDone}
-              size="large"
-              fullWidth
+            {/* Title */}
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              gutterBottom
+              sx={{ color: '#333', marginBottom: '24px', textAlign: 'center' }}
+            >
+              Transaction Details
+            </Typography>
+
+            {/* Divider for structure */}
+            <Divider sx={{ marginBottom: '24px' }} />
+
+            {/* Side-by-side layout */}
+            <Grid container spacing={2} sx={{ marginBottom: '24px' }}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" sx={{ color: '#666' }}>
+                  Branch Name:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
+                  {formData.branch_name}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" sx={{ color: '#666' }}>
+                  Invoice #:
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
+                  {formData.invoice_number}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="subtitle1" sx={{ color: '#666' }}>
+                  Amount (PHP):
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h4" color="primary" fontWeight="bold">
+                  ₱{formData.amount}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            {/* QR Code Section */}
+            <Box
               sx={{
-                padding: '10px 0',
-                borderRadius: '8px',
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 'bold',
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '24px'
               }}
             >
-              Done
-            </Button>
+              <QRCode value={generatedQrCode} size={180} />
+            </Box>
+
+            {/* Done Button */}
+            <Box mt={3}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDone}
+                size="large"
+                fullWidth
+                sx={{
+                  padding: '10px 0',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                Done
+              </Button>
+            </Box>
           </Box>
-        </Box>
         )}
       </Box>
     </Container>

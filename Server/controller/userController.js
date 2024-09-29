@@ -28,7 +28,7 @@ export const getProfile = async (req, res) => {
           as: 'branch',
           attributes: ['branch_name'],
         },
-        attributes: ['id','first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],
+        attributes: ['id', 'first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],
       });
 
       if (!user) {
@@ -60,7 +60,6 @@ export const addUser = async (req, res) => {
       if (!branch) {
         return res.status(404).json({ error: 'Branch not found' });
       }
-      // The existingUser check is removed, allowing multiple users to have the same branchId
     }
 
     // Hash password before storing it
@@ -141,8 +140,8 @@ export const updateUser = async (req, res) => {
       ...(username && { username }),
       ...(email && { email }),
       ...(user_type && { user_type }),
-      ...(branch_id !== undefined && { branch_id }),  // Allow multiple users for the same branch_id
-      ...(status !== undefined && { status }),  // Ensure status is updated if provided
+      ...(branch_id !== undefined && { branch_id }),
+      ...(status !== undefined && { status }),
     };
 
     // Password should only be updated if it's provided and non-empty
@@ -236,7 +235,7 @@ export const checkBranchAssignment = async (req, res) => {
     if (user) {
       return res.status(200).json(user);
     } else {
-      return res.status(200).json(null); 
+      return res.status(200).json(null);
     }
   } catch (error) {
     console.error('Error checking branch assignment:', error);

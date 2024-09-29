@@ -41,10 +41,7 @@ const AddUser = () => {
     try {
       if (userType === 'Branch User' && branchUser) {
         const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${branchUser.id}`);
-        if (checkBranchResponse.data) {
-          setError('This branch is already assigned to another user');
-          return;
-        }
+        
       }
 
       const userData = {

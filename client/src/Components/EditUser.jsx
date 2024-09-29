@@ -41,14 +41,6 @@ const EditUser = () => {
 
   const handleUpdate = async () => {
     try {
-      if (user.user_type === "Branch User" && selectedBranch !== user.branch_id) {
-        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${selectedBranch}`);
-        if (checkBranchResponse.data && checkBranchResponse.data.userId !== id) {
-          setError("This branch is already assigned to another user");
-          return;
-        }
-      }
-  
       // Build the updated user object
       const updatedUser = {
         first_name: user.first_name,
@@ -59,19 +51,19 @@ const EditUser = () => {
         branch_id: user.user_type === "Branch User" ? selectedBranch : null, 
         status: user.status,
       };
-  
+
       // Only include the password if the user explicitly updated it
       if (newPassword && newPassword.trim()) {
         updatedUser.password = newPassword;
       }
-  
+
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
       navigate('/super-dashboard/manage-users');
     } catch (error) {
       console.error('Failed to update user:', error);
+      setError('An error occurred while updating the user.');
     }
   };
-  
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-users');
@@ -174,3 +166,4 @@ const EditUser = () => {
 };
 
 export default EditUser;
+

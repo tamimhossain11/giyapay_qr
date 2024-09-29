@@ -28,7 +28,7 @@ export const getProfile = async (req, res) => {
           as: 'branch',
           attributes: ['branch_name'],
         },
-        attributes: ['first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],
+        attributes: ['id','first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],
       });
 
       if (!user) {
@@ -48,25 +48,25 @@ export const getProfile = async (req, res) => {
 export const addUser = async (req, res) => {
   const { firstName, lastName, username, email, password, userType, branchId } = req.body;
 
+  // Validate required fields
   if (!firstName || !lastName || !username || !email || !password || !userType) {
     return res.status(400).json({ error: 'All fields are required except branchId' });
   }
 
   try {
+    // Check if branchId is provided and if the branch exists
     if (branchId) {
       const branch = await Branch.findByPk(branchId);
       if (!branch) {
         return res.status(404).json({ error: 'Branch not found' });
       }
-
-      const existingUser = await User.findOne({ where: { branch_id: branchId } });
-      if (existingUser) {
-        return res.status(400).json({ error: 'This branch already has an assigned user' });
-      }
+      // The existingUser check is removed, allowing multiple users to have the same branchId
     }
 
+    // Hash password before storing it
     const hashedPassword = bcrypt.hashSync(password, 10);
 
+    // Create the new user
     const user = await User.create({
       first_name: firstName,
       last_name: lastName,
@@ -77,12 +77,14 @@ export const addUser = async (req, res) => {
       branch_id: branchId || null,
     });
 
+    // Respond with success
     res.status(201).json({ message: 'User added successfully', user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 // Controller function to get all users
 export const getAllUsers = async (req, res) => {
@@ -132,15 +134,6 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check if branch_id is being changed
-    if (branch_id && user.branch_id !== branch_id) {
-      const existingUser = await User.findOne({ where: { branch_id } });
-
-      if (existingUser && existingUser.id !== userId) {
-        return res.status(400).json({ error: 'This branch already has an assigned user' });
-      }
-    }
-
     // Only update fields that are provided in the request body
     const updatedFields = {
       ...(first_name && { first_name }),
@@ -148,8 +141,8 @@ export const updateUser = async (req, res) => {
       ...(username && { username }),
       ...(email && { email }),
       ...(user_type && { user_type }),
-      ...(branch_id !== undefined && { branch_id }),
-      ...(status !== undefined && { status }),
+      ...(branch_id !== undefined && { branch_id }),  // Allow multiple users for the same branch_id
+      ...(status !== undefined && { status }),  // Ensure status is updated if provided
     };
 
     // Password should only be updated if it's provided and non-empty
@@ -159,6 +152,7 @@ export const updateUser = async (req, res) => {
       updatedFields.password = hashedPassword;
     }
 
+    // Update the user with the new fields
     await user.update(updatedFields);
 
     res.status(200).json({ message: 'User updated successfully', user });

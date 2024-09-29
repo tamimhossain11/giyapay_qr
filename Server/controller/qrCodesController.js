@@ -4,25 +4,49 @@ const { QrCode, User, Branch } = models;
 
 const createQrCode = async (req, res) => {
   try {
-    const { branch_id, amount, qr_code, invoice_number, payment_channel, signature, nonce, description } = req.body;
+    const {
+      branch_id,
+      user_id,
+      amount,
+      qr_code,
+      invoice_number,
+      payment_channel,
+      signature,
+      nonce,
+      description,
+    } = req.body;
 
-    if (!branch_id || !amount || !qr_code || !invoice_number || !payment_channel || !signature || !nonce || !description) {
+    // Validate that all required fields are provided
+    if (
+      !branch_id ||
+      !user_id ||
+      !amount ||
+      !qr_code ||
+      !invoice_number ||
+      !payment_channel ||
+      !signature ||
+      !nonce ||
+      !description
+    ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Check if the branch exists
     const branch = await Branch.findByPk(branch_id);
     if (!branch) {
       return res.status(404).json({ error: 'Branch not found' });
     }
 
-    const user = await User.findOne({ where: { branch_id: branch.id } });
+    // Check if the user exists
+    const user = await User.findByPk(user_id);
     if (!user) {
-      return res.status(404).json({ error: 'User not found for this branch' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
+    // Create the QR code record in the database
     const qrCode = await QrCode.create({
       branch_id,
-      user_id: user.id,
+      user_id,
       amount,
       qr_code,
       invoice_number,
@@ -32,6 +56,7 @@ const createQrCode = async (req, res) => {
       description,
     });
 
+    // Send a success response with the created QR code
     res.status(201).json({ message: 'QR code created successfully', qrCode });
   } catch (error) {
     console.error('Error creating QR code:', error);
@@ -116,44 +141,6 @@ const getAllQrCodes = async (req, res) => {
 };
 
 
-const getQrCodeById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Add default conditions or empty objects if no conditions are passed
-    const userConditions = {}; 
-    const branchConditions = {};
-
-    const qrCode = await QrCode.findByPk(id, {
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['username'],
-          where: Object.keys(userConditions).length > 0 ? userConditions : undefined,
-          required: false 
-        },
-        {
-          model: Branch,
-          as: 'branch',
-          attributes: ['branch_name'],
-          where: Object.keys(branchConditions).length > 0 ? branchConditions : undefined,
-          required: false 
-        },
-      ],
-    });
-
-    if (!qrCode) {
-      return res.status(404).json({ message: 'QR Code not found' });
-    }
-
-    res.json(qrCode);
-  } catch (error) {
-    console.error('Error fetching QR code:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
 //check_invoice
 
 const checkInvoice = async (req, res) => {
@@ -229,4 +216,4 @@ const getFilteredQrCodes = async (req, res) => {
 
 
 
-export { createQrCode, handleCallback, getAllQrCodes, getQrCodeById, checkInvoice, getFilteredQrCodes };
+export { createQrCode, handleCallback, getAllQrCodes, checkInvoice, getFilteredQrCodes };

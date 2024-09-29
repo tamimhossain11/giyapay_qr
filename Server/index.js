@@ -9,14 +9,18 @@ import branchesRoutes from './Routes/branchesRoutes.js';
 import BlacklistedToken from './model/blacklistedTokenModel.js';
 import qrCodesRoute from './Routes/qrCodesRoutes.js'
 import bodyParser from 'body-parser';
+import http from 'http';
+import { Server } from 'socket.io'; 
 
 const app = express();
+const server = http.createServer(app); 
+const io = new Server(server); 
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: 'https://giyapay-qr.vercel.app',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -49,6 +53,20 @@ const cleanUpBlacklistedTokens = async () => {
 };
 
 setInterval(cleanUpBlacklistedTokens, 24 * 60 * 60 * 1000);
+
+// Socket.IO connection event
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // Store the io instance in app
+    app.set('socketio', io);
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
+
 
 //server listening
 app.listen(3000, () => {

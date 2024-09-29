@@ -37,10 +37,11 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'branches', // Name of the Branch model
-      key: 'id', // Key in the Branch model
+      model: 'branches',
+      key: 'id',
     },
   },
+  
 }, {
   timestamps: true,
   tableName: 'users',

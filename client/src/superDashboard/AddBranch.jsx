@@ -11,7 +11,28 @@ const CreateBranch = () => {
   const [branchUser, setBranchUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [adminId, setAdminId] = useState(null); // Add adminId state
   const navigate = useNavigate();
+
+  // Fetch logged-in admin details
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+          },
+        });
+        const { id } = response.data;
+        setAdminId(id); // Ensure adminId is being set
+      } catch (error) {
+        console.error('Failed to fetch admin details:', error);
+      }
+    };
+  
+    fetchAdminProfile();
+  }, []);
+  
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -25,26 +46,25 @@ const CreateBranch = () => {
 
     fetchUsers();
   }, []);
-  
+
   const handleSave = async () => {
     if (!branchName) {
       return setErrorMessage('Please provide a Branch Name.');
     }
-  
+
     if (branchUser && branchUser.id !== 'addLater') {
       try {
-        // Check the user type and branch assignment
         const checkResponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/check-user-type`, {
           userId: branchUser.id,
         });
-  
+
         const { isCoAdmin, alreadyAssigned } = checkResponse.data;
-  
+
         if (isCoAdmin) {
           setErrorMessage('Sorry, the selected user is a Co-Admin and cannot be assigned to a branch.');
           return;
         }
-  
+
         if (alreadyAssigned) {
           setErrorMessage('This user is already assigned to another branch.');
           return;
@@ -55,31 +75,31 @@ const CreateBranch = () => {
         return;
       }
     }
-  
+
     try {
       const branchData = {
         branchName,
         bankName,
         bankBranch,
-        branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null, 
+        branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null,
+        adminId, // Include adminId in the request
       };
-  
+
       if (id) {
         await axios.put(`${import.meta.env.VITE_BACKEND_URL}/branches/${id}`, branchData);
       } else {
         await axios.post(`${import.meta.env.VITE_BACKEND_URL}/branches`, branchData);
       }
-  
+
       navigate('/super-dashboard/manage-branches');
     } catch (error) {
       console.error('Failed to save branch:', error);
       setErrorMessage('An error occurred while saving the branch.');
     }
   };
-  
 
   const handleCancel = () => {
-    navigate('/super-dashboard/manage-branches'); 
+    navigate('/super-dashboard/manage-branches');
   };
 
   return (

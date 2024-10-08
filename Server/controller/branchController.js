@@ -3,13 +3,14 @@ import User from '../model/userModel.js';
 
 // Create a new branch
 export const createBranch = async (req, res) => {
-  const { branchName, bankName, bankBranch, branchUserId } = req.body;
+  const { branchName, bankName, bankBranch, branchUserId, adminId } = req.body; 
 
   try {
     const branch = await Branch.create({
       branch_name: branchName,
       bank_name: bankName,
       bank_branch: bankBranch,
+      admin_id: adminId, 
     });
 
     if (branchUserId) {
@@ -27,16 +28,56 @@ export const createBranch = async (req, res) => {
   }
 };
 
-// Get all branches
+
+// Get branches based on the logged-in admin
 export const getAllBranches = async (req, res) => {
   try {
-    const branches = await Branch.findAll();
+    const adminId = req.user.id;  
+    const branches = await Branch.findAll({
+      where: {
+        admin_id: adminId 
+      }
+    });
     res.json(branches);
   } catch (error) {
     console.error('Error fetching branches:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+//get all branch for co admins qr page
+
+export const getAllBranchesCA = async (req, res) => {
+  try {
+    const { userType, admin_id } = req.user;
+    
+    if (!admin_id) {
+      return res.status(400).json({ message: 'Admin ID is missing' });
+    }
+
+    let whereConditions = {};
+
+    // Admins and Co-Admins should both have access to branches linked to their admin_id
+    if (userType === 'admin' || userType === 'Co-Admin') {
+      whereConditions = {
+        admin_id: admin_id, 
+      };
+    } else {
+      return res.status(403).json({ message: 'You do not have the appropriate permissions to view this data' });
+    }
+
+    // Fetch branches linked to the admin or co-admin
+    const branches = await Branch.findAll({
+      where: whereConditions,
+    });
+
+    res.json(branches);
+  } catch (error) {
+    console.error('Error fetching branches:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 // Delete a branch
 export const deleteBranch = async (req, res) => {
@@ -117,10 +158,25 @@ export const editBranch = async (req, res) => {
 
 export const getBranchCount = async (req, res) => {
   try {
-    const count = await Branch.count();
+    const { userType, id, admin_id } = req.user; 
+
+    let adminId;
+    if (userType === 'admin') {
+      adminId = id; 
+    } else if (userType === 'Co-Admin' && admin_id) {
+      adminId = admin_id; 
+    } else {
+      return res.status(400).json({ Status: false, Error: 'Admin ID is missing' });
+    }
+
+    // Query to count branches associated with the adminId
+    const count = await Branch.count({
+      where: { admin_id: adminId } 
+    });
+
     res.json({ Status: true, Result: count });
   } catch (error) {
-    console.error('Error counting branches:', error);
-    res.status(500).json({ Status: false, error: 'Internal server error' });
+    console.error('Error in getBranchCountByAdmin:', error);
+    res.status(500).json({ Status: false, Error: 'Internal server error' });
   }
 };

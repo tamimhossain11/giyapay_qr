@@ -30,7 +30,12 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`);
+        // The request should send a token that contains the admin_id
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Assuming token is stored in localStorage
+          }
+        });
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -38,9 +43,11 @@ const ManageUsers = () => {
         setLoading(false);
       }
     };
-
+  
     fetchUsers();
   }, []);
+  
+  
 
   const handleDelete = async () => {
     try {

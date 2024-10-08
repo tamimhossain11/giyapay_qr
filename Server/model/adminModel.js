@@ -7,17 +7,26 @@ const Admin = sequelize.define('Admin', {
     primaryKey: true,
     autoIncrement: true,
   },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  }, {
-    tableName: 'admin', 
-    timestamps: false,
-  });
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  merchant_name: {
+    type: DataTypes.STRING,
+    allowNull: false, // Make this required as the merchant is tied to the admin
+  },
+  merchant_secret: {
+    type: DataTypes.STRING,
+    allowNull: false, // The secret associated with the merchant
+  },
+}, {
+  tableName: 'admin', 
+  timestamps: false,
+});
 
 export default Admin;

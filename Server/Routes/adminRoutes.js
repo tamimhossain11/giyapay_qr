@@ -1,5 +1,5 @@
 import express from 'express';
-import { addAdmin, countAdmins } from '../controller/adminController.js';
+import { addAdmin, countAdmins, getAllAdmins } from '../controller/adminController.js';
 
 const router = express.Router();
 
@@ -8,5 +8,8 @@ router.post('/add', addAdmin);
 
 // Route for counting admins
 router.get('/count', countAdmins);
+
+//get list
+router.get('/all', getAllAdmins);
 
 export default router;

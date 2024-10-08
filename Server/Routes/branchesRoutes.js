@@ -1,16 +1,24 @@
 import express from 'express';
-import { createBranch, getAllBranches, deleteBranch, updateBranchStatus, getBranchCount, editBranch, getBranchById } from '../controller/branchController.js';
+import { createBranch, 
+         getAllBranches,
+         getAllBranchesCA, 
+         deleteBranch, 
+         updateBranchStatus, 
+         getBranchCount, 
+         editBranch, 
+         getBranchById } from '../controller/branchController.js';
+import { authenticateToken } from '../middleware/authenticate.js';
 
 const router = express.Router();
 
 // Route definitions
 router.post('/', createBranch);
-router.get('/all', getAllBranches);
+router.get('/all', authenticateToken, getAllBranches);
+router.get('/coadmin_all', authenticateToken, getAllBranchesCA);
 router.delete('/:id', deleteBranch);
 router.put('/:id/status', updateBranchStatus);
-router.get('/count', getBranchCount);
+router.get('/count',authenticateToken, getBranchCount);
 router.put('/edit/:id', editBranch); 
-//get branch by id
 router.get('/:id', getBranchById);
 
 

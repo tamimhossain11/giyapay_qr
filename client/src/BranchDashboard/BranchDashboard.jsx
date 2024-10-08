@@ -119,7 +119,7 @@ const BranchDashboard = () => {
           </Link>
 
           <nav className="nav-links">
-            <Link to="/branch-dashboard/manage-qr" onClick={() => handleRouteClick("/branch-dashboard/manage-qr")}> Manage Qr</Link>
+            <Link to="/branch-dashboard/manage-qrbu" onClick={() => handleRouteClick("/branch-dashboard/manage-qrbu")}> Manage Qr</Link>
             <Link to="/branch-dashboard/add-qr" onClick={() => handleRouteClick("/branch-dashboard/add-qr")}>Add Qr</Link>
           </nav>
 

@@ -116,7 +116,7 @@ const SuperDashboard = () => {
 
           <Link to="/super-dashboard" className="brand">
             <i className="bi bi-wallet2 fs-3 me-2"></i>
-            <span className="brand-text">Super Admin</span>
+            <span className="brand-text">Admin</span>
           </Link>
 
           <nav className="nav-links">
@@ -128,6 +128,7 @@ const SuperDashboard = () => {
               Manage Users
             </Link>
             <Link to="/super-dashboard/manage-qr" onClick={() => handleRouteClick("/super-dashboard/manage-qr")}>QR List</Link>
+            <Link to="/super-dashboard/upload" onClick={() => handleRouteClick("/super-dashboard/upload")}>Batch Upload</Link>
           </nav>
 
           <IconButton
@@ -194,6 +195,9 @@ const SuperDashboard = () => {
           </ListItem>
           <ListItem button onClick={() => { handleRouteClick("/super-dashboard/manage-qr"); handleDrawerToggle(); }}>
             <ListItemText primary="QR List" />
+          </ListItem>
+          <ListItem button onClick={() => { handleRouteClick("/super-dashboard/upload"); handleDrawerToggle(); }}>
+            <ListItemText primary="Batch Upload" />
           </ListItem>
           <ListItem button onClick={() => { handleProfileView(); handleDrawerToggle(); }}>
             <ListItemText primary="View Profile" />

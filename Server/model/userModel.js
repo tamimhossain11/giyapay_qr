@@ -41,6 +41,14 @@ const User = sequelize.define('User', {
       key: 'id',
     },
   },
+  admin_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'admin',  
+      key: 'id',
+    },
+  },
   
 }, {
   timestamps: true,

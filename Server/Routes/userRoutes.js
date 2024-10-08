@@ -8,10 +8,9 @@ import {
   updateUser,
   getSingleUser,
   deleteUser,
-  getBranchUserCount,
-  getCoAdminCount,
   checkBranchAssignment,
-  checkUserTypeAndAssignment
+  checkUserTypeAndAssignment,
+  getAllUsersCA
 } from '../controller/userController.js';
 
 const router = express.Router();
@@ -21,21 +20,14 @@ router.get('/branch/:branchId', checkBranchAssignment);
 // Define user routes and attach appropriate controller functions
 router.get('/profile', authenticateToken, getProfile);
 router.post('/add', addUser);
-router.get('/all', getAllUsers);
+router.get('/all',authenticateToken, getAllUsers);
+router.get('/coadmin_all',authenticateToken, getAllUsersCA);
 router.put('/edit_status/:id', updateUserStatus);
 router.put('/edit/:id', updateUser);
 router.get('/:id', getSingleUser);
 router.delete('/delete/:id', deleteUser);
-router.get('/branchUserCount', (req, res, next) => {
-  console.log('Received request for branch user count');
-  getBranchUserCount(req, res, next);
-});
-
-router.get('/co-admin-count', (req, res, next) => {
-  console.log('Received request for co-admin count');
-  getCoAdminCount(req, res, next);
-});
-
 router.post('/check-user-type', checkUserTypeAndAssignment);
+
+
 
 export default router;

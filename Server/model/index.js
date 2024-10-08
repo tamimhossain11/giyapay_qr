@@ -3,13 +3,16 @@ import sequelize from '../databse/connection.js';
 import User from './userModel.js';
 import Branch from './branchModel.js';
 import QrCode from './qrCodesModel.js';
+import Admin from './adminModel.js'; 
 
 const models = {
   User: User,
   Branch: Branch,
   QrCode: QrCode,
+  Admin: Admin,  
 };
 
+// Define associations
 models.User.belongsTo(models.Branch, {
   foreignKey: 'branch_id',
   as: 'branch',
@@ -38,6 +41,17 @@ models.QrCode.belongsTo(models.User, {
 models.QrCode.belongsTo(models.Branch, {
   foreignKey: 'branch_id',
   as: 'branch',
+});
+
+// Add associations between Admin and User
+models.Admin.hasMany(models.User, {
+  foreignKey: 'admin_id',
+  as: 'users',
+});
+
+models.User.belongsTo(models.Admin, {
+  foreignKey: 'admin_id',
+  as: 'admin',
 });
 
 // Export all models

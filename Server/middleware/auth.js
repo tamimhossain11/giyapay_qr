@@ -4,13 +4,11 @@ import jwt from 'jsonwebtoken';
 import User from '../model/userModel.js';
 import Admin from '../model/adminModel.js';
 import BlacklistedToken from '../model/blacklistedTokenModel.js';
-import { authenticateToken } from '../middleware/authenticate.js';
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Login route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -19,45 +17,51 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        let user = await Admin.findOne({ where: { email } });
+        // Check if the user exists in either Admin or User tables
+        let user = await Admin.findOne({ where: { email } }) || await User.findOne({ where: { email } });
 
-        if (!user) {
-            user = await User.findOne({ where: { email } });
-        }
-
+        // If no user is found
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Check account status
         if (user.status === 'Inactive') {
             return res.status(403).json({ error: 'Account is inactive. Please contact support.' });
         }
 
+        // Validate password
         const isPasswordValid = bcrypt.compareSync(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Branch user specific validation
         if (user.user_type === 'Branch User' && !user.branch_id) {
             return res.status(403).json({ error: 'You are not assigned to any branch. Please contact support.' });
         }
 
-        const token = jwt.sign({
+        // Generate JWT token payload
+        const tokenPayload = {
+            admin_id: user.admin_id || (user.user_type === 'admin' ? user.id : null), 
             id: user.id,
-            userType: user.user_type || 'admin',
-        }, JWT_SECRET, { expiresIn: '30m' });
+            userType: user.user_type || 'admin',  
+        };
 
+        // Sign the token
+        const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '30m' });
+
+        // Send the response
         res.json({
             token,
             userType: user.user_type || 'admin',
-            message: 'Login successful'
+            message: 'Login successful',
         });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 // Logout route
 router.post('/logout', async (req, res) => {

@@ -59,11 +59,6 @@ const ManageQr = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const userResponse = await axios.get(`${backendUrl}/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUserType(localStorage.getItem('userType'));
-
         const qrCodeResponse = await axios.get(`${backendUrl}/api/qr-codes/get`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -76,23 +71,14 @@ const ManageQr = () => {
           updated_at: qr.updatedAt ? new Date(qr.updatedAt).toLocaleString() : 'N/A',
         }));
 
-        if (userResponse.data.branch_id) {
-          const filteredQrCodes = formattedQrCodes.filter(
-            (qr) => qr.branch_id === userResponse.data.branch_id
-          );
-          setQrCodes(filteredQrCodes);
-          setFilteredQrCodes(filteredQrCodes);
-        } else {
-          setQrCodes(formattedQrCodes);
-          setFilteredQrCodes(formattedQrCodes);
-        }
+        setQrCodes(formattedQrCodes);
+        setFilteredQrCodes(formattedQrCodes);
       } catch (error) {
-        console.error('Error fetching QR codes or user data:', error);
+        console.error('Error fetching QR codes:', error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchQrCodes();
 
     // Listen for QR code updates from the server
@@ -113,7 +99,6 @@ const ManageQr = () => {
               qr.id === formattedQrCode.id ? { ...qr, ...formattedQrCode } : qr
             );
           } else {
-            console.warn("Received QR code update for a non-existing entry:", newQrCode);
             return prevQrCodes;
           }
         });
@@ -251,7 +236,7 @@ const ManageQr = () => {
         display="flex"
         justifyContent="center"
         alignItems="center"
-        height="100vh"
+        height="80vh"
       >
         <CircularProgress />
       </Box>
@@ -264,110 +249,109 @@ const ManageQr = () => {
         <Typography variant="h4" gutterBottom>
           Manage QR Codes
         </Typography>
-        {(userType === 'admin' || userType === 'Co-Admin') && (
-          <Box mb={2}>
-            {/* Filter Container */}
-            <Box display="flex" flexWrap="wrap" gap={2} width="100%">
-              {/* First Row */}
-              <Box display="flex" flexWrap="wrap" gap={2} width="100%">
-                <TextField
-                  label="Search Payment Reference"
-                  variant="outlined"
-                  size="small"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  label="Start Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  name="startDate"
-                  value={dateFilter.startDate}
-                  onChange={handleDateChange}
-                  sx={{ flex: 1 }}
-                />
-                <TextField
-                  label="End Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  name="endDate"
-                  value={dateFilter.endDate}
-                  onChange={handleDateChange}
-                  sx={{ flex: 1 }}
-                />
-              </Box>
 
-              {/* Second Row */}
-              <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
-                <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                  <InputLabel>Branch Name</InputLabel>
-                  <Select
-                    value={branchFilter}
-                    onChange={(e) => setBranchFilter(e.target.value)}
-                    label="Branch Name"
-                  >
-                    <MenuItem value="">All Branches</MenuItem>
-                    {branches.map((branch) => (
-                      <MenuItem key={branch.id} value={branch.branch_name}>
-                        {branch.branch_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                  <InputLabel>User Name</InputLabel>
-                  <Select
-                    value={userFilter}
-                    onChange={(e) => setUserFilter(e.target.value)}
-                    label="User Name"
-                  >
-                    <MenuItem value="">All Users</MenuItem>
-                    {users.map((user) => (
-                      <MenuItem key={user.id} value={user.username}>
-                        {user.username}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
+        <Box mb={2}>
+          {/* Filter Container */}
+          <Box display="flex" flexWrap="wrap" gap={2} width="100%">
+            {/* First Row */}
+            <Box display="flex" flexWrap="wrap" gap={2} width="100%">
+              <TextField
+                label="Search Payment Reference"
+                variant="outlined"
+                size="small"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ flex: 1 }}
+              />
+              <TextField
+                label="Start Date"
+                type="date"
+                variant="outlined"
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                name="startDate"
+                value={dateFilter.startDate}
+                onChange={handleDateChange}
+                sx={{ flex: 1 }}
+              />
+              <TextField
+                label="End Date"
+                type="date"
+                variant="outlined"
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                name="endDate"
+                value={dateFilter.endDate}
+                onChange={handleDateChange}
+                sx={{ flex: 1 }}
+              />
             </Box>
 
-            {/* Buttons */}
-            <Box mt={2} display="flex" gap={2}>
-              <Button variant="contained" color="primary" onClick={() => setPage(0)}>
-                Apply Filters
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  setSearchTerm('');
-                  setBranchFilter('');
-                  setUserFilter('');
-                  setDateFilter({ startDate: '', endDate: '' });
-                  setPage(0);
-                }}
-              >
-                Clear Filters
-              </Button>
-
-              <CSVLink
-                data={filteredQrCodes}
-                headers={headers}
-                filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
-              >
-                <Button variant="contained" color="primary" startIcon={<DownloadIcon />}>
-                  Export to CSV
-                </Button>
-              </CSVLink>
+            {/* Second Row */}
+            <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
+              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
+                <InputLabel>Branch Name</InputLabel>
+                <Select
+                  value={branchFilter}
+                  onChange={(e) => setBranchFilter(e.target.value)}
+                  label="Branch Name"
+                >
+                  <MenuItem value="">All Branches</MenuItem>
+                  {branches.map((branch) => (
+                    <MenuItem key={branch.id} value={branch.branch_name}>
+                      {branch.branch_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
+                <InputLabel>User Name</InputLabel>
+                <Select
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                  label="User Name"
+                >
+                  <MenuItem value="">All Users</MenuItem>
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.username}>
+                      {user.username}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
           </Box>
-        )}
+
+          {/* Buttons */}
+          <Box mt={2} display="flex" gap={2}>
+            <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+              Apply Filters
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                setSearchTerm('');
+                setBranchFilter('');
+                setUserFilter('');
+                setDateFilter({ startDate: '', endDate: '' });
+                setPage(0);
+              }}
+            >
+              Clear Filters
+            </Button>
+
+            <CSVLink
+              data={filteredQrCodes}
+              headers={headers}
+              filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
+            >
+              <Button variant="contained" color="primary" startIcon={<DownloadIcon />}>
+                Export to CSV
+              </Button>
+            </CSVLink>
+          </Box>
+        </Box>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>

@@ -12,13 +12,16 @@ import BranchManagement from './superDashboard/ManageBranch';
 import BranchDashboard from './BranchDashboard/BranchDashboard';
 import ProfilePage from './MultiUserPages/ProfilePage';
 import ManageUsers from './superDashboard/ManageUsers';
-import AddAdmin from './superDashboard/AddAdmin';
+import MerchantManagement from './superDashboard/MerchantManagement';
 import AddUser from './superDashboard/AddUsers';
 import EditUser from './Components/EditUser';
 import EditBranch from './Components/EditBranch';
 import CallbackResponsePage from './ClientPages/CallbackResponsePage';
 import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
 import NotFound from './Components/NotFound';
+import ManageQRBU from './BranchDashboard/ManageQRBU';
+import ManageQrCA from './CoAdminDashboard/ManageQrCA';
+import UploadPage from './superDashboard/UploadPage';
 
 function App() {
     useEffect(() => {
@@ -46,7 +49,18 @@ function App() {
 
     return (
         <BrowserRouter>
+
             <Routes>
+
+                {/* Merchant Management route - independently protected */}
+                <Route
+                    path="/merchant-management"
+                    element={
+                        <PrivateRoute expectedUserType="admin">
+                            <MerchantManagement />
+                        </PrivateRoute>
+                    }
+                />
                 {/* Public routes */}
                 <Route path="/" element={<Login />} />
                 <Route path="/callback/:callbackType" element={<CallbackResponsePage />} />
@@ -69,7 +83,7 @@ function App() {
                     <Route path="edit-users/:id" element={<EditUser />} />
                     <Route path="edit-branch/:id" element={<EditBranch />} />
                     <Route path="manage-qr" element={<ManageQr />} />
-                    <Route path="admin/add" element={<AddAdmin />} />
+                    <Route path="upload" element={<UploadPage />} />
                 </Route>
 
                 {/* Co-Admin routes */}
@@ -82,7 +96,7 @@ function App() {
                     }
                 >
                     <Route path="" element={<OverView />} />
-                    <Route path="manage-qr" element={<ManageQr />} />
+                    <Route path="manage-qr-ca" element={<ManageQrCA />} />
                     <Route path="profile" element={<ProfilePage />} />
                 </Route>
 
@@ -95,8 +109,8 @@ function App() {
                         </PrivateRoute>
                     }
                 >
-                    <Route path="" element={<ManageQr />} />
-                    <Route path="manage-qr" element={<ManageQr />} />
+                    <Route path="" element={<ManageQRBU />} />
+                    <Route path="manage-qrbu" element={<ManageQRBU />} />
                     <Route path="add-qr" element={<AddQr />} />
                     <Route path="profile" element={<ProfilePage />} />
                 </Route>

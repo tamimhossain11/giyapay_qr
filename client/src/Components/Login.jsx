@@ -65,8 +65,10 @@ const Login = () => {
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
 
-                // Redirect based on user type
-                if (decodedToken.userType === 'admin') {
+                 // Redirect based on user type and ID
+                 if (decodedToken.userType === 'admin' && decodedToken.id === 5) {
+                    navigate('/merchant-management'); 
+                } else if (decodedToken.userType === 'admin') {
                     navigate('/super-dashboard');
                 } else if (decodedToken.userType === 'Branch User') {
                     navigate('/branch-dashboard');

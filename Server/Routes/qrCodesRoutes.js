@@ -1,40 +1,23 @@
 import express from 'express';
-import { createQrCode, handleCallback, getAllQrCodes,checkInvoice,getFilteredQrCodes } from '../controller/qrCodesController.js';
+import { createQrCode, handleCallback,getAdminQrCodes,checkInvoice,getFilteredQrCodes,getQrCodesBU,getFilteredQrCodesCA,countQrCodesByAdmin } from '../controller/qrCodesController.js';
 import models from '../model/index.js';
+import { authenticateToken } from '../middleware/authenticate.js';
 
 const { QrCode } = models;
 
 const router = express.Router();
 
-// Middleware to log incoming requests
-router.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`);
-    console.log('Request Body:', req.body);
-    next();
-});
-
 // Routes for QR code management
-router.get('/get', (req, res, next) => {
-    console.log('GET /get route hit');
-    next();
-}, getAllQrCodes);
+router.get('/get', authenticateToken, getAdminQrCodes,);
 
-router.post('/create', (req, res, next) => {
-    console.log('POST /create route hit');
-    next();
-}, createQrCode);
+// Routes for QR code management for Branch user
+router.get('/get_qr_bu', authenticateToken, getQrCodesBU);
+
+
+router.post('/create', createQrCode);
 
 // Count
-router.get('/count', async (req, res) => {
-    console.log('GET /count route hit');
-    try {
-        const count = await QrCode.count();
-        res.json({ Status: true, Result: count });
-    } catch (error) {
-        console.error('Error counting QR codes:', error);
-        res.status(500).json({ Status: false, error: 'Internal server error' });
-    }
-});
+router.get('/count', authenticateToken, countQrCodesByAdmin);
 
 // Callback
 const validateCallbackType = (req, res, next) => {
@@ -57,7 +40,9 @@ router.post('/callback/:callbackType', validateCallbackType, (req, res, next) =>
 router.get('/check-invoice/:invoice_number', checkInvoice);
 //filter
 
-router.get('/filter', getFilteredQrCodes);
+router.get('/filter',authenticateToken, getFilteredQrCodes);
+
+router.get('/coadmin_filter',authenticateToken, getFilteredQrCodesCA);
 
 
 router.get('/csv', async (req, res) => {

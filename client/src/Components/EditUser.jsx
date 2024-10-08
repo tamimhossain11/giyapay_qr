@@ -28,8 +28,12 @@ const EditUser = () => {
 
     const fetchBranches = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
-        setBranches(response.data);
+        const token = localStorage.getItem('token'); // Assuming you store JWT in localStorage
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });setBranches(response.data);
       } catch (error) {
         console.error('Failed to fetch branches:', error);
       }

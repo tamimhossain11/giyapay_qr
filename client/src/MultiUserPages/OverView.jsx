@@ -2,33 +2,35 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/home.css';
-import { FaUser, FaQrcode, FaBuilding } from 'react-icons/fa';
+import { FaQrcode, FaBuilding, FaUsers } from 'react-icons/fa';
 
 const OverView = () => {
-  const [adminTotal, setAdminTotal] = useState(0);
   const [qrTotal, setQrTotal] = useState(0);
-  const [branchTotal, setBranchTotal] = useState(0); 
+  const [branchTotal, setBranchTotal] = useState(0);
+  const [userCount, setUserCount] = useState(0);
 
   useEffect(() => {
-    adminCount();
     qrCount();
     branchCount();
+    userCountFetch();
   }, []);
 
-  const adminCount = async () => {
-    try {
-      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin/count`);
-      if (result.data.Status) {
-        setAdminTotal(result.data.Result);
-      }
-    } catch (error) {
-      console.error('Error fetching admin count:', error);
-    }
-  };
+
 
   const qrCount = async () => {
     try {
-      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/count`);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error('Authorization token is missing.');
+      }
+
+      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/qr-codes/count`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (result.data.Status) {
         setQrTotal(result.data.Result);
       }
@@ -37,14 +39,46 @@ const OverView = () => {
     }
   };
 
+
   const branchCount = async () => {
     try {
-      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/count`);
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error('Authorization token is missing.');
+      }
+      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/count`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (result.data.Status) {
         setBranchTotal(result.data.Result);
       }
     } catch (error) {
       console.error('Error fetching branch count:', error);
+    }
+  };
+
+  const userCountFetch = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error('Authorization token is missing.');
+      }
+
+      const result = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/count`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (result.data.Status) {
+        setUserCount(result.data.Result);
+      }
+    } catch (error) {
+      console.error('Error fetching user count:', error);
     }
   };
 
@@ -67,9 +101,9 @@ const OverView = () => {
         </div>
         <div className="col-md-4">
           <div className="card shadow-sm text-center p-3 mb-4">
-            <FaUser size={50} className="icon text-primary mb-3" />
-            <h5 className="card-title">Admins</h5>
-            <p className="card-text">Total: {adminTotal}</p>
+            <FaUsers size={50} className="icon text-warning mb-3" />
+            <h5 className="card-title">Users</h5>
+            <p className="card-text">Total: {userCount}</p> {/* Display user count */}
           </div>
         </div>
       </div>

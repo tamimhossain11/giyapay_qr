@@ -15,6 +15,10 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  admin_id: { 
+    type: DataTypes.INTEGER,
+    allowNull: false,  
+  },
   amount: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,

@@ -16,6 +16,9 @@ const AddQr = () => {
   const [showFields, setShowFields] = useState(true);
   const [userId, setUserId] = useState('');
   const [branchId, setBranchId] = useState('');
+  const [adminId, setAdminId] = useState('');
+  const [merchantName, setMerchantName] = useState('');
+  const [merchantSecret, setMerchantSecret] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -41,6 +44,12 @@ const AddQr = () => {
           }));
           setUserId(user.id);
           setBranchId(user.branch_id);
+
+          if (user.admin) {
+            setAdminId(user.admin.id);
+            setMerchantName(user.admin.merchant_name);
+            setMerchantSecret(user.admin.merchant_secret);
+          }
         } else {
           console.error('User does not have associated branch data');
         }
@@ -51,6 +60,7 @@ const AddQr = () => {
 
     fetchUserAndBranchData();
   }, [backendUrl]);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -89,7 +99,7 @@ const AddQr = () => {
         success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}`,
         error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}`,
         cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}`,
-        merchant_id: 'merchant1234',
+        merchant_id: merchantName,
         amount: amountInCents,
         currency: 'PHP',
         nonce,
@@ -100,7 +110,7 @@ const AddQr = () => {
         payWith: 'GiyaPay',
         gateway_account_type: 'Individualized',
         payment_method: 'MASTERCARD/VISA',
-        merchant_name: import.meta.env.VITE_MERCHANT_NAME,
+        merchant_name: merchantName,
       };
 
       const checkoutUrl = `https://sandbox.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
@@ -116,6 +126,7 @@ const AddQr = () => {
         signature,
         nonce,
         description: params.description,
+        admin_id: adminId,
       });
 
       setGeneratedQrCode(checkoutUrl);
@@ -126,7 +137,7 @@ const AddQr = () => {
   };
 
   const handleDone = () => {
-    navigate('/branch-dashboard/manage-qr');
+    navigate('/branch-dashboard/manage-qrbu');
   };
 
   const generateNonce = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -134,8 +145,8 @@ const AddQr = () => {
   const generateTimestamp = () => Math.floor(Date.now() / 1000);
 
   const generateSignature = (amount, invoice_number, nonce, timestamp) => {
-    const secretKey = import.meta.env.VITE_MERCHANT_SECRET;
-    const merchantId = 'merchant1234';
+    const secretKey = merchantSecret;
+    const merchantId = merchantName;
     const currency = 'PHP';
 
     const myStringForHashing = `${merchantId}${amount}${currency}${invoice_number}${timestamp}${nonce}${secretKey}`;

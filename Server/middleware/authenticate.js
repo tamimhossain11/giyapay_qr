@@ -24,7 +24,7 @@ export const authenticateToken = async (req, res, next) => {
                 }
                 return res.status(403).json({ error: 'Invalid token' });
             }
-
+            console.log('Verified user:', user);
             req.user = user;
             req.token = token;
             next();

@@ -120,7 +120,7 @@ const CoAdminDashboard = () => {
 
           <nav className="nav-links">
             <Link to="/co-admin-dashboard" onClick={() => handleRouteClick("/co-admin-dashboard")}>Dashboard</Link>
-            <Link to="/co-admin-dashboard/manage-qr" onClick={() => handleRouteClick("/co-admin-dashboard/manage-qr")}> Manage Qr</Link>
+            <Link to="/co-admin-dashboard/manage-qr-ca" onClick={() => handleRouteClick("/co-admin-dashboard/manage-qr-ca")}> Manage Qr</Link>
           </nav>
 
           <IconButton
@@ -179,7 +179,7 @@ const CoAdminDashboard = () => {
           <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard"); handleDrawerToggle(); }}>
             <ListItemText primary="Dashboard" />
           </ListItem>
-          <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard/manage-qr"); handleDrawerToggle(); }}>
+          <ListItem button onClick={() => { handleRouteClick("/co-admin-dashboard/manage-qr-ca"); handleDrawerToggle(); }}>
             <ListItemText primary="Manage QR" />
           </ListItem>
           <ListItem button onClick={() => { handleProfileView(); handleDrawerToggle(); }}>

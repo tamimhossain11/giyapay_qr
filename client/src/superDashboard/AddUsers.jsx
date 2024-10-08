@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, MenuItem, FormControl, Select, InputLabel, Box, Typography, IconButton, InputAdornment, Autocomplete } from '@mui/material';
+import { TextField, Button, MenuItem, FormControl, Select, InputLabel, Box, Typography, IconButton, InputAdornment, Autocomplete, Grid, Paper } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -18,11 +18,35 @@ const AddUser = () => {
   const [branchUser, setBranchUser] = useState(null);
   const [branches, setBranches] = useState([]);
   const [error, setError] = useState('');
+  const [adminId, setAdminId] = useState(null);
+
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+          },
+        });
+        const { id } = response.data;
+        setAdminId(id);
+      } catch (error) {
+        console.error('Failed to fetch admin details:', error);
+      }
+    };
+  
+    fetchAdminProfile();
+  }, []);
 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         setBranches(response.data);
       } catch (error) {
         console.error('Error fetching branches:', error);
@@ -32,18 +56,12 @@ const AddUser = () => {
   }, []);
 
   const handleSave = async () => {
-    // Validate if password and confirm password match
     if (password !== confirmPassword) {
-      setError('Passwords did not matched');
+      setError('Passwords did not match');
       return;
     }
 
     try {
-      if (userType === 'Branch User' && branchUser) {
-        const checkBranchResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/branch/${branchUser.id}`);
-        
-      }
-
       const userData = {
         firstName,
         lastName,
@@ -52,6 +70,7 @@ const AddUser = () => {
         password,
         userType,
         branchId: branchUser ? branchUser.id : null,
+        adminId,
       };
 
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/add`, userData);
@@ -66,121 +85,129 @@ const AddUser = () => {
   };
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>Add User</Typography>
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="user-type-label">User Type</InputLabel>
-        <Select
-          labelId="user-type-label"
-          value={userType}
-          onChange={(e) => setUserType(e.target.value)}
-          required
-        >
-          <MenuItem value="Co-Admin">Co-Admin</MenuItem>
-          <MenuItem value="Branch User">Branch User</MenuItem>
-        </Select>
-      </FormControl>
-
-      <TextField
-        label="First Name"
-        fullWidth
-        margin="normal"
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-        required
-      />
-      <TextField
-        label="Last Name"
-        fullWidth
-        margin="normal"
-        value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
-        required
-      />
-      <TextField
-        label="Username"
-        fullWidth
-        margin="normal"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <TextField
-        label="Email"
-        fullWidth
-        margin="normal"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-
-      {/* Password Input with Toggle */}
-      <TextField
-        label="Password"
-        type={showPassword ? 'text' : 'password'}
-        fullWidth
-        margin="normal"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      {/* Confirm Password Input with Toggle */}
-      <TextField
-        label="Confirm Password"
-        type={showConfirmPassword ? 'text' : 'password'}
-        fullWidth
-        margin="normal"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        required
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      {userType === 'Branch User' && (
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+      <Paper elevation={3} sx={{ p: 4, maxWidth: '600px', width: '100%' }}>
+        <Typography variant="h4" align="center" gutterBottom>Add User</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+          <FormControl fullWidth margin="normal">
         <Autocomplete
-          options={branches}
-          getOptionLabel={(branch) => branch.branch_name}
-          value={branchUser}
-          onChange={(e, newValue) => setBranchUser(newValue)}
-          renderInput={(params) => <TextField {...params} label="Select Branch" />}
-          fullWidth
-          margin="normal"
+          options={['Co-Admin', 'Branch User']}
+          renderInput={(params) => (
+            <TextField {...params} label="User Type" required />
+          )}
+          value={userType}
+          onChange={(e, newValue) => setUserType(newValue)}
         />
-      )}
+      </FormControl>
+          </Grid>
 
-      {error && <Typography color="error">{error}</Typography>}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="First Name"
+              fullWidth
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Last Name"
+              fullWidth
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </Grid>
 
-      <Box mt={2} display="flex" justifyContent="space-between">
-        <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 3 }}>
-          Save
-        </Button>
-        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
-          Cancel
-        </Button>
-      </Box>
+          <Grid item xs={12}>
+            <TextField
+              label="Username"
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Email"
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              label="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              fullWidth
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          {userType === 'Branch User' && (
+            <Grid item xs={12}>
+              <Autocomplete
+                options={branches}
+                getOptionLabel={(branch) => branch.branch_name}
+                value={branchUser}
+                onChange={(e, newValue) => setBranchUser(newValue)}
+                renderInput={(params) => <TextField {...params} label="Select Branch (Optional)" />}
+                fullWidth
+              />
+            </Grid>
+          )}
+
+          {error && (
+            <Grid item xs={12}>
+              <Typography color="error" align="center">{error}</Typography>
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Box display="flex" justifyContent="space-between">
+              <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
+              <Button variant="outlined" color="secondary" onClick={handleCancel}>Cancel</Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
     </Box>
   );
 };

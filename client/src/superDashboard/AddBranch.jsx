@@ -37,7 +37,12 @@ const CreateBranch = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+          },
+        }
+        );
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);

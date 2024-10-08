@@ -1,6 +1,6 @@
 import express from 'express';
 import xlsx from 'xlsx';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import upload from '../middleware/uploadMiddleware.js';
 import User from '../model/userModel.js';
 import Branch from '../model/branchModel.js';

@@ -16,13 +16,17 @@ const Admin = sequelize.define('Admin', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  merchant_name: {
+  merchant_id: {
     type: DataTypes.STRING,
-    allowNull: false, // Make this required as the merchant is tied to the admin
+    allowNull: false, 
   },
   merchant_secret: {
     type: DataTypes.STRING,
-    allowNull: false, // The secret associated with the merchant
+    allowNull: false, 
+  },
+  merchant_name: {
+    type: DataTypes.STRING,
+    allowNull: false, 
   },
 }, {
   tableName: 'admin', 

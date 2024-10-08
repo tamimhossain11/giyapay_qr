@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-    TextField, Button, Box, Typography, Container, Paper, IconButton, InputAdornment, Grid, 
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Snackbar, 
+    TextField, Button, Box, Typography, Container, Paper, IconButton, InputAdornment, Grid,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Snackbar,
     Alert
 } from '@mui/material';
 import { Visibility, VisibilityOff, ExpandMore, ExpandLess, Logout } from '@mui/icons-material';
 import { FaUsers } from 'react-icons/fa';
 import { styled } from '@mui/system';
+import io from 'socket.io-client';
+
 
 const LeftSection = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -29,9 +31,24 @@ const WelcomeBanner = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(3),
 }));
 
+const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
+    marginTop: theme.spacing(3),
+    maxHeight: '400px',
+    '& table': {
+        width: '100%',
+        tableLayout: 'fixed',
+    },
+    [theme.breakpoints.up('md')]: {
+        '& table': {
+            tableLayout: 'auto', // Wider tables on larger screens
+        },
+    },
+}));
+
 const MerchantManagement = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [merchantID, setMerchantID] = useState('');
     const [merchantName, setMerchantName] = useState('');
     const [merchantSecret, setMerchantSecret] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +58,10 @@ const MerchantManagement = () => {
     const [expandedRow, setExpandedRow] = useState(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success or error
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [socket, setSocket] = useState(null);
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -66,12 +86,22 @@ const MerchantManagement = () => {
     useEffect(() => {
         const fetchAdminCountAndAdmins = async () => {
             try {
-                const countResult = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin/count`);
+                // Fetch total admin count
+                const countResult = await axios.get(`${backendUrl}/admin/count`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Auth token if needed
+                    },
+                });
                 if (countResult.data.Status) {
                     setAdminTotal(countResult.data.Result);
                 }
 
-                const adminsResult = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin/all`);
+                // Fetch admin list
+                const adminsResult = await axios.get(`${backendUrl}/admin/all`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Auth token if needed
+                    },
+                });
                 setAdmins(adminsResult.data.Result);
             } catch (error) {
                 console.error('Error fetching admin data:', error);
@@ -80,6 +110,30 @@ const MerchantManagement = () => {
 
         fetchAdminCountAndAdmins();
     }, []);
+
+    useEffect(() => {
+        const newSocket = io(backendUrl, {
+            auth: {
+                token: localStorage.getItem('token'),
+            },
+        });
+
+        setSocket(newSocket);
+
+        // Listen for real-time updates to the admin list
+        newSocket.on('adminListUpdated', (updatedAdminList) => {
+            setAdmins(updatedAdminList);
+        });
+
+        // Clean up the connection when the component unmounts
+        return () => {
+            if (newSocket) {
+                newSocket.disconnect();
+            }
+        };
+    }, [backendUrl]);
+
+
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -96,6 +150,7 @@ const MerchantManagement = () => {
                 email,
                 password,
                 merchant_name: merchantName,
+                merchant_id: merchantID,
                 merchant_secret: merchantSecret,
             });
 
@@ -104,7 +159,7 @@ const MerchantManagement = () => {
             setSnackbarOpen(true);
             setEmail('');
             setPassword('');
-            setMerchantName('');
+            setMerchantID('');
             setMerchantSecret('');
         } catch (error) {
             console.error('Error adding admin:', error);
@@ -185,6 +240,15 @@ const MerchantManagement = () => {
                             </Box>
                             <Box mb={2}>
                                 <TextField
+                                    label="Merchant ID"
+                                    value={merchantID}
+                                    onChange={(e) => setMerchantID(e.target.value)}
+                                    fullWidth
+                                    required
+                                />
+                            </Box>
+                            <Box mb={2}>
+                                <TextField
                                     label="Merchant Secret"
                                     value={merchantSecret}
                                     onChange={(e) => setMerchantSecret(e.target.value)}
@@ -217,7 +281,7 @@ const MerchantManagement = () => {
                         <Box sx={{ textAlign: 'center' }}>
                             <Typography variant="h5" component="h2" gutterBottom>
                                 <FaUsers style={{ marginRight: 8 }} />
-                               Super Admin Dashboard
+                                Super Admin Dashboard
                             </Typography>
                             <Typography variant="h6" component="p" color="primary">
                                 Total Admins: {adminTotal}
@@ -225,12 +289,13 @@ const MerchantManagement = () => {
                         </Box>
 
                         {/* Admin List Table */}
-                        <TableContainer component={Paper} sx={{ mt: 3 }}>
-                            <Table>
+                        <ResponsiveTable component={Paper}>
+                            <Table stickyHeader>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>ID</TableCell>
                                         <TableCell>Merchant Name</TableCell>
+                                        <TableCell>Merchant ID</TableCell>
                                         <TableCell>Email</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
@@ -238,9 +303,10 @@ const MerchantManagement = () => {
                                 <TableBody>
                                     {admins.map((admin, index) => (
                                         <React.Fragment key={admin.id}>
-                                            <TableRow>
+                                            <TableRow hover>
                                                 <TableCell>{admin.id}</TableCell>
                                                 <TableCell>{admin.merchant_name}</TableCell>
+                                                <TableCell>{admin.merchant_id}</TableCell>
                                                 <TableCell>{admin.email}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => toggleRowExpansion(index)}>
@@ -248,31 +314,34 @@ const MerchantManagement = () => {
                                                     </IconButton>
                                                 </TableCell>
                                             </TableRow>
-                                            <TableRow>
-                                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                                                    <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
-                                                        <Box margin={2}>
-                                                            <Typography variant="body1">
-                                                                Merchant Secret: {admin.merchant_secret}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Collapse>
-                                                </TableCell>
-                                            </TableRow>
+                                            {expandedRow === index && (
+                                                <TableRow>
+                                                    <TableCell colSpan={4}>
+                                                        <Collapse in={expandedRow === index}>
+                                                            <Box p={2}>
+                                                                <Typography>
+                                                                    Merchant Secret: {admin.merchant_secret}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Collapse>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
                                         </React.Fragment>
                                     ))}
                                 </TableBody>
                             </Table>
-                        </TableContainer>
+                        </ResponsiveTable>
                     </RightSection>
                 </Grid>
             </Grid>
 
-            {/* Snackbar for success/error messages */}
+            {/* Snackbar for notifications */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={6000}
                 onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}

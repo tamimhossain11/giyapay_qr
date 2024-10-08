@@ -94,8 +94,8 @@ const ProfilePage = () => {
           {profile.user_type === 'admin' ? (
             <>
               {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
-              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} {/* Display Merchant Name */}
-              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} {/* Display Merchant Secret */}
+              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
+              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
             </>
           ) : (
             <>
@@ -105,8 +105,9 @@ const ProfilePage = () => {
               {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
               {renderProfileDetail(<StatusIcon />, 'Status', profile.status)}
               {profile.branch && renderProfileDetail(<BranchIcon />, 'Branch Name', profile.branch.branch_name)}
-              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} {/* Display Merchant Name */}
-              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} {/* Display Merchant Secret */}
+              {renderProfileDetail(<PersonIcon />, 'Merchant ID', profile.merchant_id)} 
+              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
+              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
               
             </>
           )}

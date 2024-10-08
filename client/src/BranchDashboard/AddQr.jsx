@@ -16,9 +16,12 @@ const AddQr = () => {
   const [showFields, setShowFields] = useState(true);
   const [userId, setUserId] = useState('');
   const [branchId, setBranchId] = useState('');
+
   const [adminId, setAdminId] = useState('');
-  const [merchantName, setMerchantName] = useState('');
+  const [merchantID, setMerchantID] = useState('');
+  const [customerEmail,setCustomerEmail] = useState('');
   const [merchantSecret, setMerchantSecret] = useState('');
+
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -47,9 +50,11 @@ const AddQr = () => {
 
           if (user.admin) {
             setAdminId(user.admin.id);
-            setMerchantName(user.admin.merchant_name);
+            setMerchantID(user.admin.merchant_id);
             setMerchantSecret(user.admin.merchant_secret);
-          }
+            setCustomerEmail(user.admin.email);
+                    }
+
         } else {
           console.error('User does not have associated branch data');
         }
@@ -60,7 +65,6 @@ const AddQr = () => {
 
     fetchUserAndBranchData();
   }, [backendUrl]);
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -99,7 +103,7 @@ const AddQr = () => {
         success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}`,
         error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}`,
         cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}`,
-        merchant_id: merchantName,
+        merchant_id: merchantID,
         amount: amountInCents,
         currency: 'PHP',
         nonce,
@@ -110,7 +114,7 @@ const AddQr = () => {
         payWith: 'GiyaPay',
         gateway_account_type: 'Individualized',
         payment_method: 'MASTERCARD/VISA',
-        merchant_name: merchantName,
+        customer_email: customerEmail,
       };
 
       const checkoutUrl = `https://sandbox.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
@@ -146,7 +150,7 @@ const AddQr = () => {
 
   const generateSignature = (amount, invoice_number, nonce, timestamp) => {
     const secretKey = merchantSecret;
-    const merchantId = merchantName;
+    const merchantId = merchantID;
     const currency = 'PHP';
 
     const myStringForHashing = `${merchantId}${amount}${currency}${invoice_number}${timestamp}${nonce}${secretKey}`;

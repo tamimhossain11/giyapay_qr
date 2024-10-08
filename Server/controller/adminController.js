@@ -24,7 +24,7 @@ export const addAdmin = async (req, res) => {
       // Emit the event to update all clients with the new admin list
       const io = req.app.get('socketio');
       const admins = await Admin.findAll({
-          attributes: ['id', 'email', 'merchant_id', 'merchant_name'], // Select only necessary fields
+          attributes: ['id', 'email', 'merchant_id', 'merchant_name','merchant_secret'], // Select only necessary fields
       });
       io.emit('adminListUpdated', admins); // Emit updated list to all connected clients
 

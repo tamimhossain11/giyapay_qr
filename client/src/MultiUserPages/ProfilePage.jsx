@@ -8,7 +8,8 @@ import {
   Avatar, 
   CircularProgress, 
   Box, 
-  Paper 
+  Paper, 
+  Divider 
 } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
@@ -17,7 +18,8 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import BranchIcon from '@mui/icons-material/Business';
 import StatusIcon from '@mui/icons-material/ToggleOn';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import LockIcon from '@mui/icons-material/Lock';  // Icon for secret
+import LockIcon from '@mui/icons-material/Lock'; // Icon for secret
+import RippleLoader from '../Components/RIppleLoader';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null); 
@@ -56,10 +58,7 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
-        <CircularProgress />
-        <Typography variant="h6" marginLeft={2}>
-          Loading profile...
-        </Typography>
+        <RippleLoader/>
       </Box>
     );
   }
@@ -89,29 +88,59 @@ const ProfilePage = () => {
         <Typography variant="h4" align="center" gutterBottom>
           {profile.user_type === 'admin' ? 'Admin Profile' : 'User Profile'}
         </Typography>
-        <Grid container spacing={2}>
-          {renderProfileDetail(<BadgeIcon />, 'ID', profile.id)}
-          {profile.user_type === 'admin' ? (
-            <>
-              {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
+        
+        {/* Personal Details Section */}
+        <Box marginBottom={3}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+            Personal Details
+          </Typography>
+          <Grid container spacing={2}>
+            {renderProfileDetail(<BadgeIcon />, 'ID', profile.id)}
+            {profile.user_type === 'admin' ? (
+              <>
+                {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
+                {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
+                {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
+              </>
+            ) : (
+              <>
+                {renderProfileDetail(<PersonIcon />, 'First Name', profile.first_name)}
+                {renderProfileDetail(<PersonIcon />, 'Last Name', profile.last_name)}
+                {renderProfileDetail(<BadgeIcon />, 'Username', profile.username)}
+                {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
+                {renderProfileDetail(<StatusIcon />, 'Status', profile.status)}
+              </>
+            )}
+          </Grid>
+        </Box>
+
+        <Divider sx={{ marginBottom: 2 }} />
+
+        {/* Branch Information Section */}
+        {profile.branch && (
+          <Box marginBottom={3}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+              Branch Information
+            </Typography>
+            <Grid container spacing={2}>
+              {renderProfileDetail(<BranchIcon />, 'Branch Name', profile.branch.branch_name)}
+            </Grid>
+          </Box>
+        )}
+
+        {/* Merchant Information Section */}
+        {profile.user_type !== 'admin' && (
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+              Merchant Information
+            </Typography>
+            <Grid container spacing={2}>
+              {renderProfileDetail(<PersonIcon />, 'Merchant ID', profile.merchant_id)}
               {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
               {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
-            </>
-          ) : (
-            <>
-              {renderProfileDetail(<PersonIcon />, 'First Name', profile.first_name)}
-              {renderProfileDetail(<PersonIcon />, 'Last Name', profile.last_name)}
-              {renderProfileDetail(<BadgeIcon />, 'Username', profile.username)}
-              {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
-              {renderProfileDetail(<StatusIcon />, 'Status', profile.status)}
-              {profile.branch && renderProfileDetail(<BranchIcon />, 'Branch Name', profile.branch.branch_name)}
-              {renderProfileDetail(<PersonIcon />, 'Merchant ID', profile.merchant_id)} 
-              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
-              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
-              
-            </>
-          )}
-        </Grid>
+            </Grid>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

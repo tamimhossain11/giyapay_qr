@@ -121,3 +121,7 @@
   float: right;
   margin-bottom: 10px;
 }
+
+html {
+  overflow-y: scroll;
+}

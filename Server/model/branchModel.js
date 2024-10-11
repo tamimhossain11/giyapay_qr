@@ -6,6 +6,7 @@ const Branch = sequelize.define('Branch', {
   branch_name: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
   bank_name: {
     type: DataTypes.STRING,

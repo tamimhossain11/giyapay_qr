@@ -6,7 +6,8 @@ import { createBranch,
          updateBranchStatus, 
          getBranchCount, 
          editBranch, 
-         getBranchById } from '../controller/branchController.js';
+         getBranchById,
+        existingBranch } from '../controller/branchController.js';
 import { authenticateToken } from '../middleware/authenticate.js';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.put('/:id/status', updateBranchStatus);
 router.get('/count',authenticateToken, getBranchCount);
 router.put('/edit/:id', editBranch); 
 router.get('/:id', getBranchById);
+router.get('/check-name/:branch_name',existingBranch);
 
 
 export default router;

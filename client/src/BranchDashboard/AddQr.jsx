@@ -19,10 +19,12 @@ const AddQr = () => {
 
   const [adminId, setAdminId] = useState('');
   const [merchantID, setMerchantID] = useState('');
-  const [customerEmail,setCustomerEmail] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [merchantSecret, setMerchantSecret] = useState('');
 
-  const [error, setError] = useState('');
+  const [invoiceError, setInvoiceError] = useState('');
+  const [amountError, setAmountError] = useState('');
+
   const navigate = useNavigate();
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -53,7 +55,7 @@ const AddQr = () => {
             setMerchantID(user.admin.merchant_id);
             setMerchantSecret(user.admin.merchant_secret);
             setCustomerEmail(user.admin.email);
-                    }
+          }
 
         } else {
           console.error('User does not have associated branch data');
@@ -67,23 +69,41 @@ const AddQr = () => {
   }, [backendUrl]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // If the field is "amount", only allow numbers and one decimal point
+    if (name === 'amount') {
+      const regex = /^[0-9]*\.?[0-9]*$/;  // Allows numbers and one decimal point
+      if (regex.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setInvoiceError('');
+    setAmountError('');
 
     // Validate invoice number
     if (!isValidInvoiceNumber(formData.invoice_number)) {
-      setError('Invalid invoice number. Please use only letters, numbers, and no special characters.');
+      setInvoiceError('Invalid invoice number. Please use only letters, numbers, and no special characters.');
       return;
     }
 
     // Check if invoice number already exists
     const invoiceExists = await checkInvoiceNumberExists(formData.invoice_number);
     if (invoiceExists) {
-      setError('Invoice number already exists. Please choose a different one.');
+      setInvoiceError('Invoice number already exists. Please choose a different one.');
+      return;
+    }
+
+    // Validate the amount field
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      setAmountError('Please enter a valid amount greater than zero.');
       return;
     }
 
@@ -206,8 +226,8 @@ const AddQr = () => {
               onChange={handleChange}
               fullWidth
               margin="normal"
-              error={!!error}
-              helperText={error}
+              error={!!invoiceError}
+              helperText={invoiceError}
             />
             <TextField
               label="Amount"
@@ -216,6 +236,8 @@ const AddQr = () => {
               onChange={handleChange}
               fullWidth
               margin="normal"
+              error={!!amountError}
+              helperText={amountError}
             />
             <Button
               variant="contained"
@@ -323,5 +345,4 @@ const AddQr = () => {
     </Container>
   );
 };
-
 export default AddQr;

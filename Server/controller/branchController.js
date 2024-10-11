@@ -6,11 +6,17 @@ export const createBranch = async (req, res) => {
   const { branchName, bankName, bankBranch, branchUserId, adminId } = req.body; 
 
   try {
+    // Check if the branch name already exists
+    const existingBranch = await Branch.findOne({ where: { branch_name: branchName } });
+    if (existingBranch) {
+      return res.status(400).json({ error: 'Branch name already exists' });
+    }
+
     const branch = await Branch.create({
       branch_name: branchName,
       bank_name: bankName,
       bank_branch: bankBranch,
-      admin_id: adminId, 
+      admin_id: adminId,
     });
 
     if (branchUserId) {
@@ -27,6 +33,7 @@ export const createBranch = async (req, res) => {
     res.status(500).json({ error: "Failed to create branch" });
   }
 };
+
 
 
 // Get branches based on the logged-in admin
@@ -79,10 +86,17 @@ export const getAllBranchesCA = async (req, res) => {
 };
 
 
-// Delete a branch
+// Delete a branch with associated user check
 export const deleteBranch = async (req, res) => {
   const { id } = req.params;
   try {
+    // Check if the branch has any users associated with it
+    const users = await User.findAll({ where: { branch_id: id } });
+    if (users.length > 0) {
+      return res.status(400).json({ message: "Cannot delete branch because there are users associated with it. Please delete the users first." });
+    }
+
+    // If no users are associated, delete the branch
     await Branch.destroy({ where: { id } });
     res.json({ message: "Branch deleted successfully" });
   } catch (error) {
@@ -178,5 +192,21 @@ export const getBranchCount = async (req, res) => {
   } catch (error) {
     console.error('Error in getBranchCountByAdmin:', error);
     res.status(500).json({ Status: false, Error: 'Internal server error' });
+  }
+};
+
+export const existingBranch = async (req, res) => {
+  try {
+    const { branch_name } = req.params;
+    const branch = await Branch.findOne({ where: { branch_name } });
+
+    if (branch) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking admin email:', error);
+    return res.status(500).json({ error: 'Server error' });
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, MenuItem, FormControl, Select, InputLabel, Box, Typography, IconButton, InputAdornment, Autocomplete, Grid, Paper } from '@mui/material';
+import { TextField, Button, FormControl, Snackbar, Alert, Box, Typography, IconButton, InputAdornment, Autocomplete, Grid, Paper } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,13 +19,19 @@ const AddUser = () => {
   const [branches, setBranches] = useState([]);
   const [error, setError] = useState('');
   const [adminId, setAdminId] = useState(null);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [usernameTaken, setUsernameTaken] = useState(false);
+  const [emailTaken, setEmailTaken] = useState(false);
 
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/profile`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
         const { id } = response.data;
@@ -34,7 +40,7 @@ const AddUser = () => {
         console.error('Failed to fetch admin details:', error);
       }
     };
-  
+
     fetchAdminProfile();
   }, []);
 
@@ -55,9 +61,62 @@ const AddUser = () => {
     fetchBranches();
   }, []);
 
+  // Handle real-time username validation
+  const handleUsernameChange = async (e) => {
+    const newValue = e.target.value;
+    setUsername(newValue);
+
+    if (newValue) {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-username/${newValue}`);
+        setUsernameTaken(response.data.exists);
+      } catch (error) {
+        console.error('Error checking username:', error);
+      }
+    }
+  };
+
+  // Handle real-time email validation
+  const handleEmailChange = async (e) => {
+    const newValue = e.target.value;
+    setEmail(newValue);
+
+    if (newValue) {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-email/${newValue}`);
+        const adminResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin/check-email/${newValue}`);
+
+        if (response.data.exists || adminResponse.data.exists) {
+          setEmailTaken(true);
+        } else {
+          setEmailTaken(false);
+        }
+      } catch (error) {
+        console.error('Error checking email:', error);
+      }
+    }
+  };
+
+
+
   const handleSave = async () => {
+    setIsFormSubmitted(true);
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
+      return showSnackbarWithMessage('All fields are required!', 'error');
+    }
+
     if (password !== confirmPassword) {
-      setError('Passwords did not match');
+      return showSnackbarWithMessage('Passwords do not match!', 'error');
+    }
+
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailPattern.test(email)) {
+      return showSnackbarWithMessage('Please enter a valid email address!', 'error');
+    }
+    if (usernameTaken || emailTaken) {
+      setSnackbarMessage('Username or email is already taken.');
+      setSnackbarSeverity('error');
+      setShowSnackbar(true);
       return;
     }
 
@@ -74,14 +133,28 @@ const AddUser = () => {
       };
 
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/add`, userData);
-      navigate('/super-dashboard/manage-users');
+      showSnackbarWithMessage('User added successfully', 'success');
+      setTimeout(() => {
+        navigate('/super-dashboard/manage-users');
+      }, 1500);
     } catch (error) {
       console.error('Failed to save the user:', error);
+      showSnackbarWithMessage('Error adding user', 'error');
     }
+  };
+
+  const showSnackbarWithMessage = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setShowSnackbar(true);
   };
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-users');
+  };
+
+  const handleCloseSnackbar = () => {
+    setShowSnackbar(false);
   };
 
   return (
@@ -90,16 +163,16 @@ const AddUser = () => {
         <Typography variant="h4" align="center" gutterBottom>Add User</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-          <FormControl fullWidth margin="normal">
-        <Autocomplete
-          options={['Co-Admin', 'Branch User']}
-          renderInput={(params) => (
-            <TextField {...params} label="User Type" required />
-          )}
-          value={userType}
-          onChange={(e, newValue) => setUserType(newValue)}
-        />
-      </FormControl>
+            <FormControl fullWidth margin="normal">
+              <Autocomplete
+                options={['Co-Admin', 'Branch User']}
+                renderInput={(params) => (
+                  <TextField {...params} label="User Type" required />
+                )}
+                value={userType}
+                onChange={(e, newValue) => setUserType(newValue)}
+              />
+            </FormControl>
           </Grid>
 
           <Grid item xs={12} sm={6}>
@@ -109,6 +182,8 @@ const AddUser = () => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
+              error={isFormSubmitted && !firstName}
+              helperText={isFormSubmitted && !firstName && 'First name is required'}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -118,16 +193,19 @@ const AddUser = () => {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+              error={isFormSubmitted && !lastName}
+              helperText={isFormSubmitted && !lastName && 'Last name is required'}
             />
           </Grid>
-
           <Grid item xs={12}>
             <TextField
               label="Username"
               fullWidth
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               required
+              error={usernameTaken}  // Show error when username is taken
+              helperText={usernameTaken ? 'Username is already taken' : ''}  // Show message instantly if username is taken
             />
           </Grid>
 
@@ -136,8 +214,10 @@ const AddUser = () => {
               label="Email"
               fullWidth
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
+              error={emailTaken}  // Show error when email is taken or invalid
+              helperText={emailTaken ? 'Email is already taken' : ''}  // Show message instantly if email is taken
             />
           </Grid>
 
@@ -149,6 +229,8 @@ const AddUser = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              error={isFormSubmitted && !password}
+              helperText={isFormSubmitted && !password && 'Password is required'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -169,6 +251,8 @@ const AddUser = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              error={isFormSubmitted && !confirmPassword || confirmPassword !== password}
+              helperText={isFormSubmitted && !confirmPassword ? 'Confirm password is required' : confirmPassword !== password ? 'Passwords do not match' : ''}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -208,6 +292,18 @@ const AddUser = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      {/* Snackbar component */}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

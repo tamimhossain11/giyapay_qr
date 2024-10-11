@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, CircularProgress } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, CircularProgress, Snackbar, Alert } from '@mui/material';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RippleLoader from '../Components/RIppleLoader';
 
 const ManageBranches = () => {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Can be 'error' or 'success'
   const isTabletOrMobile = useMediaQuery('(max-width: 900px)');
+  const location = useLocation();
 
+  // Fetch all branches when component mounts
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const token = localStorage.getItem('token'); // Assuming you store JWT in localStorage
+        const token = localStorage.getItem('token');
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         setBranches(response.data);
       } catch (error) {
@@ -32,40 +38,56 @@ const ManageBranches = () => {
     fetchBranches();
   }, []);
 
+  // Handle successful branch create or edit
+  useEffect(() => {
+    if (location.state && location.state.successMessage) {
+      setSnackbarMessage(location.state.successMessage);
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+    }
+  }, [location]);
+
+  // Open delete confirmation dialog
   const openDeleteDialog = (branch) => {
     setBranchToDelete(branch);
     setDeleteDialogOpen(true);
   };
 
+  // Close delete confirmation dialog
   const closeDeleteDialog = () => {
     setDeleteDialogOpen(false);
     setBranchToDelete(null);
   };
 
+  // Handle branch deletion
   const handleDelete = async () => {
     if (!branchToDelete) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/branches/${branchToDelete.id}`);
+      const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/branches/${branchToDelete.id}`);
       setBranches(branches.filter((branch) => branch.id !== branchToDelete.id));
+      setSnackbarMessage(response.data.message);
+      setOpenSnackbar(true);
       closeDeleteDialog();
     } catch (error) {
       console.error('Failed to delete branch:', error);
+      setSnackbarMessage(error.response?.data?.message || 'Failed to delete branch');
+      setOpenSnackbar(true);
     }
   };
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Manage Branches
-      </Typography>
-
       {loading ? (
         <Box display="flex" justifyContent="center" mt={5}>
-          <CircularProgress />
+          <RippleLoader />
         </Box>
       ) : (
         <>
+          <Typography variant="h4" gutterBottom>
+            Manage Branches
+          </Typography>
+  
           <Button
             component={Link}
             to="/super-dashboard/manage-branches/add"
@@ -75,7 +97,7 @@ const ManageBranches = () => {
           >
             Create Branch
           </Button>
-
+  
           {branches.length === 0 ? (
             <Typography>No branches found. Create a new branch to get started.</Typography>
           ) : (
@@ -128,16 +150,13 @@ const ManageBranches = () => {
           )}
         </>
       )}
-
+  
       {/* Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={closeDeleteDialog}
-      >
+      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Delete Branch</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this branch?
+            Are you sure you want to delete this branch? If there are users associated with this branch, you must delete them first.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -149,8 +168,25 @@ const ManageBranches = () => {
           </Button>
         </DialogActions>
       </Dialog>
+  
+      {/* Snackbar for Success/Error */}
+      <Snackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={snackbarSeverity} onClose={() => setOpenSnackbar(false)}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
-};
+}  
 
 export default ManageBranches;
+
+
+
+
+

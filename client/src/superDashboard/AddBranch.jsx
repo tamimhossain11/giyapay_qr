@@ -1,48 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, Box, Typography, Autocomplete } from '@mui/material';
+import { Button, TextField, Box, Typography, Autocomplete, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const CreateBranch = () => {
   const { id } = useParams();
   const [branchName, setBranchName] = useState('');
+  const [isBranchNameUnique, setIsBranchNameUnique] = useState(true); // Track branch name uniqueness
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
   const [branchUser, setBranchUser] = useState(null);
   const [users, setUsers] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [adminId, setAdminId] = useState(null); // Add adminId state
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info'); 
+  const [adminId, setAdminId] = useState(null); 
   const navigate = useNavigate();
 
-  // Fetch logged-in admin details
   useEffect(() => {
+    // Fetch admin profile
     const fetchAdminProfile = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/profile`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, 
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         const { id } = response.data;
-        setAdminId(id); // Ensure adminId is being set
+        setAdminId(id); 
       } catch (error) {
         console.error('Failed to fetch admin details:', error);
       }
     };
-  
+
     fetchAdminProfile();
   }, []);
-  
 
   useEffect(() => {
+    // Fetch users for branch assignment
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`,{
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, 
-          },
-        }
-        );
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -52,9 +50,40 @@ const CreateBranch = () => {
     fetchUsers();
   }, []);
 
+  // Check branch name uniqueness
+  const checkBranchName = async (name) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/check-name/${name}`);
+      setIsBranchNameUnique(!response.data.exists); // If exists, it's not unique
+    } catch (error) {
+      console.error('Error checking branch name:', error);
+    }
+  };
+
+  const handleBranchNameChange = (e) => {
+    const name = e.target.value;
+    setBranchName(name);
+    if (name) {
+      checkBranchName(name);
+    }
+  };
+
   const handleSave = async () => {
+    // Check if all mandatory fields are filled
     if (!branchName) {
-      return setErrorMessage('Please provide a Branch Name.');
+      return showSnackbarWithMessage('Please provide a Branch Name.', 'error');
+    }
+
+    if (!isBranchNameUnique) {
+      return showSnackbarWithMessage('Branch name already exists.', 'error');
+    }
+
+    if (!bankName) {
+      return showSnackbarWithMessage('Please provide a Bank Name.', 'error');
+    }
+
+    if (!bankBranch) {
+      return showSnackbarWithMessage('Please provide a Bank Branch Name.', 'error');
     }
 
     if (branchUser && branchUser.id !== 'addLater') {
@@ -66,18 +95,15 @@ const CreateBranch = () => {
         const { isCoAdmin, alreadyAssigned } = checkResponse.data;
 
         if (isCoAdmin) {
-          setErrorMessage('Sorry, the selected user is a Co-Admin and cannot be assigned to a branch.');
-          return;
+          return showSnackbarWithMessage('The selected user is a Co-Admin and cannot be assigned to a branch.', 'error');
         }
 
         if (alreadyAssigned) {
-          setErrorMessage('This user is already assigned to another branch.');
-          return;
+          return showSnackbarWithMessage('This user is already assigned to another branch.', 'error');
         }
       } catch (error) {
         console.error('Failed to check user type or assignment:', error);
-        setErrorMessage('An error occurred while checking user details.');
-        return;
+        return showSnackbarWithMessage('An error occurred while checking user details.', 'error');
       }
     }
 
@@ -92,82 +118,116 @@ const CreateBranch = () => {
 
       if (id) {
         await axios.put(`${import.meta.env.VITE_BACKEND_URL}/branches/${id}`, branchData);
+        showSnackbarWithMessage('Branch updated successfully!', 'success');
       } else {
         await axios.post(`${import.meta.env.VITE_BACKEND_URL}/branches`, branchData);
+        showSnackbarWithMessage('Branch created successfully!', 'success');
       }
 
-      navigate('/super-dashboard/manage-branches');
+      setTimeout(() => {
+        navigate('/super-dashboard/manage-branches');
+      }, 1500); 
     } catch (error) {
       console.error('Failed to save branch:', error);
-      setErrorMessage('An error occurred while saving the branch.');
+      showSnackbarWithMessage('An error occurred while saving the branch.', 'error');
     }
+  };
+
+  const showSnackbarWithMessage = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity); 
+    setShowSnackbar(true);
   };
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-branches');
   };
 
+  const handleCloseSnackbar = () => {
+    setShowSnackbar(false);
+  };
+
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        {id ? 'Edit Branch' : 'Create Branch'}
-      </Typography>
-
-      {errorMessage && (
-        <Typography color="error" gutterBottom>
-          {errorMessage}
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
+      <Box width="100%" maxWidth="600px" p={3} boxShadow={3} borderRadius={2}>
+        <Typography variant="h4" align="center" gutterBottom>
+          {id ? 'Edit Branch' : 'Create Branch'}
         </Typography>
-      )}
 
-      <TextField
-        label="Branch Name"
-        value={branchName}
-        onChange={(e) => setBranchName(e.target.value)}
-        fullWidth
-        margin="normal"
-        required
-      />
-      <TextField
-        label="Bank Name"
-        value={bankName}
-        onChange={(e) => setBankName(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Bank Branch"
-        value={bankBranch}
-        onChange={(e) => setBankBranch(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label="Branch Name"
+              value={branchName}
+              onChange={handleBranchNameChange}
+              fullWidth
+              margin="normal"
+              required
+              error={!isBranchNameUnique}
+              helperText={!isBranchNameUnique ? 'Branch name already exists' : ''}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Bank Name"
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Bank Branch"
+              value={bankBranch}
+              onChange={(e) => setBankBranch(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Autocomplete
+              options={[...users, { first_name: '', last_name: '', username: 'Add later', id: 'addLater' }]}
+              getOptionLabel={(user) =>
+                user.id === 'addLater' ? 'Add later' : `${user.first_name} ${user.last_name} (${user.username})`
+              }
+              value={branchUser}
+              onChange={(event, newValue) => setBranchUser(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Branch User (optional)"
+                  fullWidth
+                  margin="normal"
+                  helperText="You can assign a user later on the Manage Users page"
+                />
+              )}
+            />
+          </Grid>
+        </Grid>
 
-      <Autocomplete
-        options={[...users, { first_name: '', last_name: '', username: 'Add later', id: 'addLater' }]}
-        getOptionLabel={(user) =>
-          user.id === 'addLater' ? 'Add later' : `${user.first_name} ${user.last_name} (${user.username})`
-        }
-        value={branchUser}
-        onChange={(event, newValue) => setBranchUser(newValue)}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Branch User (optional)"
-            fullWidth
-            margin="normal"
-            helperText="You can assign a user later on the Manage Users page"
-          />
-        )}
-      />
-
-      <Box mt={2} display="flex" justifyContent="space-between">
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save
-        </Button>
-        <Button variant="outlined" color="secondary" onClick={handleCancel}>
-          Cancel
-        </Button>
+        <Box mt={3} display="flex" justifyContent="space-between">
+          <Button variant="contained" color="primary" onClick={handleSave}>
+            {id ? 'Update' : 'Save'}
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </Box>
       </Box>
+
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

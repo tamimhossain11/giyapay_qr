@@ -71,3 +71,20 @@ export const getAllAdmins = async (req, res) => {
       });
   }
 };
+
+export const adminEmailCheck= async (req, res) => {
+    try {
+      const { email } = req.params;
+      const admin = await Admin.findOne({ where: { email } });
+  
+      if (admin) {
+        return res.json({ exists: true });
+      } else {
+        return res.json({ exists: false });
+      }
+    } catch (error) {
+      console.error('Error checking admin email:', error);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  };
+  

@@ -16,10 +16,12 @@ const LeftSection = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     padding: theme.spacing(3),
     borderRight: `1px solid ${theme.palette.divider}`,
+    height: '100%',
 }));
 
 const RightSection = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),
+    height: '100%',
 }));
 
 const WelcomeBanner = styled(Box)(({ theme }) => ({
@@ -60,6 +62,8 @@ const MerchantManagement = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [socket, setSocket] = useState(null);
+
+    const [errors, setErrors] = useState({});
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -133,6 +137,18 @@ const MerchantManagement = () => {
         };
     }, [backendUrl]);
 
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!email) newErrors.email = 'Email is required';
+        if (!password) newErrors.password = 'Password is required';
+        if (!merchantName) newErrors.merchantName = 'Merchant Name is required';
+        if (!merchantID) newErrors.merchantID = 'Merchant ID is required';
+        if (!merchantSecret) newErrors.merchantSecret = 'Merchant Secret is required';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
 
     const handleLogout = () => {
@@ -145,8 +161,10 @@ const MerchantManagement = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (!validateForm()) return;
+
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin/add`, {
+            const response = await axios.post(`${backendUrl}/admin/add`, {
                 email,
                 password,
                 merchant_name: merchantName,
@@ -169,6 +187,7 @@ const MerchantManagement = () => {
         }
     };
 
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -182,18 +201,17 @@ const MerchantManagement = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 5 }}>
+        <Container maxWidth="xl" sx={{ mt: 5 }}>
             {/* Welcome Message */}
             <WelcomeBanner>
                 <Typography variant="h4">Welcome to the Super Admin Dashboard</Typography>
                 <Typography variant="subtitle1">Manage merchants and view stats below</Typography>
             </WelcomeBanner>
 
-            <Grid container spacing={4}>
-                {/* Left Section - Form & Logout */}
+            <Grid container spacing={4} sx={{ flexGrow: 1 }}>
                 <Grid item xs={12} md={5}>
                     <LeftSection component={Paper} elevation={3}>
-                        <Typography variant="h5" component="h2" gutterBottom>
+                        <Typography variant="h5" gutterBottom>
                             Add Admin
                         </Typography>
                         <form onSubmit={handleSubmit}>
@@ -205,6 +223,8 @@ const MerchantManagement = () => {
                                     onChange={(e) => setEmail(e.target.value)}
                                     fullWidth
                                     required
+                                    error={!!errors.email}
+                                    helperText={errors.email}
                                 />
                             </Box>
                             <Box mb={2}>
@@ -215,13 +235,12 @@ const MerchantManagement = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     fullWidth
                                     required
+                                    error={!!errors.password}
+                                    helperText={errors.password}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
-                                                <IconButton
-                                                    onClick={handleClickShowPassword}
-                                                    edge="end"
-                                                >
+                                                <IconButton onClick={handleClickShowPassword}>
                                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
                                             </InputAdornment>
@@ -236,6 +255,8 @@ const MerchantManagement = () => {
                                     onChange={(e) => setMerchantName(e.target.value)}
                                     fullWidth
                                     required
+                                    error={!!errors.merchantName}
+                                    helperText={errors.merchantName}
                                 />
                             </Box>
                             <Box mb={2}>
@@ -245,6 +266,8 @@ const MerchantManagement = () => {
                                     onChange={(e) => setMerchantID(e.target.value)}
                                     fullWidth
                                     required
+                                    error={!!errors.merchantID}
+                                    helperText={errors.merchantID}
                                 />
                             </Box>
                             <Box mb={2}>
@@ -254,14 +277,14 @@ const MerchantManagement = () => {
                                     onChange={(e) => setMerchantSecret(e.target.value)}
                                     fullWidth
                                     required
+                                    error={!!errors.merchantSecret}
+                                    helperText={errors.merchantSecret}
                                 />
                             </Box>
                             <Button type="submit" variant="contained" color="primary" fullWidth>
                                 Add Admin
                             </Button>
                         </form>
-
-                        {/* Logout Button */}
                         <Button
                             variant="contained"
                             color="error"
@@ -275,20 +298,18 @@ const MerchantManagement = () => {
                     </LeftSection>
                 </Grid>
 
-                {/* Right Section - Admin Count & Admin List */}
                 <Grid item xs={12} md={7}>
                     <RightSection component={Paper} elevation={3}>
                         <Box sx={{ textAlign: 'center' }}>
-                            <Typography variant="h5" component="h2" gutterBottom>
+                            <Typography variant="h5" gutterBottom>
                                 <FaUsers style={{ marginRight: 8 }} />
                                 Super Admin Dashboard
                             </Typography>
-                            <Typography variant="h6" component="p" color="primary">
+                            <Typography variant="h6" color="primary">
                                 Total Admins: {adminTotal}
                             </Typography>
                         </Box>
 
-                        {/* Admin List Table */}
                         <ResponsiveTable component={Paper}>
                             <Table stickyHeader>
                                 <TableHead>
@@ -314,19 +335,17 @@ const MerchantManagement = () => {
                                                     </IconButton>
                                                 </TableCell>
                                             </TableRow>
-                                            {expandedRow === index && (
-                                                <TableRow>
-                                                    <TableCell colSpan={4}>
-                                                        <Collapse in={expandedRow === index}>
-                                                            <Box p={2}>
-                                                                <Typography>
-                                                                    Merchant Secret: {admin.merchant_secret}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Collapse>
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
+                                            <TableRow>
+                                                <TableCell colSpan={5} sx={{ p: 0 }}>
+                                                    <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
+                                                        <Box sx={{ p: 2 }}>
+                                                            <Typography variant="subtitle1" gutterBottom>
+                                                                Merchant Secret: {admin.merchant_secret}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Collapse>
+                                                </TableCell>
+                                            </TableRow>
                                         </React.Fragment>
                                     ))}
                                 </TableBody>
@@ -336,13 +355,7 @@ const MerchantManagement = () => {
                 </Grid>
             </Grid>
 
-            {/* Snackbar for notifications */}
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>

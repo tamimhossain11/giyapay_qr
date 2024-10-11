@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography,Snackbar, Paper, Alert } from '@mui/material';
 import axios from 'axios';
 
 const EditBranch = () => {
@@ -9,6 +9,9 @@ const EditBranch = () => {
   const [branchName, setBranchName] = useState('');
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
 
   useEffect(() => {
     const fetchBranch = async () => {
@@ -34,7 +37,11 @@ const EditBranch = () => {
         bank_name: bankName,
         bank_branch: bankBranch,
       });
-      navigate('/super-dashboard/manage-branches');
+      showSnackbarWithMessage('Branch updated successfully', 'success');
+      setTimeout(() => {
+        navigate('/super-dashboard/manage-branches');
+      }, 1500);
+
     } catch (error) {
       console.error('Failed to update branch:', error);
     }
@@ -44,51 +51,67 @@ const EditBranch = () => {
     navigate('/super-dashboard/manage-branches');
   };
 
+  const showSnackbarWithMessage = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setShowSnackbar(true);
+  };
+
+  const handleCloseSnackbar = () => {
+    setShowSnackbar(false);
+  };
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Edit Branch
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Branch Name"
-          value={branchName}
-          onChange={(e) => setBranchName(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Bank Name"
-          value={bankName}
-          onChange={(e) => setBankName(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Bank Branch"
-          value={bankBranch}
-          onChange={(e) => setBankBranch(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Box mt={2} display="flex" justifyContent="space-between">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            Save Changes
-          </Button>
-          <Button
-            type="button"
-            variant="outlined"
-            color="secondary"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </form>
+    <Box p={3} display="flex" justifyContent="center">
+      <Paper elevation={3} sx={{ width: '100%', maxWidth: '600px', p: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Edit Branch
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Branch Name"
+            value={branchName}
+            onChange={(e) => setBranchName(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Bank Name"
+            value={bankName}
+            onChange={(e) => setBankName(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Bank Branch"
+            value={bankBranch}
+            onChange={(e) => setBankBranch(e.target.value)}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <Box mt={2} display="flex" justifyContent="space-between">
+            <Button type="submit" variant="contained" color="primary">
+              Save Changes
+            </Button>
+            <Button type="button" variant="outlined" color="secondary" onClick={handleCancel}>
+              Cancel
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+      {/* Snackbar component */}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

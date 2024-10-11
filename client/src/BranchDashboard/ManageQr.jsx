@@ -13,6 +13,7 @@ import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
+import RippleLoader from '../Components/RIppleLoader';
 
 const ManageQr = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -238,7 +239,7 @@ const ManageQr = () => {
         alignItems="center"
         height="80vh"
       >
-        <CircularProgress />
+        <RippleLoader/>
       </Box>
     );
   }

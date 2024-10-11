@@ -7,6 +7,7 @@ import { Visibility as ViewIcon,} from '@mui/icons-material';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
+import RippleLoader from '../Components/RIppleLoader';
 
 const ManageQRBU = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -168,7 +169,7 @@ const ManageQRBU = () => {
         alignItems="center"
         height="80vh"
       >
-        <CircularProgress />
+       <RippleLoader/>
       </Box>
     );
   }

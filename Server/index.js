@@ -14,8 +14,8 @@ import { Server } from 'socket.io';
 import uploadRoutes from './Routes/uploadRoutes.js'
 import { authenticateToken } from './middleware/authenticate.js';
 import User from './model/userModel.js';
-
-
+import { Op } from 'sequelize';
+import Admin from './model/adminModel.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -47,26 +47,27 @@ app.use('/branches', branchesRoutes);
 app.use('/api/qr-codes', qrCodesRoute);
 app.use('/upload', uploadRoutes);
 
-// User count route based on admin_id or user_id (for Co-Admin or Admin)
+//--------------------------------------------------------------Temporary users section for fast use issues will be fixed later----------------------------------------------------
+
+
 app.get('/user/count', authenticateToken, async (req, res) => {
   try {
-    const { userType, id, admin_id } = req.user; // Destructure user info from token
+    const { userType, id, admin_id } = req.user; 
 
     let adminId;
     if (userType === 'admin') {
-      adminId = id; // Admin is matched by their own id
+      adminId = id; 
     } else if (userType === 'Co-Admin' && admin_id) {
-      adminId = admin_id; // Co-Admin is matched by the associated admin_id
+      adminId = admin_id; 
     } else {
       return res.status(400).json({ Status: false, Error: 'Admin ID is missing' });
     }
 
-    // Query to count users associated with the adminId (based on userType)
     const userCount = await User.count({
       where: {
         [Sequelize.Op.or]: [
-          { id: adminId }, // If the user is an admin, count by their own user_id
-          { admin_id: adminId } // If the user is a co-admin, count users under that admin_id
+          { id: adminId }, 
+          { admin_id: adminId } 
         ]
       }
     });
@@ -77,6 +78,53 @@ app.get('/user/count', authenticateToken, async (req, res) => {
     return res.status(500).json({ Status: false, Error: 'Internal server error' });
   }
 });
+
+// Check if username exists
+app.get('/user/check-username/:username', async (req, res) => {
+  const { username } = req.params;
+  const user = await User.findOne({ where: { username } });
+  res.json({ exists: !!user });
+});
+
+// Check if email exists
+app.get('/user/check-email/:email', async (req, res) => {
+  const { email } = req.params;
+  const user = await User.findOne({ where: { email } });
+  res.json({ exists: !!user });
+});
+//--------------------------------------------------------------
+// Check if username is taken, excluding the current user
+app.get('/user/check-username/:username/:userId', async (req, res) => {
+  const { username, userId } = req.params;
+  const user = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
+  res.json({ exists: !!user });
+});
+
+// Check if email is taken, excluding the current user (checks both 'users' and 'admin' tables)
+app.get('/user/check-email/:email/:userId', async (req, res) => {
+  const { email, userId } = req.params;
+
+  try {
+    // Check in 'users' table
+    const user = await User.findOne({ where: { email, id: { [Op.ne]: userId } } });
+
+    // Check in 'admin' table
+    const admin = await Admin.findOne({ where: { email } });
+
+    // If the email exists in either table, respond with 'exists: true'
+    if (user || admin) {
+      return res.json({ exists: true });
+    }
+
+    // If the email does not exist in both tables, respond with 'exists: false'
+    return res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return res.status(500).json({ error: 'An error occurred while checking the email' });
+  }
+});
+
+//---------------------------------------------------------------------Temporary user section ends here-----------------------------------------------------------------
 
 
 // Cleanup old blacklisted tokens
@@ -102,16 +150,14 @@ setInterval(cleanUpBlacklistedTokens, 24 * 60 * 60 * 1000);
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Store the io instance in app
   app.set('socketio', io);
 
-  // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
 });
 
-// Server listening
+// Server listening port
 server.listen(3000, () => {
   console.log('Server is running on port 3000');
 });

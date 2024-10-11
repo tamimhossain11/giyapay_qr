@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, MenuItem, Box, Typography, Autocomplete, IconButton, InputAdornment } from '@mui/material';
+import { Button, TextField, MenuItem, Box, Typography, Autocomplete, IconButton, InputAdornment, Snackbar, Alert } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import MuiAlert from '@mui/material/Alert';
 
 const EditUser = () => {
   const { id } = useParams();
@@ -11,9 +12,16 @@ const EditUser = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [error, setError] = useState('');
-  const [newPassword, setNewPassword] = useState(''); 
+  const [newPassword, setNewPassword] = useState('');
   const [showPasswordField, setShowPasswordField] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [isFormValid, setIsFormValid] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,12 +36,13 @@ const EditUser = () => {
 
     const fetchBranches = async () => {
       try {
-        const token = localStorage.getItem('token'); // Assuming you store JWT in localStorage
+        const token = localStorage.getItem('token');
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/all`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });setBranches(response.data);
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBranches(response.data);
       } catch (error) {
         console.error('Failed to fetch branches:', error);
       }
@@ -43,31 +52,149 @@ const EditUser = () => {
     fetchBranches();
   }, [id]);
 
-  const handleUpdate = async () => {
+  // Enhanced validation for required fields
+  const validateForm = () => {
+    if (!user.first_name.trim()) {
+      setSnackbarMessage('First Name is required.');
+      setOpenSnackbar(true);
+      return false;
+    }
+    if (!user.last_name.trim()) {
+      setSnackbarMessage('Last Name is required.');
+      setOpenSnackbar(true);
+      return false;
+    }
+    if (!user.username.trim()) {
+      setSnackbarMessage('Username is required.');
+      setOpenSnackbar(true);
+      return false;
+    }
+    if (!user.email.trim()) {
+      setSnackbarMessage('Email is required.');
+      setOpenSnackbar(true);
+      return false;
+    }
+
+    if (usernameError) {
+      setSnackbarMessage('Username is already in use.');
+      setOpenSnackbar(true);
+      return false;
+    }
+
+    if (emailError) {
+      setSnackbarMessage('Email is already in use.');
+      setOpenSnackbar(true);
+      return false;
+    }
+
+    return true;
+  };
+
+
+  // Check if the username already exists (excluding current user's username)
+  const checkUsernameAvailability = async (username) => {
     try {
-      // Build the updated user object
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-username/${username}/${id}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking username:', error);
+    }
+  };
+
+  // Check if the email already exists (excluding current user's email)
+  const checkEmailAvailability = async (email) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-email/${email}/${id}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking email:', error);
+    }
+  };
+
+
+  // Handle dynamic email validation
+  const handleEmailChange = async (e) => {
+    const email = e.target.value;
+    setUser({ ...user, email });
+    setEmailError(''); // Clear error
+
+    if (email.trim() === '') {
+      setEmailError('Email is required');
+      return;
+    }
+
+    const isEmailTaken = await checkEmailAvailability(email);
+    if (isEmailTaken) {
+      setEmailError('Email is already taken.');
+    }
+  };
+
+
+
+  // Handle dynamic username validation
+  const handleUsernameChange = async (e) => {
+    const username = e.target.value;
+    setUser({ ...user, username });
+    setUsernameError(''); // Clear error
+
+    if (username.trim() === '') {
+      setUsernameError('Username is required');
+      return;
+    }
+
+    const isUsernameTaken = await checkUsernameAvailability(username);
+    if (isUsernameTaken) {
+      setUsernameError('Username is already taken.');
+    }
+
+  };
+
+  const handleUpdate = async () => {
+    setError(''); // Clear any previous error messages
+    setIsError(false); // Reset error state
+  
+    // Use validateForm to check all fields
+    if (!validateForm()) {
+      setIsError(true); // Validation failed, it's an error
+      return; // Stop if validation fails
+    }
+  
+    try {
       const updatedUser = {
         first_name: user.first_name,
         last_name: user.last_name,
         username: user.username,
         email: user.email,
         user_type: user.user_type,
-        branch_id: user.user_type === "Branch User" ? selectedBranch : null, 
+        branch_id: user.user_type === 'Branch User' ? selectedBranch : null,
         status: user.status,
       };
-
-      // Only include the password if the user explicitly updated it
+  
       if (newPassword && newPassword.trim()) {
         updatedUser.password = newPassword;
       }
-
+  
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
-      navigate('/super-dashboard/manage-users');
+  
+      setUpdateSuccess(true);
+      setSnackbarMessage('User updated successfully');
+      setIsError(false); // No error
+      setOpenSnackbar(true);
+  
+      // Navigate back after showing the Snackbar for 2 seconds
+      setTimeout(() => {
+        navigate('/super-dashboard/manage-users');
+      }, 2000);
     } catch (error) {
       console.error('Failed to update user:', error);
-      setError('An error occurred while updating the user.');
+      setError(error.response?.data?.error || 'An error occurred while updating the user.');
+      setSnackbarMessage('Error updating user.');
+      setIsError(true); // Set error state
+      setOpenSnackbar(true);
     }
   };
+  
+
 
   const handleCancel = () => {
     navigate('/super-dashboard/manage-users');
@@ -78,7 +205,7 @@ const EditUser = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: '600px', margin: '0 auto', minHeight: '80vh' }}>
       <Typography variant="h4" gutterBottom>Edit User</Typography>
       <TextField
         label="First Name"
@@ -86,6 +213,8 @@ const EditUser = () => {
         onChange={(e) => setUser({ ...user, first_name: e.target.value })}
         fullWidth
         margin="normal"
+        error={!user.first_name}
+        helperText={!user.first_name && 'First name is required'}
       />
       <TextField
         label="Last Name"
@@ -93,20 +222,29 @@ const EditUser = () => {
         onChange={(e) => setUser({ ...user, last_name: e.target.value })}
         fullWidth
         margin="normal"
+        error={!user.last_name}
+        helperText={!user.last_name && 'Last name is required'}
       />
       <TextField
         label="Username"
         value={user.username || ''}
-        onChange={(e) => setUser({ ...user, username: e.target.value })}
+        onChange={handleUsernameChange} // Dynamic check
         fullWidth
         margin="normal"
+        required
+        error={!!usernameError}
+        helperText={usernameError || 'Username is required'}
       />
+
       <TextField
         label="Email"
         value={user.email || ''}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
+        onChange={handleEmailChange} // Dynamic check
         fullWidth
         margin="normal"
+        required
+        error={!!emailError}
+        helperText={emailError || 'Email is required'}
       />
       <TextField
         label="User Type"
@@ -124,7 +262,7 @@ const EditUser = () => {
         <Autocomplete
           options={branches}
           getOptionLabel={(option) => option.branch_name}
-          value={branches.find(branch => branch.id === selectedBranch) || null}
+          value={branches.find((branch) => branch.id === selectedBranch) || null}
           onChange={(event, newValue) => setSelectedBranch(newValue ? newValue.id : null)}
           renderInput={(params) => <TextField {...params} label="Assign Branch" margin="normal" fullWidth />}
         />
@@ -132,7 +270,8 @@ const EditUser = () => {
 
       <Box mt={2}>
         <Typography variant="body1">
-          Do you want to update the password? <Button onClick={() => setShowPasswordField(!showPasswordField)}>Click here</Button>
+          {showPasswordField ? 'Change your password' : 'Do you want to update the password?'}
+          <Button onClick={() => setShowPasswordField(!showPasswordField)}>Click here</Button>
         </Typography>
         {showPasswordField && (
           <TextField
@@ -165,9 +304,22 @@ const EditUser = () => {
           Cancel
         </Button>
       </Box>
+
+      {/* Snackbar for success/error message */}
+      <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000}
+  onClose={() => setOpenSnackbar(false)}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+>
+  <Alert onClose={() => setOpenSnackbar(false)} severity={isError ? 'error' : 'success'}>
+    {snackbarMessage}
+  </Alert>
+</Snackbar>
+
+
     </div>
   );
 };
 
 export default EditUser;
-

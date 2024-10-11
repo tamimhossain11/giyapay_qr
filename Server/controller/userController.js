@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import models from '../model/index.js';
 import Admin from '../model/adminModel.js';
-import sequelize from '../databse/connection.js';
+import { Op } from 'sequelize';
 
 const { User, Branch } = models;
 
@@ -63,16 +63,39 @@ export const getProfile = async (req, res) => {
 
 
 
-// Controller function to add a user
 export const addUser = async (req, res) => {
-  const { firstName, lastName, username, email, password, userType, branchId , adminId } = req.body;
+  const { firstName, lastName, username, email, password, userType, branchId, adminId } = req.body;
 
   // Validate required fields
-  if (!firstName || !lastName || !username || !email || !password || !userType || !adminId ) {
+  if (!firstName || !lastName || !username || !email || !password || !userType || !adminId) {
     return res.status(400).json({ error: 'All fields are required except branchId' });
   }
 
   try {
+    // Check for duplicate username and email in both User and Admin tables
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ username }, { email }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        error: `User with the same ${existingUser.username === username ? 'username' : 'email'} already exists.`,
+      });
+    }
+
+    // Check if email already exists in the Admin table
+    const existingAdmin = await Admin.findOne({
+      where: { email }
+    });
+
+    if (existingAdmin) {
+      return res.status(400).json({
+        error: 'An admin with the same email already exists.',
+      });
+    }
+
     // Check if branchId is provided and if the branch exists
     if (branchId) {
       const branch = await Branch.findByPk(branchId);
@@ -93,7 +116,7 @@ export const addUser = async (req, res) => {
       password: hashedPassword,
       user_type: userType,
       branch_id: branchId || null,
-      admin_id: adminId, 
+      admin_id: adminId,
     });
 
     // Respond with success
@@ -190,14 +213,32 @@ export const updateUser = async (req, res) => {
   const userId = req.params.id;
   const { first_name, last_name, username, email, user_type, branch_id, status, password } = req.body;
 
+  // Validate required fields
+  if (!first_name || !last_name || !username || !email) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
   try {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found.' });
     }
 
-    // Only update fields that are provided in the request body
+    // Check if the username is already taken (excluding the current user)
+    const usernameExists = await User.findOne({ where: { username, id: { [Op.ne]: userId } } });
+    if (usernameExists) {
+      return res.status(400).json({ error: 'Username is already in use.' });
+    }
+
+    // Check if the email is already taken (check both User and Admin tables)
+    const emailExistsInUser = await User.findOne({ where: { email, id: { [Op.ne]: userId } } });
+    const emailExistsInAdmin = await Admin.findOne({ where: { email } });
+    if (emailExistsInUser || emailExistsInAdmin) {
+      return res.status(400).json({ error: 'Email is already in use.' });
+    }
+
+    // Only update fields that are provided
     const updatedFields = {
       ...(first_name && { first_name }),
       ...(last_name && { last_name }),
@@ -208,22 +249,23 @@ export const updateUser = async (req, res) => {
       ...(status !== undefined && { status }),
     };
 
-    // Password should only be updated if it's provided and non-empty
+    // Password should only be updated if provided
     if (password && password.trim() !== '') {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       updatedFields.password = hashedPassword;
     }
 
-    // Update the user with the new fields
+    // Update the user with new data
     await user.update(updatedFields);
 
     res.status(200).json({ message: 'User updated successfully', user });
   } catch (error) {
     console.error('Error updating user:', error);
-    res.status(500).json({ error: 'An error occurred while updating the user' });
+    res.status(500).json({ error: 'An error occurred while updating the user.' });
   }
 };
+
 
 
 

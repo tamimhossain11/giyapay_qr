@@ -176,7 +176,7 @@ const BranchDashboard = () => {
         </IconButton>
         <Divider />
         <List>
-          <ListItem button onClick={() => { handleRouteClick("/branch-dashboard/manage-qr"); handleDrawerToggle(); }}>
+          <ListItem button onClick={() => { handleRouteClick("/branch-dashboard/manage-qrbu"); handleDrawerToggle(); }}>
             <ListItemText primary="Manage QR" />
           </ListItem>
           <ListItem button onClick={() => { handleRouteClick("/branch-dashboard/add-qr"); handleDrawerToggle(); }}>

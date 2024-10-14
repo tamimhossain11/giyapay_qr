@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
+  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress,Autocomplete
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -13,7 +13,8 @@ import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader';
+import CustomTextField from '../Mui/CustomTextField';
 
 const ManageQr = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -239,7 +240,7 @@ const ManageQr = () => {
         alignItems="center"
         height="80vh"
       >
-        <RippleLoader/>
+        <RippleLoader />
       </Box>
     );
   }
@@ -247,7 +248,7 @@ const ManageQr = () => {
   return (
     <Container maxWidth={false} disableGutters>
       <Box mt={4} width="100%">
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           Manage QR Codes
         </Typography>
 
@@ -256,7 +257,7 @@ const ManageQr = () => {
           <Box display="flex" flexWrap="wrap" gap={2} width="100%">
             {/* First Row */}
             <Box display="flex" flexWrap="wrap" gap={2} width="100%">
-              <TextField
+              <CustomTextField
                 label="Search Payment Reference"
                 variant="outlined"
                 size="small"
@@ -264,7 +265,7 @@ const ManageQr = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 sx={{ flex: 1 }}
               />
-              <TextField
+              <CustomTextField
                 label="Start Date"
                 type="date"
                 variant="outlined"
@@ -275,7 +276,7 @@ const ManageQr = () => {
                 onChange={handleDateChange}
                 sx={{ flex: 1 }}
               />
-              <TextField
+              <CustomTextField
                 label="End Date"
                 type="date"
                 variant="outlined"
@@ -287,50 +288,83 @@ const ManageQr = () => {
                 sx={{ flex: 1 }}
               />
             </Box>
-
-            {/* Second Row */}
             <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
-              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                <InputLabel>Branch Name</InputLabel>
-                <Select
-                  value={branchFilter}
-                  onChange={(e) => setBranchFilter(e.target.value)}
-                  label="Branch Name"
-                >
-                  <MenuItem value="">All Branches</MenuItem>
-                  {branches.map((branch) => (
-                    <MenuItem key={branch.id} value={branch.branch_name}>
-                      {branch.branch_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                <InputLabel>User Name</InputLabel>
-                <Select
-                  value={userFilter}
-                  onChange={(e) => setUserFilter(e.target.value)}
-                  label="User Name"
-                >
-                  <MenuItem value="">All Users</MenuItem>
-                  {users.map((user) => (
-                    <MenuItem key={user.id} value={user.username}>
-                      {user.username}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              {/* Branch Name Autocomplete */}
+              <Autocomplete
+                options={branches}
+                getOptionLabel={(branch) => branch.branch_name || ''}
+                value={branchFilter ? branches.find(b => b.branch_name === branchFilter) : null}
+                onChange={(event, newValue) => setBranchFilter(newValue ? newValue.branch_name : '')}
+                renderInput={(params) => (
+                  <CustomTextField
+                    {...params}
+                    label="Branch Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"  // Keeps the input size small like the Select field
+                    sx={{
+                      flex: 1,
+                      minWidth: '500px', // Ensures minimum width
+                    }}
+                  />
+                )}
+              />
+
+              {/* User Name Autocomplete */}
+              <Autocomplete
+                options={users}
+                getOptionLabel={(user) => user.username || ''}
+                value={userFilter ? users.find(u => u.username === userFilter) : null}
+                onChange={(event, newValue) => setUserFilter(newValue ? newValue.username : '')}
+                renderInput={(params) => (
+                  <CustomTextField
+                    {...params}
+                    label="User Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"  // Matches size
+                    sx={{
+                      flex: 1,
+                      minWidth: '500px', // Ensures minimum width
+                    }}
+                  />
+                )}
+              />
             </Box>
+
           </Box>
 
           {/* Buttons */}
           <Box mt={2} display="flex" gap={2}>
-            <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+            <Button variant="contained" color="primary"
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#FBB03A',
+              color: 'black',
+              '&:hover': {
+                backgroundColor: '#ED1F79',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }}
+            onClick={() => setPage(0)}>
               Apply Filters
             </Button>
             <Button
               variant="contained"
               color="secondary"
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#ED1F79',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+              }}
               onClick={() => {
                 setSearchTerm('');
                 setBranchFilter('');
@@ -345,9 +379,32 @@ const ManageQr = () => {
             <CSVLink
               data={filteredQrCodes}
               headers={headers}
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#FBB03A',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#ED1F79',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+              }}
               filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
             >
-              <Button variant="contained" color="primary" startIcon={<DownloadIcon />}>
+              <Button variant="contained" color="primary"
+              sx={{
+                maxWidth: '200px',
+                flex: 1,
+                backgroundColor: '#b3b3b3',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+              }}
+              startIcon={<DownloadIcon />}>
                 Export to CSV
               </Button>
             </CSVLink>
@@ -357,32 +414,32 @@ const ManageQr = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>QR Code</TableCell>
-                <TableCell>Payment Reference</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Created At</TableCell>
-                <TableCell>Updated At</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>ID</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>QR Code</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Payment Reference</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Amount</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Status</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Description</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Created At</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Updated At</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr, index) => (
                 <TableRow key={qr.id || `qr-${index}`}>
-                  <TableCell>{qr.id}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.id}</TableCell>
                   <TableCell>
                     <QRCode value={qr.qr_code} size={50} />
                   </TableCell>
-                  <TableCell>{qr.payment_reference}</TableCell>
-                  <TableCell>{qr.amount}</TableCell>
-                  <TableCell>{qr.status}</TableCell>
-                  <TableCell style={{ whiteSpace: 'pre-wrap' }}>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.payment_reference}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.amount}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.status}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }} style={{ whiteSpace: 'pre-wrap' }}>
                     {qr.description}
                   </TableCell>
-                  <TableCell>{qr.created_at}</TableCell>
-                  <TableCell>{qr.updated_at}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.created_at}</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.updated_at}</TableCell>
                   <TableCell>
                     <Tooltip title="View QR Code">
                       <IconButton onClick={() => handleOpenView(qr)}>
@@ -418,26 +475,27 @@ const ManageQr = () => {
         >
           {selectedQr && (
             <Box>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                 QR Code Details
               </Typography>
               <Box mb={3} display="flex" justifyContent="center">
                 <QRCode value={selectedQr.qr_code} size={200} />
               </Box>
               <Box mb={2}>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>ID:</strong> {selectedQr.id}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>Payment Reference:</strong> {selectedQr.payment_reference}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>Amount:</strong> {selectedQr.amount}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>Status:</strong> {selectedQr.status}
                 </Typography>
                 <Typography
+                sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}
                   variant="body1"
                   gutterBottom
                   style={{
@@ -450,14 +508,25 @@ const ManageQr = () => {
                 >
                   <strong>Description:</strong> {selectedQr.description}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>Created At:</strong> {selectedQr.created_at}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   <strong>Updated At:</strong> {selectedQr.updated_at}
                 </Typography>
                 <Box mt={2} display="flex" justifyContent="flex-end">
-                  <Button variant="contained" color="primary" onClick={handleCloseView}>
+                  <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
+                            maxWidth: '150px',
+                            flex: 1,
+                            backgroundColor: '#FBB03A',
+                            color: 'black',
+                            '&:hover': {
+                              backgroundColor: '#ED1F79',
+                            },
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 400,
+                          }}
+                        >
                     Close
                   </Button>
                 </Box>

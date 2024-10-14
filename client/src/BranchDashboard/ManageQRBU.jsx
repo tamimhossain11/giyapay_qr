@@ -7,7 +7,7 @@ import { Visibility as ViewIcon,} from '@mui/icons-material';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader';
 
 const ManageQRBU = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -177,47 +177,47 @@ const ManageQRBU = () => {
   return (
     <Container maxWidth={false} disableGutters>
       <Box mt={4} width="100%">
-        <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           Manage QR Codes
         </Typography>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>QR Code</TableCell>
-                <TableCell>Payment Reference</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Created At</TableCell>
-                <TableCell>Updated At</TableCell>
-                <TableCell>Actions</TableCell>
+            <TableRow>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>ID</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>QR Code</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Payment Reference</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Amount</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Status</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Description</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Created At</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Updated At</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr, index) => (
                 <TableRow key={qr.id || `qr-${index}`}>
-                  <TableCell>{qr.id}</TableCell>
-                  <TableCell>
-                    <QRCode value={qr.qr_code} size={50} />
-                  </TableCell>
-                  <TableCell>{qr.payment_reference}</TableCell>
-                  <TableCell>{qr.amount}</TableCell>
-                  <TableCell>{qr.status}</TableCell>
-                  <TableCell style={{ whiteSpace: 'pre-wrap' }}>
-                    {qr.description}
-                  </TableCell>
-                  <TableCell>{qr.created_at}</TableCell>
-                  <TableCell>{qr.updated_at}</TableCell>
-                  <TableCell>
-                    <Tooltip title="View QR Code">
-                      <IconButton onClick={() => handleOpenView(qr)}>
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.id}</TableCell>
+                <TableCell>
+                  <QRCode value={qr.qr_code} size={50} />
+                </TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.payment_reference}</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.amount}</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.status}</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }} style={{ whiteSpace: 'pre-wrap' }}>
+                  {qr.description}
+                </TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.created_at}</TableCell>
+                <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.updated_at}</TableCell>
+                <TableCell>
+                  <Tooltip title="View QR Code">
+                    <IconButton onClick={() => handleOpenView(qr)}>
+                      <ViewIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
               ))}
             </TableBody>
           </Table>
@@ -245,53 +245,65 @@ const ManageQRBU = () => {
         >
           {selectedQr && (
             <Box>
-              <Typography variant="h6" gutterBottom>
-                QR Code Details
+            <Typography variant="h6" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+              QR Code Details
+            </Typography>
+            <Box mb={3} display="flex" justifyContent="center">
+              <QRCode value={selectedQr.qr_code} size={200} />
+            </Box>
+            <Box mb={2}>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>ID:</strong> {selectedQr.id}
               </Typography>
-              <Box mb={3} display="flex" justifyContent="center">
-                <QRCode value={selectedQr.qr_code} size={200} />
-              </Box>
-              <Box mb={2}>
-                <Typography variant="body1" gutterBottom>
-                  <strong>ID:</strong> {selectedQr.id}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>Payment Reference:</strong> {selectedQr.payment_reference}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>Amount:</strong> {selectedQr.amount}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>Status:</strong> {selectedQr.status}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  gutterBottom
-                  style={{
-                    whiteSpace: 'pre-wrap',
-                    backgroundColor: '#f5f5f5',
-                    padding: '8px',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd',
-                  }}
-                >
-                  <strong>Description:</strong> {selectedQr.description}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>Created At:</strong> {selectedQr.created_at}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  <strong>Updated At:</strong> {selectedQr.updated_at}
-                </Typography>
-                <Box mt={2} display="flex" justifyContent="flex-end">
-                  <Button variant="contained" color="primary" onClick={handleCloseView}>
-                    Close
-                  </Button>
-                </Box>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>Payment Reference:</strong> {selectedQr.payment_reference}
+              </Typography>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>Amount:</strong> {selectedQr.amount}
+              </Typography>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>Status:</strong> {selectedQr.status}
+              </Typography>
+              <Typography
+              sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}
+                variant="body1"
+                gutterBottom
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  backgroundColor: '#f5f5f5',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #ddd',
+                }}
+              >
+                <strong>Description:</strong> {selectedQr.description}
+              </Typography>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>Created At:</strong> {selectedQr.created_at}
+              </Typography>
+              <Typography variant="body1" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                <strong>Updated At:</strong> {selectedQr.updated_at}
+              </Typography>
+              <Box mt={2} display="flex" justifyContent="flex-end">
+                <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
+                          maxWidth: '150px',
+                          flex: 1,
+                          backgroundColor: '#FBB03A',
+                          color: 'black',
+                          '&:hover': {
+                            backgroundColor: '#ED1F79',
+                          },
+                          fontFamily: 'Montserrat, sans-serif',
+                          fontWeight: 400,
+                        }}
+                      >
+                  Close
+                </Button>
               </Box>
             </Box>
-          )}
-        </Box>
+          </Box>
+        )}
+      </Box>
       </Modal>
     </Container>
   );

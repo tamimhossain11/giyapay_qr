@@ -58,8 +58,8 @@ const CallbackResponsePage = () => {
     if (transactionProcessed) {
       return (
         <Box sx={{ textAlign: 'center' }}>
-          <CheckCircleOutline color="success" sx={{ fontSize: 70 }} />
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2 }}>
+          <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79'  }} />
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
             Transaction Already Processed
           </Typography>
           <Typography variant="body1" sx={{ mt: 1 }}>
@@ -75,7 +75,7 @@ const CallbackResponsePage = () => {
           <Alert severity="info">
             Please wait, we are fetching your transaction details...
           </Alert>
-          <LinearProgress sx={{ mt: 2 }} />
+          <LinearProgress sx={{ mt: 2, background: 'linear-gradient(#fbb03a, #ed1f79)' }} />
         </Box>
       );
     }
@@ -84,18 +84,18 @@ const CallbackResponsePage = () => {
       case 'success-callback':
         return (
           <Box sx={{ textAlign: 'center' }}>
-            <CheckCircleOutline color="success" sx={{ fontSize: 70 }} />
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+            <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79' }} />
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
               Payment Successful!
             </Typography>
             <Typography variant="body1" sx={{ mt: 2 }}>
               Thank you for your payment. Your transaction was completed successfully.
             </Typography>
-            <Paper sx={{ p: 3, mt: 4, borderRadius: 3, backgroundColor: '#f9f9f9', boxShadow: 3 }}>
+            <Paper sx={{ p: 3, mt: 4, borderRadius: 3, backgroundColor: '#ffffff', boxShadow: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle1">Amount</Typography>
-                  <Typography variant="h6" sx={{ color: 'green' }}>
+                  <Typography variant="h6" sx={{ color: '#ed1f79' }}>
                     ₱{transactionDetails.amount}
                   </Typography>
                 </Grid>
@@ -110,8 +110,8 @@ const CallbackResponsePage = () => {
       case 'error-callback':
         return (
           <Box sx={{ textAlign: 'center' }}>
-            <ErrorOutline color="error" sx={{ fontSize: 70 }} />
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+            <ErrorOutline sx={{ fontSize: 70, color: '#ed1f79' }} />
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
               Payment Error
             </Typography>
             <Typography variant="body1" sx={{ mt: 2 }}>
@@ -122,8 +122,8 @@ const CallbackResponsePage = () => {
       case 'cancel-callback':
         return (
           <Box sx={{ textAlign: 'center' }}>
-            <Cancel color="warning" sx={{ fontSize: 70 }} />
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+            <Cancel sx={{ fontSize: 70, color: '#ed1f79' }} />
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
               Payment Cancelled
             </Typography>
             <Typography variant="body1" sx={{ mt: 2 }}>
@@ -134,7 +134,7 @@ const CallbackResponsePage = () => {
       default:
         return (
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
               Unknown Status
             </Typography>
           </Box>
@@ -146,7 +146,15 @@ const CallbackResponsePage = () => {
     <Container sx={{ maxWidth: 800, mt: 5, mb: 5 }}>
       <Box sx={{ textAlign: 'center' }}>
         {renderContent()}
-        <Button variant="contained" color="primary" sx={{ mt: 4 }} href="/">
+        <Button variant="contained"  sx={{ 
+    mt: 4, 
+    backgroundColor: '#fbb03a', 
+    color: '#000000',
+    '&:hover': {
+      backgroundColor: '#b3b3b3', // Set hover color here
+      color: '#000000',
+    },
+  }}  href="/">
           Go Back to Home
         </Button>
       </Box>

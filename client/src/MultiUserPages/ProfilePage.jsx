@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { 
-  Card, 
-  CardContent, 
-  Typography, 
-  Grid, 
-  Avatar, 
-  CircularProgress, 
-  Box, 
-  Paper, 
-  Divider 
+import {
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Avatar,
+  CircularProgress,
+  Box,
+  Paper,
+  Divider
 } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
@@ -19,29 +19,29 @@ import BranchIcon from '@mui/icons-material/Business';
 import StatusIcon from '@mui/icons-material/ToggleOn';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LockIcon from '@mui/icons-material/Lock'; // Icon for secret
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader';
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState(null); 
-  const [error, setError] = useState(''); 
+  const [profile, setProfile] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/profile`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
 
-        setProfile(response.data); 
+        setProfile(response.data);
       } catch (err) {
         console.error('Error fetching profile:', err);
         setError('Error fetching profile data.');
       }
     };
 
-    fetchProfile(); 
+    fetchProfile();
   }, []);
 
   if (error) {
@@ -58,7 +58,7 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
-        <RippleLoader/>
+        <RippleLoader />
       </Box>
     );
   }
@@ -66,49 +66,56 @@ const ProfilePage = () => {
   const renderProfileDetail = (icon, label, value) => (
     <Grid item xs={12} sm={6} display="flex" alignItems="center">
       {icon}
-      <Typography variant="body1" sx={{ marginLeft: 1 }}>
+      <Typography variant="body1" sx={{ marginLeft: 1, fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
         <strong>{label}:</strong> {value || 'N/A'}
       </Typography>
     </Grid>
   );
 
   return (
-    <Box 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="80vh" 
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="80vh"
     >
       <Paper elevation={6} sx={{ maxWidth: 800, width: '100%', padding: 3, borderRadius: 2 }}>
         <Box display="flex" justifyContent="center" marginBottom={2}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 80, height: 80 }}>
-            <AccountCircleIcon sx={{ fontSize: 50 }} />
+          <Avatar
+            sx={{
+              background: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+              width: 80,
+              height: 80
+            }}
+          >
+            <AccountCircleIcon sx={{ fontSize: 50, color: 'white' }} />
           </Avatar>
         </Box>
-        <Typography variant="h4" align="center" gutterBottom>
+
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           {profile.user_type === 'admin' ? 'Admin Profile' : 'User Profile'}
         </Typography>
-        
+
         {/* Personal Details Section */}
         <Box marginBottom={3}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
             Personal Details
           </Typography>
           <Grid container spacing={2}>
-            {renderProfileDetail(<BadgeIcon />, 'ID', profile.id)}
+            {renderProfileDetail(<BadgeIcon sx={{ color: '#ED1F79' }} />, 'ID', profile.id)}
             {profile.user_type === 'admin' ? (
               <>
-                {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
-                {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
-                {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
+                {renderProfileDetail(<EmailIcon sx={{ color: '#ED1F79' }} />, 'Email', profile.email)}
+                {renderProfileDetail(<PersonIcon sx={{ color: '#ED1F79' }} />, 'Merchant Name', profile.merchant_name)}
+                {renderProfileDetail(<LockIcon sx={{ color: '#ED1F79' }} />, 'Merchant Secret', profile.merchant_secret)}
               </>
             ) : (
               <>
-                {renderProfileDetail(<PersonIcon />, 'First Name', profile.first_name)}
-                {renderProfileDetail(<PersonIcon />, 'Last Name', profile.last_name)}
-                {renderProfileDetail(<BadgeIcon />, 'Username', profile.username)}
-                {renderProfileDetail(<EmailIcon />, 'Email', profile.email)}
-                {renderProfileDetail(<StatusIcon />, 'Status', profile.status)}
+                {renderProfileDetail(<PersonIcon sx={{ color: '#ED1F79' }} />, 'First Name', profile.first_name)}
+                {renderProfileDetail(<PersonIcon sx={{ color: '#ED1F79' }} />, 'Last Name', profile.last_name)}
+                {renderProfileDetail(<BadgeIcon sx={{ color: '#ED1F79' }} />, 'Username', profile.username)}
+                {renderProfileDetail(<EmailIcon sx={{ color: '#ED1F79' }} />, 'Email', profile.email)}
+                {renderProfileDetail(<StatusIcon sx={{ color: '#ED1F79' }} />, 'Status', profile.status)}
               </>
             )}
           </Grid>
@@ -119,11 +126,11 @@ const ProfilePage = () => {
         {/* Branch Information Section */}
         {profile.branch && (
           <Box marginBottom={3}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
               Branch Information
             </Typography>
             <Grid container spacing={2}>
-              {renderProfileDetail(<BranchIcon />, 'Branch Name', profile.branch.branch_name)}
+              {renderProfileDetail(<BranchIcon sx={{ color: '#ED1F79' }} />, 'Branch Name', profile.branch.branch_name)}
             </Grid>
           </Box>
         )}
@@ -131,13 +138,13 @@ const ProfilePage = () => {
         {/* Merchant Information Section */}
         {profile.user_type !== 'admin' && (
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
               Merchant Information
             </Typography>
             <Grid container spacing={2}>
-              {renderProfileDetail(<PersonIcon />, 'Merchant ID', profile.merchant_id)}
-              {renderProfileDetail(<PersonIcon />, 'Merchant Name', profile.merchant_name)} 
-              {renderProfileDetail(<LockIcon />, 'Merchant Secret', profile.merchant_secret)} 
+              {renderProfileDetail(<PersonIcon sx={{ color: '#ED1F79' }} />, 'Merchant ID', profile.merchant_id)}
+              {renderProfileDetail(<PersonIcon sx={{ color: '#ED1F79' }} />, 'Merchant Name', profile.merchant_name)}
+              {renderProfileDetail(<LockIcon sx={{ color: '#ED1F79' }} />, 'Merchant Secret', profile.merchant_secret)}
             </Grid>
           </Box>
         )}

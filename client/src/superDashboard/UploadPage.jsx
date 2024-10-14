@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Card, Grid, Typography, Box, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Button, Card, Grid, Typography, Box, Alert, Select, MenuItem, FormControl, InputLabel, Autocomplete } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader'
+import CustomTextField from '../Mui/CustomTextField';
 
 const UploadPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -60,9 +61,9 @@ const UploadPage = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto', p: 3 }}>
+    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto', p: 3 }} >
       <Card elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>Batch Upload</Typography>
+        <Typography variant="h4" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400, mb: 3, textAlign: 'center' }}>Batch Upload</Typography>
 
         {loading ? (
           <Box display="flex" justifyContent="center" mt={3}>
@@ -71,27 +72,48 @@ const UploadPage = () => {
         ) : (
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined" required sx={{ mb: 2 }}>
-                <InputLabel id="upload-type-label">Upload Type</InputLabel>
-                <Select
-                  labelId="upload-type-label"
-                  value={uploadType}
-                  onChange={(e) => setUploadType(e.target.value)}
-                  label="Upload Type"
-                >
-                  <MenuItem value="">None</MenuItem>
-                  <MenuItem value="users">Upload Users</MenuItem>
-                  <MenuItem value="branches">Upload Branches</MenuItem>
-                </Select>
-              </FormControl>
+              <Autocomplete
+                options={[
+                  { value: '', label: 'None' },
+                  { value: 'users', label: 'Upload Users' },
+                  { value: 'branches', label: 'Upload Branches' },
+                ]}
+                getOptionLabel={(option) => option.label}
+                value={uploadType ? { value: uploadType, label: uploadType === 'users' ? 'Upload Users' : 'Upload Branches' } : { value: '', label: 'None' }}
+                onChange={(event, newValue) => setUploadType(newValue ? newValue.value : '')}
+                renderInput={(params) => (
+                  <CustomTextField
+                    {...params}
+                    label="Upload Type"
+                    variant="outlined"
+                    fullWidth
+                    required
+                  />
+                )}
+                sx={{ mb: 2 }}
+              />
+
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="body1" sx={{ mt: 2 }}>Please upload your Excel files:</Typography>
+              <Typography variant="body1" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400, mt: 2 }}>Please upload your Excel files:</Typography>
             </Grid>
 
             <Grid item xs={12}>
-              <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />}>
+              <Button variant="outlined"
+                component="label"
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  flex: 1,
+                  backgroundColor: '#b3b3b3',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#FBB03A',
+                  },
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 400,
+                }}
+              >
                 Select Excel File
                 <input type="file" onChange={handleFileChange} accept=".xlsx, .xls" hidden />
               </Button>
@@ -99,7 +121,7 @@ const UploadPage = () => {
 
             <Grid item xs={12}>
               {selectedFile && (
-                <Typography variant="body2" color="textSecondary">
+                <Typography variant="body2" color="textSecondary" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                   Selected File: {selectedFile.name}
                 </Typography>
               )}
@@ -111,6 +133,20 @@ const UploadPage = () => {
                   variant="contained"
                   color="primary"
                   fullWidth
+                  sx={{
+                    color: '#fff',
+                    backgroundImage: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+                    backgroundSize: '300% 100%',
+                    border: 'none',
+                    transition: 'all 0.4s ease-in-out',
+                    borderRadius: '8px',
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundPosition: '100% 0',
+                    },
+                  }}
                   onClick={() => handleUpload(uploadType === 'users' ? 'upload-users' : 'upload-branches')}
                 >
                   {uploadType === 'users' ? 'Upload Users' : 'Upload Branches'}
@@ -127,24 +163,49 @@ const UploadPage = () => {
             </Grid>
 
             <Grid item xs={12} sx={{ mt: 3 }}>
-              <Typography variant="body1">Download Sample Excel Files:</Typography>
-              <Button
-                variant="text"
-                startIcon={<FileDownloadIcon />}
-                href="/sample-users.xlsx"
-                download
-              >
-                Download Users Sample
-              </Button>
-              <Button
-                variant="text"
-                startIcon={<FileDownloadIcon />}
-                href="/sample-branches.xlsx"
-                download
-              >
-                Download Branches Sample
-              </Button>
+              <Typography variant="body1" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
+                Download Sample Excel Files:
+              </Typography>
+              <Box display="flex" gap={2} mt={2}>
+                <Button
+                  variant="text"
+                  startIcon={<FileDownloadIcon />}
+                  href="/sample-users.xlsx"
+                  download
+                  sx={{
+                    flex: 1,
+                    backgroundColor: '#b3b3b3',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#FBB03A',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                  }}
+                >
+                  Download Users Sample
+                </Button>
+                <Button
+                  variant="text"
+                  startIcon={<FileDownloadIcon />}
+                  href="/sample-branches.xlsx"
+                  download
+                  sx={{
+                    flex: 1,
+                    backgroundColor: '#b3b3b3',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#FBB03A',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                  }}
+                >
+                  Download Branches Sample
+                </Button>
+              </Box>
             </Grid>
+
           </Grid>
         )}
       </Card>

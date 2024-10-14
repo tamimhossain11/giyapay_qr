@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -125,15 +125,19 @@ const ManageUsers = () => {
             component={Link}
             to="/super-dashboard/manage-users/add"
             sx={{
-              mb: 3,
-              maxWidth: '200px',
-              backgroundColor: '#ED1F79',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: '#FBB03A',
-              },
+              color: '#fff',
+              backgroundImage: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+              backgroundSize: '300% 100%',
+              border: 'none',
+              transition: 'all 0.4s ease-in-out',
+              padding: '8px 40px',
+              borderRadius: '8px',
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 400,
+              textTransform: 'none',
+              '&:hover': {
+                backgroundPosition: '100% 0',
+              },
             }}
           >
             Add User
@@ -235,9 +239,9 @@ const ManageUsers = () => {
 
           {/* Delete Confirmation Dialog */}
           <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Confirm Delete</DialogTitle>
             <DialogContent>
-              <DialogContentText>
+              <DialogContentText sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                 Are you sure you want to delete this user? This action cannot be undone.
               </DialogContentText>
             </DialogContent>

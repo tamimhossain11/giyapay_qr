@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, TextField, Button, Typography, Box, Divider, Grid } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Divider, Grid, Modal } from '@mui/material';
 import QRCode from 'react-qr-code';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { QRCodeCanvas } from 'qrcode.react';
+import Customtextfield from '../Mui/CustomTextField'
 
 
 const AddQr = () => {
@@ -30,6 +31,11 @@ const AddQr = () => {
   const navigate = useNavigate();
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
 
   useEffect(() => {
     const fetchUserAndBranchData = async () => {
@@ -197,15 +203,13 @@ const AddQr = () => {
       return false;
     }
   };
-
-
   return (
     <Container maxWidth="sm">
       <Box textAlign="center" my={4}>
         {showFields ? (
           <>
             <Typography variant="h4" gutterBottom>Create QR Code</Typography>
-            <TextField
+            <Customtextfield
               label="Branch"
               name="branch_name"
               value={formData.branch_name}
@@ -213,7 +217,7 @@ const AddQr = () => {
               margin="normal"
               disabled
             />
-            <TextField
+            <Customtextfield
               label="User"
               name="user_name"
               value={formData.user_name}
@@ -221,7 +225,7 @@ const AddQr = () => {
               margin="normal"
               disabled
             />
-            <TextField
+            <Customtextfield
               label="Invoice #"
               name="invoice_number"
               value={formData.invoice_number}
@@ -231,7 +235,7 @@ const AddQr = () => {
               error={!!invoiceError}
               helperText={invoiceError}
             />
-            <TextField
+            <Customtextfield
               label="Amount"
               name="amount"
               value={formData.amount}
@@ -243,31 +247,40 @@ const AddQr = () => {
             />
             <Button
               variant="contained"
-              color="primary"
               onClick={handleSubmit}
               fullWidth
+              sx={{
+                color: '#fff',
+                backgroundColor: '#FBB03A', // Solid GiyaPay yellow
+                '&:hover': {
+                  backgroundColor: '#FBB03A', // Maintain same color on hover
+                  boxShadow: 'none', // Remove any default box shadow on hover
+                },
+                '&:focus': {
+                  outline: 'none', // Remove default outline on focus
+                },
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                textTransform: 'none',
+                transition: 'all 0.4s ease-in-out',
+              }}
             >
               Generate QR Code
             </Button>
+
+
+
           </>
         ) : (
-          <Box
-            sx={{
-              maxWidth: '600px',
-              margin: 'auto',
-              padding: '32px',
-              borderRadius: '16px',
-              backgroundColor: '#f9f9f9',
-              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12)',
-              textAlign: 'left',
-            }}
-          >
+          <Box>
             {/* Title */}
             <Typography
               variant="h5"
               fontWeight="bold"
               gutterBottom
-              sx={{ color: '#333', marginBottom: '24px', textAlign: 'center' }}
+              sx={{ color: '#333', marginBottom: '24px', textAlign: 'center', fontFamily: 'Montserrat, sans-serif' }}
             >
               Transaction Details
             </Typography>
@@ -275,70 +288,31 @@ const AddQr = () => {
             {/* Divider for structure */}
             <Divider sx={{ marginBottom: '24px' }} />
 
-            {/* Side-by-side layout */}
-            <Grid container spacing={2} sx={{ marginBottom: '24px' }}>
-              <Grid item xs={6}>
-                <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                  Branch Name:
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
-                  {formData.branch_name}
-                </Typography>
-              </Grid>
+            <Box sx={{ textAlign: 'center', marginBottom: '24px' }}>
+              {/* Centered Amount */}
+              <Typography variant="h4" fontWeight="bold" sx={{ color: '#ed1f79', marginBottom: '16px' }}>
+                ₱{new Intl.NumberFormat().format(formData.amount)}
+              </Typography>
 
-              <Grid item xs={6}>
-                <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                  Invoice #:
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1" fontWeight="500" sx={{ color: '#111' }}>
-                  {formData.invoice_number}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={6}>
-                <Typography variant="subtitle1" sx={{ color: '#666' }}>
-                  Amount (PHP):
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h4" color="primary" fontWeight="bold">
-                  ₱{formData.amount}
-                </Typography>
-              </Grid>
-            </Grid>
-
-            {/* QR Code Section */}
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginBottom: '24px',
-                padding: '16px',
-                borderRadius: '12px',
-                backgroundColor: '#f1f1f1',
-              }}
-            >
-              <QRCodeCanvas
+              {/* QR Code */}
+              <QRCode
                 value={generatedQrCode}
                 size={300}
-                bgColor="#ffffff"
-                fgColor="#000000"
-                level="H"  // Higher error correction level
-                includeMargin={true}
-                renderAs="svg"
+                style={{ width: '100%', height: 'auto',marginBottom:'10px' }}
               />
+              {/* Centered Branch Name and Invoice Number */}
+              <Typography variant="body1" sx={{ fontWeight: '500', color: '#333' }}>
+                {formData.branch_name}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#666' }}>
+                Invoice #: {formData.invoice_number}
+              </Typography>
             </Box>
-
 
             {/* Done Button */}
             <Box mt={3}>
               <Button
                 variant="contained"
-                color="primary"
                 onClick={handleDone}
                 size="large"
                 fullWidth
@@ -348,12 +322,18 @@ const AddQr = () => {
                   textTransform: 'none',
                   fontSize: '1rem',
                   fontWeight: 'bold',
+                  backgroundColor: '#FBB03A', // Solid GiyaPay yellow
+                  '&:hover': {
+                    backgroundColor: '#FBB03A', // Same color on hover to keep it solid
+                  },
                 }}
               >
                 Done
               </Button>
             </Box>
           </Box>
+
+
         )}
       </Box>
     </Container>

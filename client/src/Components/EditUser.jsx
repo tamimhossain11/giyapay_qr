@@ -4,6 +4,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MuiAlert from '@mui/material/Alert';
+import CustomTextField from '../Mui/CustomTextField';
 
 const EditUser = () => {
   const { id } = useParams();
@@ -206,8 +207,8 @@ const EditUser = () => {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', minHeight: '80vh' }}>
-      <Typography variant="h4" gutterBottom>Edit User</Typography>
-      <TextField
+      <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Edit User</Typography>
+      <CustomTextField
         label="First Name"
         value={user.first_name || ''}
         onChange={(e) => setUser({ ...user, first_name: e.target.value })}
@@ -216,7 +217,7 @@ const EditUser = () => {
         error={!user.first_name}
         helperText={!user.first_name && 'First name is required'}
       />
-      <TextField
+      <CustomTextField
         label="Last Name"
         value={user.last_name || ''}
         onChange={(e) => setUser({ ...user, last_name: e.target.value })}
@@ -225,7 +226,7 @@ const EditUser = () => {
         error={!user.last_name}
         helperText={!user.last_name && 'Last name is required'}
       />
-      <TextField
+      <CustomTextField
         label="Username"
         value={user.username || ''}
         onChange={handleUsernameChange} // Dynamic check
@@ -236,7 +237,7 @@ const EditUser = () => {
         helperText={usernameError || 'Username is required'}
       />
 
-      <TextField
+      <CustomTextField
         label="Email"
         value={user.email || ''}
         onChange={handleEmailChange} // Dynamic check
@@ -246,7 +247,7 @@ const EditUser = () => {
         error={!!emailError}
         helperText={emailError || 'Email is required'}
       />
-      <TextField
+      <CustomTextField
         label="User Type"
         value={user.user_type || ''}
         onChange={(e) => setUser({ ...user, user_type: e.target.value })}
@@ -256,7 +257,7 @@ const EditUser = () => {
       >
         <MenuItem value="Co-Admin">Co-Admin</MenuItem>
         <MenuItem value="Branch User">Branch User</MenuItem>
-      </TextField>
+      </CustomTextField>
 
       {user.user_type === 'Branch User' && (
         <Autocomplete
@@ -264,17 +265,17 @@ const EditUser = () => {
           getOptionLabel={(option) => option.branch_name}
           value={branches.find((branch) => branch.id === selectedBranch) || null}
           onChange={(event, newValue) => setSelectedBranch(newValue ? newValue.id : null)}
-          renderInput={(params) => <TextField {...params} label="Assign Branch" margin="normal" fullWidth />}
+          renderInput={(params) => <CustomTextField {...params} label="Assign Branch" margin="normal" fullWidth />}
         />
       )}
 
       <Box mt={2}>
-        <Typography variant="body1">
+        <Typography variant="body1" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           {showPasswordField ? 'Change your password' : 'Do you want to update the password?'}
-          <Button onClick={() => setShowPasswordField(!showPasswordField)}>Click here</Button>
+          <Button onClick={() => setShowPasswordField(!showPasswordField)} sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Click here</Button>
         </Typography>
         {showPasswordField && (
-          <TextField
+          <CustomTextField
             label="New Password"
             type={showPassword ? 'text' : 'password'}
             value={newPassword}
@@ -297,10 +298,36 @@ const EditUser = () => {
       {error && <Typography color="error">{error}</Typography>}
 
       <Box mt={2} display="flex" justifyContent="space-between">
-        <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 3 }}>
+        <Button variant="contained" 
+        color="primary" 
+        
+        onClick={handleUpdate} 
+        sx={{
+          maxWidth: '150px',
+          flex: 1,
+          backgroundColor: '#ED1F79',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: '#FBB03A',
+          },
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 400,
+        }}>
           Update User
         </Button>
-        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}>
+        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}
+          sx={{
+            maxWidth: '150px',
+            flex: 1,
+            backgroundColor: '#FBB03A',
+            color: 'black',
+            '&:hover': {
+              backgroundColor: '#ED1F79',
+            },
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+          }}
+        >
           Cancel
         </Button>
       </Box>

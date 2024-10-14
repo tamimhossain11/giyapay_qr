@@ -19,7 +19,7 @@ import BranchIcon from '@mui/icons-material/Business';
 import StatusIcon from '@mui/icons-material/ToggleOn';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LockIcon from '@mui/icons-material/Lock'; // Icon for secret
-import RippleLoader from '../Components/RippleLoader';
+import RippleLoader from '../Components/Loader';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);

@@ -13,7 +13,7 @@ import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/Loader';
 
 const ManageQrCA = () => {
   const [qrCodes, setQrCodes] = useState([]);

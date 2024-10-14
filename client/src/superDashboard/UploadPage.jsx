@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, Card, Grid, Typography, Box, Alert, Select, MenuItem, FormControl, InputLabel, Autocomplete } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import RippleLoader from '../Components/RippleLoader'
+import RippleLoader from '../Components/Loader'
 import CustomTextField from '../Mui/CustomTextField';
 
 const UploadPage = () => {

@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import RippleLoader from '../Components/RippleLoader';
+import RippleLoader from '../Components/Loader';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);

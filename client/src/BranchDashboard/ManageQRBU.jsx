@@ -7,7 +7,7 @@ import { Visibility as ViewIcon,} from '@mui/icons-material';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
-import RippleLoader from '../Components/RippleLoader';
+import RippleLoader from '../Components/Loader';
 
 const ManageQRBU = () => {
   const [qrCodes, setQrCodes] = useState([]);

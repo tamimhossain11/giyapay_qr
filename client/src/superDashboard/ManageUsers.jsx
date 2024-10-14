@@ -116,7 +116,7 @@ const ManageUsers = () => {
         </Box>
       ) : (
         <Box p={3}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
             Manage Users
           </Typography>
           <Button
@@ -124,7 +124,17 @@ const ManageUsers = () => {
             color="primary"
             component={Link}
             to="/super-dashboard/manage-users/add"
-            sx={{ mb: 3, maxWidth: '200px' }}
+            sx={{
+              mb: 3,
+              maxWidth: '200px',
+              backgroundColor: '#ED1F79',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#FBB03A',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }}
           >
             Add User
           </Button>
@@ -133,28 +143,28 @@ const ManageUsers = () => {
             <Table size={isMobile ? 'small' : 'medium'}>
               <TableHead>
                 <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>First Name</TableCell>
-                  <TableCell>Last Name</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>User Type</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Branch</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>ID</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>First Name</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Last Name</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Username</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Email</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>User Type</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Status</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Branch</TableCell>
+                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.first_name}</TableCell>
-                    <TableCell>{user.last_name}</TableCell>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.user_type}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.id}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.first_name}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.last_name}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.username}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.email}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.user_type}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.status}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                       {user.user_type === 'Co-Admin' ? 'Bank' : user.branch ? user.branch.branch_name : 'No Branch Assigned'}
                     </TableCell>
                     <TableCell>
@@ -163,7 +173,18 @@ const ManageUsers = () => {
                           variant="contained"
                           color="secondary"
                           onClick={() => handleClickOpen(user.id)}
-                          sx={{ maxWidth: '150px' }}
+                          sx={{
+                            maxWidth: '150px',
+                            flex: 1,
+                            backgroundColor: '#ED1F79',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: '#FBB03A',
+                            },
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 400,
+                          }}
+                          
                         >
                           Delete
                         </Button>
@@ -172,7 +193,17 @@ const ManageUsers = () => {
                           color="primary"
                           component={Link}
                           to={`/super-dashboard/edit-users/${user.id}`}
-                          sx={{ maxWidth: '150px' }}
+                          sx={{
+                            maxWidth: '150px',
+                            flex: 1,
+                            backgroundColor: '#FBB03A',
+                            color: 'black',
+                            '&:hover': {
+                              backgroundColor: '#ED1F79',
+                            },
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 400,
+                          }}
                         >
                           Edit
                         </Button>
@@ -180,7 +211,17 @@ const ManageUsers = () => {
                           variant="contained"
                           color={user.status === 'Active' ? 'success' : 'inherit'}
                           onClick={() => toggleStatus(user.id, user.status)}
-                          sx={{ maxWidth: '150px' }}
+                          sx={{
+                            maxWidth: '150px',
+                            flex: 1,
+                            backgroundColor: '#b3b3b3',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: '#FBB03A',
+                            },
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 400,
+                          }}
                         >
                           {user.status === 'Active' ? 'Active' : 'Inactive'}
                         </Button>
@@ -201,10 +242,10 @@ const ManageUsers = () => {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose} color="primary">
+              <Button onClick={handleClose} color="primary" sx={{ color: '#ED1F79' }}>
                 Cancel
               </Button>
-              <Button onClick={handleDelete} color="secondary">
+              <Button onClick={handleDelete} color="secondary" sx={{ color: '#FBB03A' }}>
                 Delete
               </Button>
             </DialogActions>

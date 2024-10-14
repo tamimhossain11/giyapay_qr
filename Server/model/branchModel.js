@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../databse/connection.js';
+import sequelize from '../database/connection.js';
 import Admin from '../model/adminModel.js';
 
 const Branch = sequelize.define('Branch', {

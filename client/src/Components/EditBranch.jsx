@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography,Snackbar, Paper, Alert } from '@mui/material';
 import axios from 'axios';
+import CustomTextField from '../Mui/CustomTextField';
 
 const EditBranch = () => {
   const { id } = useParams();
@@ -67,7 +68,7 @@ const EditBranch = () => {
           Edit Branch
         </Typography>
         <form onSubmit={handleSubmit}>
-          <TextField
+          <CustomTextField
             label="Branch Name"
             value={branchName}
             onChange={(e) => setBranchName(e.target.value)}
@@ -75,7 +76,7 @@ const EditBranch = () => {
             margin="normal"
             required
           />
-          <TextField
+          <CustomTextField
             label="Bank Name"
             value={bankName}
             onChange={(e) => setBankName(e.target.value)}
@@ -83,7 +84,7 @@ const EditBranch = () => {
             margin="normal"
             required
           />
-          <TextField
+          <CustomTextField
             label="Bank Branch"
             value={bankBranch}
             onChange={(e) => setBankBranch(e.target.value)}
@@ -91,11 +92,40 @@ const EditBranch = () => {
             margin="normal"
             required
           />
-          <Box mt={2} display="flex" justifyContent="space-between">
-            <Button type="submit" variant="contained" color="primary">
+          <Box mt={2} 
+          display="flex" 
+          justifyContent="space-between">
+            <Button type="submit" 
+            variant="contained" 
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#ED1F79',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#FBB03A',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }}
+            color="primary">
               Save Changes
             </Button>
-            <Button type="button" variant="outlined" color="secondary" onClick={handleCancel}>
+            <Button type="button" 
+            variant="outlined"
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#FBB03A',
+              color: 'black',
+              '&:hover': {
+                backgroundColor: '#ED1F79',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }} 
+            color="secondary" 
+            onClick={handleCancel}>
               Cancel
             </Button>
           </Box>

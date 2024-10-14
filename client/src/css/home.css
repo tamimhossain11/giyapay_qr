@@ -1,4 +1,8 @@
 /* General Container */
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -9,12 +13,13 @@
 .card {
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   border-radius: 15px;
-  background-color: #f8f9fa;
+  background-color: #ffffff; /* Changed to white for better contrast */
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
   border: none;
 }
 
+/* Hover Effect */
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -30,7 +35,7 @@
 .card-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #333;
+  color: #4f4f4f; /* Secondary color */
   margin-bottom: 0.5rem;
 }
 
@@ -38,8 +43,21 @@
 .card-text {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #444;
+  color: #828282; /* Secondary color */
   margin-top: 0.5rem;
+}
+
+/* Background Colors for Cards */
+.overview-card:nth-child(1) {
+  border-top: 5px solid #ed1f79; /* Primary color */
+}
+
+.overview-card:nth-child(2) {
+  border-top: 5px solid #fbb03a; /* Primary color */
+}
+
+.overview-card:nth-child(3) {
+  border-top: 5px solid #b3b3b3; /* Secondary color */
 }
 
 /* Responsive Grid */

@@ -4,6 +4,8 @@ import QRCode from 'react-qr-code';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
+import { QRCodeCanvas } from 'qrcode.react';
+
 
 const AddQr = () => {
   const [formData, setFormData] = useState({
@@ -314,11 +316,23 @@ const AddQr = () => {
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                marginBottom: '24px'
+                marginBottom: '24px',
+                padding: '16px',
+                borderRadius: '12px',
+                backgroundColor: '#f1f1f1',
               }}
             >
-              <QRCode value={generatedQrCode} size={180} />
+              <QRCodeCanvas
+                value={generatedQrCode}
+                size={300}
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="H"  // Higher error correction level
+                includeMargin={true}
+                renderAs="svg"
+              />
             </Box>
+
 
             {/* Done Button */}
             <Box mt={3}>

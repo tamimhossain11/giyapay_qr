@@ -9,14 +9,17 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
 
 const CustomOutlinedInput = styled(OutlinedInput)(({ theme }) => ({
+  fontFamily: 'Montserrat, sans-serif', 
+  borderRadius: '10px', 
   '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#000000',
+    borderColor: '#e0e0e0', // Normal state
+    borderWidth: '1px',
   },
   '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#000000',
+    borderColor: '#e0e0e0',
   },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#000000',
+    borderColor: '#000000', // Focused state
   },
   '& .MuiInputAdornment-root': {
     color: '#000000',
@@ -24,11 +27,13 @@ const CustomOutlinedInput = styled(OutlinedInput)(({ theme }) => ({
 }));
 
 const CustomInputLabel = styled(InputLabel)(({ theme }) => ({
-  color: '#000000',
+  fontFamily: 'Montserrat, sans-serif', // Set the font family to Montserrat
+  color: '#616161', // Set the label color to #616161
   '&.Mui-focused': {
-    color: '#000000',
+    color: '#000000', // Focused state color
   },
 }));
+
 
 export default function InputAdornments({ label, type, value, onChange, placeholder, variant }) {
   const [showPassword, setShowPassword] = React.useState(type === 'password' ? false : undefined);

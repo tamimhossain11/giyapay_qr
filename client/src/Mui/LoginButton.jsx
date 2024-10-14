@@ -2,18 +2,24 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 
+
 const GradientButton = styled(Button)(({ theme }) => ({
-  background: 'linear-gradient(90deg, rgba(221,142,10,1) 4%, rgba(255,0,110,0.965) 100%)',
-  color: '#ffffff',
-  fontWeight: 'bold',
-  padding: '16px 0', 
+  color: '#fff',
+  backgroundImage: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+  backgroundSize: '300% 100%',
+  border: '1px',
+  transition: 'all 0.4s ease-in-out',
+  padding: '12px 24px',
   borderRadius: '8px',
-  width: '100%', 
-  transition: 'background 0.3s',
+  width: '100%',
+  fontFamily: 'Montserrat, sans-serif', // Set font to Montserrat
+  fontWeight: 400, // Font weight 400
+  textTransform: 'none', // Prevent uppercase text
   '&:hover': {
-    background: 'linear-gradient(90deg, rgba(221,142,10,1) 20%, rgba(255,0,110,0.965) 100%)',
+    backgroundPosition: '100% 0',
   },
 }));
+
 
 export default function LoginButton({ onClick, children, ...props }) {
   return (
@@ -26,3 +32,4 @@ export default function LoginButton({ onClick, children, ...props }) {
     </GradientButton>
   );
 }
+

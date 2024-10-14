@@ -1,3 +1,8 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}
+
 .login-page {
     display: flex;
     height: 100vh;
@@ -40,9 +45,9 @@
 }
 
 .login-form h2 {
-    color: #000000; 
+    color: #4f4f4f;
     margin-bottom: 20px;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: bold;
     text-align: center;
 }
@@ -52,6 +57,9 @@
     font-size: 16px;
     color: #616161; 
     text-align: center;
+}
+.subtitle, p {
+    font-size: 1rem;
 }
 
 .form-group {

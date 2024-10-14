@@ -63,7 +63,7 @@ const OverView = () => {
       <div className="row justify-content-center">
         <div className="col-lg-3 col-md-6 col-sm-12">
           <div className="card shadow-sm text-center p-4 overview-card mb-4">
-            <FaBuilding className="icon text-success mb-3" />
+            <FaBuilding className="icon mb-3" style={{ color: '#ed1f79' }} />
             <h5 className="card-title">Branches</h5>
             <p className="card-text">
               <CountUp start={0} end={branchTotal} duration={3} separator="," />
@@ -72,7 +72,7 @@ const OverView = () => {
         </div>
         <div className="col-lg-3 col-md-6 col-sm-12">
           <div className="card shadow-sm text-center p-4 overview-card mb-4">
-            <FaUsers className="icon text-warning mb-3" />
+            <FaUsers className="icon mb-3" style={{ color: '#FBB03A' }} />
             <h5 className="card-title">Users</h5>
             <p className="card-text">
               <CountUp start={0} end={userCount} duration={3} separator="," />
@@ -81,7 +81,7 @@ const OverView = () => {
         </div>
         <div className="col-lg-3 col-md-6 col-sm-12">
           <div className="card shadow-sm text-center p-4 overview-card mb-4">
-            <FaQrcode className="icon text-info mb-3" />
+            <FaQrcode className="icon mb-3" style={{ color: '#b3b3b3' }} />
             <h5 className="card-title">QR Codes</h5>
             <p className="card-text">
               <CountUp start={0} end={qrTotal} duration={3} separator="," />

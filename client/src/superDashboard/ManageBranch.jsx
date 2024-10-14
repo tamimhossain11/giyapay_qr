@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, CircularProgress, Snackbar, Alert } from '@mui/material';
+import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Snackbar, Alert } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RippleLoader from '../Components/RIppleLoader';
+import RippleLoader from '../Components/RippleLoader';
+import '../css/global.css';
 
 const ManageBranches = () => {
   const [branches, setBranches] = useState([]);
@@ -13,7 +14,7 @@ const ManageBranches = () => {
   const [branchToDelete, setBranchToDelete] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Can be 'error' or 'success'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const isTabletOrMobile = useMediaQuery('(max-width: 900px)');
   const location = useLocation();
 
@@ -77,27 +78,36 @@ const ManageBranches = () => {
   };
 
   return (
-    <Box p={3}>
+    <Box className="manage-branches-container" sx={{ backgroundColor: 'white', padding: '20px' }}>
       {loading ? (
-        <Box display="flex" justifyContent="center" mt={5}>
+        <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
           <RippleLoader />
         </Box>
       ) : (
         <>
-          <Typography variant="h4" gutterBottom>
+          <Typography className="manage-branches-title" variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
             Manage Branches
           </Typography>
-  
+
           <Button
             component={Link}
             to="/super-dashboard/manage-branches/add"
             variant="contained"
-            color="primary"
-            sx={{ mb: 3, maxWidth: '200px' }}
+            sx={{
+              mb: 3,
+              maxWidth: '200px',
+              backgroundColor: '#ED1F79',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#FBB03A',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }}
           >
             Create Branch
           </Button>
-  
+
           {branches.length === 0 ? (
             <Typography>No branches found. Create a new branch to get started.</Typography>
           ) : (
@@ -105,37 +115,55 @@ const ManageBranches = () => {
               <Table size={isTabletOrMobile ? 'small' : 'medium'}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Branch Name</TableCell>
-                    <TableCell>Bank Name</TableCell>
-                    <TableCell>Bank Branch</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>ID</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Branch Name</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Bank Name</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Bank Branch</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {branches.map((branch) => (
                     <TableRow key={branch.id}>
-                      <TableCell>{branch.id}</TableCell>
-                      <TableCell>{branch.branch_name}</TableCell>
-                      <TableCell>{branch.bank_name}</TableCell>
-                      <TableCell>{branch.bank_branch}</TableCell>
+                      <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.id}</TableCell>
+                      <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.branch_name}</TableCell>
+                      <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.bank_name}</TableCell>
+                      <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.bank_branch}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 1 }}>
                           <Button
                             component={Link}
                             to={`/super-dashboard/edit-branch/${branch.id}`}
                             variant="contained"
-                            color="primary"
-                            sx={{ maxWidth: '150px', flex: 1 }}
+                            sx={{
+                              maxWidth: '150px',
+                              flex: 1,
+                              backgroundColor: '#FBB03A',
+                              color: 'black',
+                              '&:hover': {
+                                backgroundColor: '#ED1F79',
+                              },
+                              fontFamily: 'Montserrat, sans-serif',
+                              fontWeight: 400,
+                            }}
                             startIcon={<EditIcon />}
                           >
                             Edit
                           </Button>
                           <Button
                             variant="contained"
-                            color="secondary"
+                            sx={{
+                              maxWidth: '150px',
+                              flex: 1,
+                              backgroundColor: '#ED1F79',
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: '#FBB03A',
+                              },
+                              fontFamily: 'Montserrat, sans-serif',
+                              fontWeight: 400,
+                            }}
                             onClick={() => openDeleteDialog(branch)}
-                            sx={{ maxWidth: '150px', flex: 1 }}
                             startIcon={<DeleteIcon />}
                           >
                             Delete
@@ -150,7 +178,7 @@ const ManageBranches = () => {
           )}
         </>
       )}
-  
+
       {/* Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Delete Branch</DialogTitle>
@@ -160,15 +188,15 @@ const ManageBranches = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog} color="primary">
+          <Button onClick={closeDeleteDialog} sx={{ color: '#ED1F79' }}>
             Cancel
           </Button>
-          <Button onClick={handleDelete} color="secondary">
+          <Button onClick={handleDelete} sx={{ color: '#FBB03A' }}>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-  
+
       {/* Snackbar for Success/Error */}
       <Snackbar
         open={openSnackbar}
@@ -182,11 +210,6 @@ const ManageBranches = () => {
       </Snackbar>
     </Box>
   );
-}  
+};
 
 export default ManageBranches;
-
-
-
-
-

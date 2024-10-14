@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, TextField, Box, Typography, Autocomplete, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import CustomTextField from '../Mui/CustomTextField';
 
 const CreateBranch = () => {
   const { id } = useParams();
@@ -59,6 +60,7 @@ const CreateBranch = () => {
       console.error('Error checking branch name:', error);
     }
   };
+  
 
   const handleBranchNameChange = (e) => {
     const name = e.target.value;
@@ -150,13 +152,13 @@ const CreateBranch = () => {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
       <Box width="100%" maxWidth="600px" p={3} boxShadow={3} borderRadius={2}>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           {id ? 'Edit Branch' : 'Create Branch'}
         </Typography>
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Branch Name"
               value={branchName}
               onChange={handleBranchNameChange}
@@ -164,11 +166,11 @@ const CreateBranch = () => {
               margin="normal"
               required
               error={!isBranchNameUnique}
-              helperText={!isBranchNameUnique ? 'Branch name already exists' : ''}
+              helperText={!isBranchNameUnique ? 'Branch name already exists' : ''}  
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Bank Name"
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
@@ -178,7 +180,7 @@ const CreateBranch = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Bank Branch"
               value={bankBranch}
               onChange={(e) => setBankBranch(e.target.value)}
@@ -196,7 +198,7 @@ const CreateBranch = () => {
               value={branchUser}
               onChange={(event, newValue) => setBranchUser(newValue)}
               renderInput={(params) => (
-                <TextField
+                <CustomTextField
                   {...params}
                   label="Branch User (optional)"
                   fullWidth
@@ -209,10 +211,38 @@ const CreateBranch = () => {
         </Grid>
 
         <Box mt={3} display="flex" justifyContent="space-between">
-          <Button variant="contained" color="primary" onClick={handleSave}>
+          <Button
+           variant="contained" 
+           color="primary" 
+           sx={{
+            maxWidth: '150px',
+            flex: 1,
+            backgroundColor: '#ED1F79',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: '#FBB03A',
+            },
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+          }}
+           onClick={handleSave}>
             {id ? 'Update' : 'Save'}
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleCancel}>
+          <Button 
+          variant="contained" 
+          color="secondary" 
+          sx={{
+            maxWidth: '150px',
+            flex: 1,
+            backgroundColor: '#FBB03A',
+            color: 'black',
+            '&:hover': {
+              backgroundColor: '#ED1F79',
+            },
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+          }}
+          onClick={handleCancel}>
             Cancel
           </Button>
         </Box>

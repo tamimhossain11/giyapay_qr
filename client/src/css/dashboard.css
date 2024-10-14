@@ -1,3 +1,7 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
 .dashboard-container {
   width: 100%;
 }

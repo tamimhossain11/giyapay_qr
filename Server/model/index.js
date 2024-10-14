@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import sequelize from '../databse/connection.js';
+import sequelize from '../database/connection.js';
 import User from './userModel.js';
 import Branch from './branchModel.js';
 import QrCode from './qrCodesModel.js';

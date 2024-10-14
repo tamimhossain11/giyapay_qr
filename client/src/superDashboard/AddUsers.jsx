@@ -3,6 +3,7 @@ import { TextField, Button, FormControl, Snackbar, Alert, Box, Typography, IconB
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CustomTextField from '../Mui/CustomTextField';
 
 const AddUser = () => {
   const navigate = useNavigate();
@@ -160,14 +161,14 @@ const AddUser = () => {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
       <Paper elevation={3} sx={{ p: 4, maxWidth: '600px', width: '100%' }}>
-        <Typography variant="h4" align="center" gutterBottom>Add User</Typography>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Add User</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <FormControl fullWidth margin="normal">
               <Autocomplete
                 options={['Co-Admin', 'Branch User']}
                 renderInput={(params) => (
-                  <TextField {...params} label="User Type" required />
+                  <CustomTextField{...params} label="User Type" required />
                 )}
                 value={userType}
                 onChange={(e, newValue) => setUserType(newValue)}
@@ -176,7 +177,7 @@ const AddUser = () => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <CustomTextField
               label="First Name"
               fullWidth
               value={firstName}
@@ -187,7 +188,7 @@ const AddUser = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <CustomTextField
               label="Last Name"
               fullWidth
               value={lastName}
@@ -198,7 +199,7 @@ const AddUser = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Username"
               fullWidth
               value={username}
@@ -210,7 +211,7 @@ const AddUser = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Email"
               fullWidth
               value={email}
@@ -222,7 +223,7 @@ const AddUser = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Password"
               type={showPassword ? 'text' : 'password'}
               fullWidth
@@ -244,7 +245,7 @@ const AddUser = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               label="Confirm Password"
               type={showConfirmPassword ? 'text' : 'password'}
               fullWidth
@@ -272,7 +273,7 @@ const AddUser = () => {
                 getOptionLabel={(branch) => branch.branch_name}
                 value={branchUser}
                 onChange={(e, newValue) => setBranchUser(newValue)}
-                renderInput={(params) => <TextField {...params} label="Select Branch (Optional)" />}
+                renderInput={(params) => <CustomTextField {...params} label="Select Branch (Optional)" />}
                 fullWidth
               />
             </Grid>
@@ -280,14 +281,42 @@ const AddUser = () => {
 
           {error && (
             <Grid item xs={12}>
-              <Typography color="error" align="center">{error}</Typography>
+              <Typography color="error" align="center" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{error}</Typography>
             </Grid>
           )}
 
           <Grid item xs={12}>
             <Box display="flex" justifyContent="space-between">
-              <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
-              <Button variant="outlined" color="secondary" onClick={handleCancel}>Cancel</Button>
+              <Button 
+              variant="contained" 
+              color="primary" 
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#ED1F79',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+              }}
+              onClick={handleSave} >Save</Button>
+
+              <Button variant="outlined"
+               color="secondary" 
+               sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#FBB03A',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#ED1F79',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+              }}
+               onClick={handleCancel}>Cancel</Button>
             </Box>
           </Grid>
         </Grid>

@@ -23,7 +23,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); 
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -48,7 +48,7 @@ const Login = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setLoading(true); 
+        setLoading(true);
 
         try {
             const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, values);
@@ -65,9 +65,9 @@ const Login = () => {
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
 
-                 // Redirect based on user type and ID
-                 if (decodedToken.userType === 'admin' && decodedToken.id === 5) {
-                    navigate('/merchant-management'); 
+                // Redirect based on user type and ID
+                if (decodedToken.userType === 'admin' && decodedToken.id === 5) {
+                    navigate('/merchant-management');
                 } else if (decodedToken.userType === 'admin') {
                     navigate('/super-dashboard');
                 } else if (decodedToken.userType === 'Branch User') {
@@ -100,6 +100,10 @@ const Login = () => {
         navigate('/');
     };
 
+    const goBack = () => {
+        navigate(-1); // Navigates to the previous page
+    };
+
     return (
         <div className="login-page">
             <div className="login-container">
@@ -112,19 +116,50 @@ const Login = () => {
                             <h2>Welcome Back</h2>
                             <Button
                                 variant="contained"
-                                color="error"
                                 onClick={handleLogout}
                                 fullWidth
-                                sx={{ mt: 2 }}
-                                className="logout-button"
+                                sx={{
+                                    mt: 2,
+                                    color: '#fff',
+                                    backgroundImage: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+                                    backgroundSize: '300% 100%',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    fontWeight: 400,
+                                    textTransform: 'none',
+                                    transition: 'all .4s ease-in-out',
+                                    '&:hover': {
+                                        backgroundPosition: '100% 0',
+                                    },
+                                }}
                             >
                                 LOG OUT
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                onClick={goBack}
+                                fullWidth
+                                sx={{
+                                    mt: 2,
+                                    color: '#ED1F79',
+                                    borderColor: '#ED1F79',
+                                    '&:hover': {
+                                        backgroundColor: '#00000', // Change this to your desired hover color
+                                        borderColor: '#FBB03A', // Change this to your desired hover border color
+                                    },
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    fontWeight: 400,
+                                    textTransform: 'none',
+                                }}
+                            >
+                                Go Back
                             </Button>
                         </div>
                     ) : (
                         <div className="login-form">
                             <h2>Welcome to Giyapay QR</h2>
-                            <p className="subtitle">Sign in to your account</p>
+                            <p className="subtitle">Login to your account</p>
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group">
                                     <InputAdornments
@@ -146,10 +181,6 @@ const Login = () => {
                                         variant="outlined"
                                     />
                                 </div>
-                                <div className="form-group form-check">
-                                    <input type="checkbox" className="form-check-input" id="rememberMe" />
-                                    <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
-                                </div>
                                 <Box sx={{ position: 'relative', mt: 2 }}>
                                     <LoginButton
                                         type="submit"
@@ -157,9 +188,8 @@ const Login = () => {
                                         disabled={loading}
                                         className="login-button"
                                     >
-                                        {loading ? <CircularProgress size={24} color="inherit" /> : 'SIGN IN'}
+                                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
                                     </LoginButton>
-
                                 </Box>
                             </form>
                             {error && <div className="error">{error}</div>}

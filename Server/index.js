@@ -3,15 +3,15 @@ import express from 'express';
 import cors from 'cors';
 import { Sequelize } from 'sequelize';
 import authRoutes from './middleware/auth.js';
-import userRoutes from './routes/userRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import branchesRoutes from './routes/branchesRoutes.js';
+import userRoutes from './Routes/userRoutes.js';
+import adminRoutes from './Routes/adminRoutes.js';
+import branchesRoutes from './Routes/branchesRoutes.js';
 import BlacklistedToken from './model/blacklistedTokenModel.js';
-import qrCodesRoute from './routes/qrCodesRoutes.js';
+import qrCodesRoute from './Routes/qrCodesRoutes.js';
 import bodyParser from 'body-parser';
 import http from 'http';
 import { Server } from 'socket.io';
-import uploadRoutes from './routes/uploadRoutes.js'
+import uploadRoutes from './Routes/uploadRoutes.js'
 import { authenticateToken } from './middleware/authenticate.js';
 import User from './model/userModel.js';
 import { Op } from 'sequelize';

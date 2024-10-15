@@ -7,7 +7,7 @@ COPY ./controller ./controller
 COPY ./database ./database
 COPY ./middleware ./middleware
 COPY ./model ./model
-COPY ./routes ./routes
+COPY ./Routes ./Routes
 COPY ./.env ./
 COPY ./index.js ./index.js
 CMD ["npm","start"]

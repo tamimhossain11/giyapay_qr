@@ -4,6 +4,5 @@
 # Ignore node_modules folder globally
 node_modules/
 
-
 # Ignore log files
 *.log

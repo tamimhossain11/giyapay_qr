@@ -62,7 +62,7 @@ body {
 /* This class will apply the blur to the background */
 .blurred-background {
   filter: blur(8px);
-  pointer-events: none; /* Disable interaction with the blurred background */
+  pointer-events: none;
   transition: filter 0.3s ease;
 }
 
@@ -74,7 +74,7 @@ body {
   right: 0;
   bottom: 0;
   z-index: 999;
-  background-color: rgba(0, 0, 0, 0.5); /* Add an overlay behind the modal */
+  background-color: rgba(0, 0, 0, 0.5); 
 }
 
 

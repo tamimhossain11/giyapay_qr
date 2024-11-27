@@ -11,7 +11,7 @@ const UploadPage = () => {
   const [uploadStatus, setUploadStatus] = useState('');
   const [uploadError, setUploadError] = useState(false);
   const [uploadType, setUploadType] = useState('');
-  const [loading, setLoading] = useState(false);  // New state for loading
+  const [loading, setLoading] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -31,7 +31,7 @@ const UploadPage = () => {
     const formData = new FormData();
     formData.append('file', selectedFile);
 
-    setLoading(true);  // Start loading
+    setLoading(true);
 
     try {
       const token = localStorage.getItem('token');
@@ -56,7 +56,7 @@ const UploadPage = () => {
       }
       setUploadError(true);
     } finally {
-      setLoading(false);  // Stop loading
+      setLoading(false);
     }
   };
 
@@ -166,14 +166,20 @@ const UploadPage = () => {
               <Typography variant="body1" sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
                 Download Sample Excel Files:
               </Typography>
-              <Box display="flex" gap={2} mt={2}>
+              <Box
+                display="flex"
+                gap={2}
+                mt={2}
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                width="100%"
+              >
                 <Button
                   variant="text"
                   startIcon={<FileDownloadIcon />}
                   href="/sample-users.xlsx"
                   download
                   sx={{
-                    flex: 1,
+                    width: { xs: '100%', sm: 'auto' },
                     backgroundColor: '#b3b3b3',
                     color: 'white',
                     '&:hover': {
@@ -181,17 +187,22 @@ const UploadPage = () => {
                     },
                     fontFamily: 'Montserrat, sans-serif',
                     fontWeight: 400,
+                    textAlign: 'center',
+                    fontSize: { xs: '14px', sm: '15px', md: '16px' },
+                    padding: { xs: '10px', sm: '8px 18px', md: '8px 24px' },
+                    minHeight: { sm: '40px', md: '42px' },
                   }}
                 >
                   Download Users Sample
                 </Button>
+
                 <Button
                   variant="text"
                   startIcon={<FileDownloadIcon />}
                   href="/sample-branches.xlsx"
                   download
                   sx={{
-                    flex: 1,
+                    width: { xs: '100%', sm: 'auto' },
                     backgroundColor: '#b3b3b3',
                     color: 'white',
                     '&:hover': {
@@ -199,11 +210,16 @@ const UploadPage = () => {
                     },
                     fontFamily: 'Montserrat, sans-serif',
                     fontWeight: 400,
+                    textAlign: 'center',
+                    fontSize: { xs: '14px', sm: '15px', md: '16px' },
+                    padding: { xs: '10px', sm: '8px 18px', md: '8px 24px' },
+                    minHeight: { sm: '40px', md: '42px' },
                   }}
                 >
                   Download Branches Sample
                 </Button>
               </Box>
+
             </Grid>
 
           </Grid>

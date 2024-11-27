@@ -7,15 +7,15 @@ import CustomTextField from '../Mui/CustomTextField';
 const CreateBranch = () => {
   const { id } = useParams();
   const [branchName, setBranchName] = useState('');
-  const [isBranchNameUnique, setIsBranchNameUnique] = useState(true); // Track branch name uniqueness
+  const [isBranchNameUnique, setIsBranchNameUnique] = useState(true); 
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
   const [branchUser, setBranchUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [showSnackbar, setShowSnackbar] = useState(false); 
-  const [snackbarSeverity, setSnackbarSeverity] = useState('info'); 
-  const [adminId, setAdminId] = useState(null); 
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [adminId, setAdminId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const CreateBranch = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         const { id } = response.data;
-        setAdminId(id); 
+        setAdminId(id);
       } catch (error) {
         console.error('Failed to fetch admin details:', error);
       }
@@ -51,16 +51,15 @@ const CreateBranch = () => {
     fetchUsers();
   }, []);
 
-  // Check branch name uniqueness
   const checkBranchName = async (name) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/branches/check-name/${name}`);
-      setIsBranchNameUnique(!response.data.exists); // If exists, it's not unique
+      setIsBranchNameUnique(!response.data.exists);
     } catch (error) {
       console.error('Error checking branch name:', error);
     }
   };
-  
+
 
   const handleBranchNameChange = (e) => {
     const name = e.target.value;
@@ -71,7 +70,6 @@ const CreateBranch = () => {
   };
 
   const handleSave = async () => {
-    // Check if all mandatory fields are filled
     if (!branchName) {
       return showSnackbarWithMessage('Please provide a Branch Name.', 'error');
     }
@@ -115,7 +113,7 @@ const CreateBranch = () => {
         bankName,
         bankBranch,
         branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null,
-        adminId, // Include adminId in the request
+        adminId, 
       };
 
       if (id) {
@@ -128,7 +126,7 @@ const CreateBranch = () => {
 
       setTimeout(() => {
         navigate('/super-dashboard/manage-branches');
-      }, 1500); 
+      }, 1500);
     } catch (error) {
       console.error('Failed to save branch:', error);
       showSnackbarWithMessage('An error occurred while saving the branch.', 'error');
@@ -137,7 +135,7 @@ const CreateBranch = () => {
 
   const showSnackbarWithMessage = (message, severity) => {
     setSnackbarMessage(message);
-    setSnackbarSeverity(severity); 
+    setSnackbarSeverity(severity);
     setShowSnackbar(true);
   };
 
@@ -166,7 +164,7 @@ const CreateBranch = () => {
               margin="normal"
               required
               error={!isBranchNameUnique}
-              helperText={!isBranchNameUnique ? 'Branch name already exists' : ''}  
+              helperText={!isBranchNameUnique ? 'Branch name already exists' : ''}
             />
           </Grid>
           <Grid item xs={12}>
@@ -210,42 +208,67 @@ const CreateBranch = () => {
           </Grid>
         </Grid>
 
-        <Box mt={3} display="flex" justifyContent="space-between">
-          <Button
-           variant="contained" 
-           color="primary" 
-           sx={{
-            maxWidth: '150px',
-            flex: 1,
-            backgroundColor: '#ED1F79',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: '#FBB03A',
+        <Box
+          mt={3}
+          display="flex"
+          justifyContent="space-between"
+          flexWrap="wrap"
+          gap={2}
+          sx={{
+            '@media (max-width: 440px)': {
+              flexDirection: 'column',
+              justifyContent: 'center',  
             },
-            fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 400,
           }}
-           onClick={handleSave}>
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#ED1F79',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#FBB03A',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+              minWidth: '120px',
+              '@media (max-width: 440px)': {
+                maxWidth: '100%',
+              },
+            }}
+            onClick={handleSave}
+          >
             {id ? 'Update' : 'Save'}
           </Button>
-          <Button 
-          variant="contained" 
-          color="secondary" 
-          sx={{
-            maxWidth: '150px',
-            flex: 1,
-            backgroundColor: '#FBB03A',
-            color: 'black',
-            '&:hover': {
-              backgroundColor: '#ED1F79',
-            },
-            fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 400,
-          }}
-          onClick={handleCancel}>
+
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#FBB03A',
+              color: 'black',
+              '&:hover': {
+                backgroundColor: '#ED1F79',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+              minWidth: '120px',
+              // Full width on smaller screens
+              '@media (max-width: 440px)': {
+                maxWidth: '100%',
+              },
+            }}
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
         </Box>
+
       </Box>
 
       <Snackbar

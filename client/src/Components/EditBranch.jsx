@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography,Snackbar, Paper, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, Snackbar, Paper, Alert } from '@mui/material';
 import axios from 'axios';
 import CustomTextField from '../Mui/CustomTextField';
 
@@ -92,43 +92,66 @@ const EditBranch = () => {
             margin="normal"
             required
           />
-          <Box mt={2} 
-          display="flex" 
-          justifyContent="space-between">
-            <Button type="submit" 
-            variant="contained" 
+          <Box
+            mt={2}
+            display="flex"
+            justifyContent="space-between"
+            flexWrap="wrap"
+            gap={2}
             sx={{
-              maxWidth: '150px',
-              flex: 1,
-              backgroundColor: '#ED1F79',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: '#FBB03A',
+              '@media (max-width: 512px)': {
+                flexDirection: 'column',
+                justifyContent: 'center',
               },
-              fontFamily: 'Montserrat, sans-serif',
-              fontWeight: 400,
             }}
-            color="primary">
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#ED1F79',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                '@media (max-width: 512px)': {
+                  maxWidth: '100%',
+                },
+              }}
+              color="primary"
+            >
               Save Changes
             </Button>
-            <Button type="button" 
-            variant="outlined"
-            sx={{
-              maxWidth: '150px',
-              flex: 1,
-              backgroundColor: '#FBB03A',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: '#ED1F79',
-              },
-              fontFamily: 'Montserrat, sans-serif',
-              fontWeight: 400,
-            }} 
-            color="secondary" 
-            onClick={handleCancel}>
+            <Button
+              type="button"
+              variant="outlined"
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#FBB03A',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#ED1F79',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                '@media (max-width: 512px)': {
+                  maxWidth: '100%',
+                },
+              }}
+              color="secondary"
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
           </Box>
+
         </form>
       </Paper>
       {/* Snackbar component */}

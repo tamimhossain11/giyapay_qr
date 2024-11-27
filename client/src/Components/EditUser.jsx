@@ -297,40 +297,69 @@ const EditUser = () => {
 
       {error && <Typography color="error">{error}</Typography>}
 
-      <Box mt={2} display="flex" justifyContent="space-between">
-        <Button variant="contained" 
-        color="primary" 
-        
-        onClick={handleUpdate} 
-        sx={{
-          maxWidth: '150px',
-          flex: 1,
-          backgroundColor: '#ED1F79',
-          color: 'white',
-          '&:hover': {
-            backgroundColor: '#FBB03A',
-          },
-          fontFamily: 'Montserrat, sans-serif',
-          fontWeight: 400,
-        }}>
-          Update User
-        </Button>
-        <Button variant="outlined" color="secondary" onClick={handleCancel} sx={{ mt: 3 }}
-          sx={{
-            maxWidth: '150px',
-            flex: 1,
-            backgroundColor: '#FBB03A',
-            color: 'black',
-            '&:hover': {
-              backgroundColor: '#ED1F79',
-            },
-            fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 400,
-          }}
-        >
-          Cancel
-        </Button>
-      </Box>
+      <Box
+  mt={2}
+  display="flex"
+  justifyContent="space-between"
+  flexWrap="wrap"
+  gap={2}
+  sx={{
+    // For small screens (below 440px), stack the buttons vertically and make them full width
+    '@media (max-width: 440px)': {
+      flexDirection: 'column',
+      justifyContent: 'center', // Center the buttons when stacked
+    },
+  }}
+>
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={handleUpdate}
+    sx={{
+      maxWidth: '150px',
+      flex: 1,
+      backgroundColor: '#ED1F79',
+      color: 'white',
+      '&:hover': {
+        backgroundColor: '#FBB03A',
+      },
+      fontFamily: 'Montserrat, sans-serif',
+      fontWeight: 400,
+      minWidth: '120px',
+      // Full width on smaller screens
+      '@media (max-width: 440px)': {
+        maxWidth: '100%',
+      },
+    }}
+  >
+    Update User
+  </Button>
+
+  <Button
+    variant="outlined"
+    color="secondary"
+    onClick={handleCancel}
+    sx={{
+      maxWidth: '150px',
+      flex: 1,
+      backgroundColor: '#FBB03A',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: '#ED1F79',
+      },
+      fontFamily: 'Montserrat, sans-serif',
+      fontWeight: 400,
+      minWidth: '120px',
+      // Full width on smaller screens
+      '@media (max-width: 440px)': {
+        maxWidth: '100%',
+      },
+    }}
+  >
+    Cancel
+  </Button>
+</Box>
+
 
       {/* Snackbar for success/error message */}
       <Snackbar

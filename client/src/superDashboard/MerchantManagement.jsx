@@ -9,6 +9,7 @@ import { Visibility, VisibilityOff, ExpandMore, ExpandLess, Logout } from '@mui/
 import { FaUsers } from 'react-icons/fa';
 import { styled } from '@mui/system';
 import io from 'socket.io-client';
+import CustomTextField from '../Mui/CustomTextField';
 
 
 const LeftSection = styled(Box)(({ theme }) => ({
@@ -25,7 +26,7 @@ const RightSection = styled(Box)(({ theme }) => ({
 }));
 
 const WelcomeBanner = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: '#ED1F79', // Giyapay brand color
     color: theme.palette.common.white,
     padding: theme.spacing(2),
     textAlign: 'center',
@@ -42,7 +43,7 @@ const ResponsiveTable = styled(TableContainer)(({ theme }) => ({
     },
     [theme.breakpoints.up('md')]: {
         '& table': {
-            tableLayout: 'auto', // Wider tables on larger screens
+            tableLayout: 'auto',
         },
     },
 }));
@@ -93,7 +94,7 @@ const MerchantManagement = () => {
                 // Fetch total admin count
                 const countResult = await axios.get(`${backendUrl}/admin/count`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Auth token if needed
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
                 if (countResult.data.Status) {
@@ -103,7 +104,7 @@ const MerchantManagement = () => {
                 // Fetch admin list
                 const adminsResult = await axios.get(`${backendUrl}/admin/all`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`, // Auth token if needed
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
                 setAdmins(adminsResult.data.Result);
@@ -216,7 +217,7 @@ const MerchantManagement = () => {
                         </Typography>
                         <form onSubmit={handleSubmit}>
                             <Box mb={2}>
-                                <TextField
+                                <CustomTextField
                                     label="Email"
                                     type="email"
                                     value={email}
@@ -228,7 +229,7 @@ const MerchantManagement = () => {
                                 />
                             </Box>
                             <Box mb={2}>
-                                <TextField
+                                <CustomTextField
                                     label="Password"
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
@@ -249,7 +250,7 @@ const MerchantManagement = () => {
                                 />
                             </Box>
                             <Box mb={2}>
-                                <TextField
+                                <CustomTextField
                                     label="Merchant Name"
                                     value={merchantName}
                                     onChange={(e) => setMerchantName(e.target.value)}
@@ -260,7 +261,7 @@ const MerchantManagement = () => {
                                 />
                             </Box>
                             <Box mb={2}>
-                                <TextField
+                                <CustomTextField
                                     label="Merchant ID"
                                     value={merchantID}
                                     onChange={(e) => setMerchantID(e.target.value)}
@@ -271,7 +272,7 @@ const MerchantManagement = () => {
                                 />
                             </Box>
                             <Box mb={2}>
-                                <TextField
+                                <CustomTextField
                                     label="Merchant Secret"
                                     value={merchantSecret}
                                     onChange={(e) => setMerchantSecret(e.target.value)}
@@ -281,9 +282,29 @@ const MerchantManagement = () => {
                                     helperText={errors.merchantSecret}
                                 />
                             </Box>
-                            <Button type="submit" variant="contained" color="primary" fullWidth>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                fullWidth
+                                sx={{
+                                    color: '#fff',
+                                    backgroundImage: 'linear-gradient(to right, #FBB03A, #ED1F79, #FBB03A, #ED1F79)',
+                                    backgroundSize: '300% 100%',
+                                    border: 'none',
+                                    transition: 'all 0.4s ease-in-out',
+                                    padding: '8px 40px',
+                                    borderRadius: '8px',
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    fontWeight: 400,
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        backgroundPosition: '100% 0',
+                                    },
+                                }}
+                            >
                                 Add Admin
                             </Button>
+
                         </form>
                         <Button
                             variant="contained"
@@ -291,10 +312,26 @@ const MerchantManagement = () => {
                             startIcon={<Logout />}
                             onClick={handleLogout}
                             fullWidth
-                            sx={{ mt: 4 }}
+                            sx={{
+                                mt: 4,
+                                color: '#fff',
+                                backgroundColor: '#ED1F79', 
+                                padding: '10px 50px',
+                                borderRadius: '8px',
+                                fontFamily: 'Montserrat, sans-serif',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    backgroundColor: '#FBB03A', 
+                                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+                                },
+                            }}
                         >
                             LOG OUT
                         </Button>
+
                     </LeftSection>
                 </Grid>
 
@@ -305,13 +342,21 @@ const MerchantManagement = () => {
                                 <FaUsers style={{ marginRight: 8 }} />
                                 Super Admin Dashboard
                             </Typography>
-                            <Typography variant="h6" color="primary">
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    color: '#ED1F79', 
+                                    fontFamily: 'Montserrat, sans-serif', 
+                                    fontWeight: 600, 
+                                }}
+                            >
                                 Total Admins: {adminTotal}
                             </Typography>
+
                         </Box>
 
                         <ResponsiveTable component={Paper}>
-                            <Table stickyHeader>
+                            <Table stickyHeader sx={{ minWidth: 650, width: '100%', overflowX: 'auto' }}>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>ID</TableCell>
@@ -325,10 +370,10 @@ const MerchantManagement = () => {
                                     {admins.map((admin, index) => (
                                         <React.Fragment key={admin.id}>
                                             <TableRow hover>
-                                                <TableCell>{admin.id}</TableCell>
-                                                <TableCell>{admin.merchant_name}</TableCell>
-                                                <TableCell>{admin.merchant_id}</TableCell>
-                                                <TableCell>{admin.email}</TableCell>
+                                                <TableCell sx={{ minWidth: 100, wordBreak: 'break-word' }}>{admin.id}</TableCell>
+                                                <TableCell sx={{ minWidth: 200, wordBreak: 'break-word' }}>{admin.merchant_name}</TableCell>
+                                                <TableCell sx={{ minWidth: 150, wordBreak: 'break-word' }}>{admin.merchant_id}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.email}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => toggleRowExpansion(index)}>
                                                         {expandedRow === index ? <ExpandLess /> : <ExpandMore />}
@@ -351,6 +396,7 @@ const MerchantManagement = () => {
                                 </TableBody>
                             </Table>
                         </ResponsiveTable>
+
                     </RightSection>
                 </Grid>
             </Grid>

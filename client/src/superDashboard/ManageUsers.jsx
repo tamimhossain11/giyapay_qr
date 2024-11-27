@@ -16,7 +16,8 @@ import {
   DialogTitle,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  TablePagination
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -27,6 +28,8 @@ const ManageUsers = () => {
   const [open, setOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0); // Pagination state
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Rows per page
   const isMobile = useMediaQuery('(max-width: 600px)');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -36,12 +39,10 @@ const ManageUsers = () => {
     setSnackbarOpen(false);
   };
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        // The request should send a token that contains the admin_id
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/all`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}` // Assuming token is stored in localStorage
@@ -58,15 +59,12 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-
-
   const handleDelete = async () => {
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/users/delete/${selectedUserId}`);
       setUsers(users.filter((user) => user.id !== selectedUserId));
       setOpen(false);
 
-      // Show snackbar with a success message
       setSnackbarMessage('User deleted successfully.');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
@@ -77,7 +75,6 @@ const ManageUsers = () => {
       setSnackbarOpen(true);
     }
   };
-
 
   const handleClickOpen = (id) => {
     setSelectedUserId(id);
@@ -95,7 +92,6 @@ const ManageUsers = () => {
       });
       setUsers(users.map(user => user.id === id ? { ...user, status: currentStatus === 'Active' ? 'Inactive' : 'Active' } : user));
 
-      // Show snackbar with a success message
       setSnackbarMessage(`User status changed to ${currentStatus === 'Active' ? 'Inactive' : 'Active'}.`);
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
@@ -106,9 +102,19 @@ const ManageUsers = () => {
       setSnackbarOpen(true);
     }
   };
+
+  // Handle page change
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when rows per page change
+  };
+
   return (
-
-
     <>
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
@@ -159,7 +165,7 @@ const ManageUsers = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
+                {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.id}</TableCell>
                     <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{user.first_name}</TableCell>
@@ -188,7 +194,6 @@ const ManageUsers = () => {
                             fontFamily: 'Montserrat, sans-serif',
                             fontWeight: 400,
                           }}
-                          
                         >
                           Delete
                         </Button>
@@ -237,6 +242,16 @@ const ManageUsers = () => {
             </Table>
           </Box>
 
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={users.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+
           {/* Delete Confirmation Dialog */}
           <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>Confirm Delete</DialogTitle>
@@ -270,6 +285,6 @@ const ManageUsers = () => {
       )}
     </>
   );
-}
+};
 
 export default ManageUsers;

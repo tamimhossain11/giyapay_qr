@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress,Autocomplete
+  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress, Autocomplete
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -96,7 +96,6 @@ const ManageQr = () => {
         setQrCodes((prevQrCodes) => {
           const existingQr = prevQrCodes.find((qr) => qr.id === formattedQrCode.id);
           if (existingQr) {
-            // If the QR code exists, update it
             return prevQrCodes.map((qr) =>
               qr.id === formattedQrCode.id ? { ...qr, ...formattedQrCode } : qr
             );
@@ -127,7 +126,6 @@ const ManageQr = () => {
       });
     }
 
-    // Cleanup event listeners on component unmount or socket change
     return () => {
       if (socket) {
         socket.off('qr-code-updated');
@@ -256,14 +254,23 @@ const ManageQr = () => {
           {/* Filter Container */}
           <Box display="flex" flexWrap="wrap" gap={2} width="100%">
             {/* First Row */}
-            <Box display="flex" flexWrap="wrap" gap={2} width="100%">
+            <Box
+              display="flex"
+              flexWrap="wrap"
+              gap={2}
+              width="100%"
+              flexDirection={{ xs: 'column', sm: 'row' }} 
+            >
               <CustomTextField
                 label="Search Payment Reference"
                 variant="outlined"
                 size="small"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' },
+                }}
               />
               <CustomTextField
                 label="Start Date"
@@ -274,7 +281,10 @@ const ManageQr = () => {
                 name="startDate"
                 value={dateFilter.startDate}
                 onChange={handleDateChange}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' }, 
+                }}
               />
               <CustomTextField
                 label="End Date"
@@ -285,10 +295,20 @@ const ManageQr = () => {
                 name="endDate"
                 value={dateFilter.endDate}
                 onChange={handleDateChange}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' }, 
+                }}
               />
             </Box>
-            <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
+
+            <Box
+              display="flex"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              gap={2}
+              mt={2}
+              width="100%"
+            >
               {/* Branch Name Autocomplete */}
               <Autocomplete
                 options={branches}
@@ -301,10 +321,9 @@ const ManageQr = () => {
                     label="Branch Name"
                     variant="outlined"
                     fullWidth
-                    size="small"  // Keeps the input size small like the Select field
+                    size="small"
                     sx={{
-                      flex: 1,
-                      minWidth: '500px', // Ensures minimum width
+                      minWidth: { xs: '100%', sm: '300px' },
                     }}
                   />
                 )}
@@ -322,40 +341,51 @@ const ManageQr = () => {
                     label="User Name"
                     variant="outlined"
                     fullWidth
-                    size="small"  // Matches size
+                    size="small"
                     sx={{
-                      flex: 1,
-                      minWidth: '500px', // Ensures minimum width
+                      minWidth: { xs: '100%', sm: '300px' },
                     }}
                   />
                 )}
               />
             </Box>
 
+
           </Box>
 
           {/* Buttons */}
-          <Box mt={2} display="flex" gap={2}>
-            <Button variant="contained" color="primary"
-            sx={{
-              maxWidth: '150px',
-              flex: 1,
-              backgroundColor: '#FBB03A',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: '#ED1F79',
-              },
-              fontFamily: 'Montserrat, sans-serif',
-              fontWeight: 400,
-            }}
-            onClick={() => setPage(0)}>
+          <Box mt={2} display="flex" gap={2} flexWrap="wrap" sx={{
+            '@media (max-width: 735px)': {
+              flexDirection: 'column',
+              alignItems: 'center',
+            },
+          }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                flex: 1,
+                backgroundColor: '#FBB03A',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#ED1F79',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                '@media (max-width: 735px)': {
+                  width: '100%',
+                },
+              }}
+              onClick={() => setPage(0)}
+            >
               Apply Filters
             </Button>
+
             <Button
               variant="contained"
               color="secondary"
               sx={{
-                maxWidth: '150px',
                 flex: 1,
                 backgroundColor: '#ED1F79',
                 color: 'white',
@@ -364,6 +394,10 @@ const ManageQr = () => {
                 },
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 400,
+                minWidth: '120px',
+                '@media (max-width: 735px)': {
+                  width: '100%',
+                },
               }}
               onClick={() => {
                 setSearchTerm('');
@@ -376,39 +410,47 @@ const ManageQr = () => {
               Clear Filters
             </Button>
 
-            <CSVLink
-              data={filteredQrCodes}
-              headers={headers}
-              sx={{
-                maxWidth: '150px',
-                flex: 1,
-                backgroundColor: '#FBB03A',
-                color: 'black',
-                '&:hover': {
-                  backgroundColor: '#ED1F79',
-                },
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
-              }}
-              filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
-            >
-              <Button variant="contained" color="primary"
-              sx={{
-                maxWidth: '200px',
-                flex: 1,
-                backgroundColor: '#b3b3b3',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: '#FBB03A',
-                },
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
-              }}
-              startIcon={<DownloadIcon />}>
-                Export to CSV
-              </Button>
-            </CSVLink>
+            <Box sx={{
+              flex: 1,
+              width: '100%',
+              '@media (max-width: 735px)': {
+                width: '100%',
+              },
+            }}>
+              <CSVLink
+                data={filteredQrCodes}
+                headers={headers}
+                sx={{
+                  width: '100%',
+                  textDecoration: 'none',
+                }}
+                filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    flex: 1,
+                    backgroundColor: '#b3b3b3',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#FBB03A',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                    minWidth: '120px',
+                    '@media (max-width: 735px)': {
+                      width: '100%',
+                    },
+                  }}
+                  startIcon={<DownloadIcon />}
+                >
+                  Export to CSV
+                </Button>
+              </CSVLink>
+            </Box>
           </Box>
+
         </Box>
         <TableContainer component={Paper}>
           <Table>
@@ -495,7 +537,7 @@ const ManageQr = () => {
                   <strong>Status:</strong> {selectedQr.status}
                 </Typography>
                 <Typography
-                sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}
+                  sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}
                   variant="body1"
                   gutterBottom
                   style={{
@@ -516,17 +558,17 @@ const ManageQr = () => {
                 </Typography>
                 <Box mt={2} display="flex" justifyContent="flex-end">
                   <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
-                            maxWidth: '150px',
-                            flex: 1,
-                            backgroundColor: '#FBB03A',
-                            color: 'black',
-                            '&:hover': {
-                              backgroundColor: '#ED1F79',
-                            },
-                            fontFamily: 'Montserrat, sans-serif',
-                            fontWeight: 400,
-                          }}
-                        >
+                    maxWidth: '150px',
+                    flex: 1,
+                    backgroundColor: '#FBB03A',
+                    color: 'black',
+                    '&:hover': {
+                      backgroundColor: '#ED1F79',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                  }}
+                  >
                     Close
                   </Button>
                 </Box>

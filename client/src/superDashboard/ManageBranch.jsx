@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Snackbar, Alert } from '@mui/material';
+import { Button, Table, TableHead, TableBody, TableRow, TableCell, Box, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Snackbar, Alert, TablePagination } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,6 +15,8 @@ const ManageBranches = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [page, setPage] = useState(0); 
+  const [rowsPerPage, setRowsPerPage] = useState(5); 
   const isTabletOrMobile = useMediaQuery('(max-width: 900px)');
   const location = useLocation();
 
@@ -77,6 +79,17 @@ const ManageBranches = () => {
     }
   };
 
+  // Handle page change in pagination
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); 
+  };
+
   return (
     <Box className="manage-branches-container" sx={{ backgroundColor: 'white', padding: '20px' }}>
       {loading ? (
@@ -127,7 +140,7 @@ const ManageBranches = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {branches.map((branch) => (
+                  {branches.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((branch) => (
                     <TableRow key={branch.id}>
                       <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.id}</TableCell>
                       <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{branch.branch_name}</TableCell>
@@ -180,6 +193,18 @@ const ManageBranches = () => {
               </Table>
             </Box>
           )}
+
+          {/* Pagination */}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={branches.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{ mt: 2 }}
+          />
         </>
       )}
 

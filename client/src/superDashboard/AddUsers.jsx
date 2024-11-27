@@ -205,8 +205,8 @@ const AddUser = () => {
               value={username}
               onChange={handleUsernameChange}
               required
-              error={usernameTaken}  // Show error when username is taken
-              helperText={usernameTaken ? 'Username is already taken' : ''}  // Show message instantly if username is taken
+              error={usernameTaken}
+              helperText={usernameTaken ? 'Username is already taken' : ''}
             />
           </Grid>
 
@@ -217,8 +217,8 @@ const AddUser = () => {
               value={email}
               onChange={handleEmailChange}
               required
-              error={emailTaken}  // Show error when email is taken or invalid
-              helperText={emailTaken ? 'Email is already taken' : ''}  // Show message instantly if email is taken
+              error={emailTaken}
+              helperText={emailTaken ? 'Email is already taken' : ''}
             />
           </Grid>
 
@@ -286,38 +286,65 @@ const AddUser = () => {
           )}
 
           <Grid item xs={12}>
-            <Box display="flex" justifyContent="space-between">
-              <Button 
-              variant="contained" 
-              color="primary" 
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              flexWrap="wrap"
+              gap={2}
               sx={{
-                maxWidth: '150px',
-                flex: 1,
-                backgroundColor: '#ED1F79',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: '#FBB03A',
+                '@media (max-width: 440px)': {
+                  flexDirection: 'column',
+                  justifyContent: 'center',
                 },
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
               }}
-              onClick={handleSave} >Save</Button>
-
-              <Button variant="outlined"
-               color="secondary" 
-               sx={{
-                maxWidth: '150px',
-                flex: 1,
-                backgroundColor: '#FBB03A',
-                color: 'black',
-                '&:hover': {
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  maxWidth: '150px',
+                  flex: 1,
                   backgroundColor: '#ED1F79',
-                },
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
-              }}
-               onClick={handleCancel}>Cancel</Button>
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#FBB03A',
+                  },
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 400,
+                  minWidth: '120px',
+                  '@media (max-width: 440px)': {
+                    maxWidth: '100%',
+                  },
+                }}
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+
+              <Button
+                variant="outlined"
+                color="secondary"
+                sx={{
+                  maxWidth: '150px',
+                  flex: 1,
+                  backgroundColor: '#FBB03A',
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: '#ED1F79',
+                  },
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 400,
+                  minWidth: '120px',
+                  '@media (max-width: 440px)': {
+                    maxWidth: '100%',
+                  },
+                }}
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
             </Box>
+
           </Grid>
         </Grid>
       </Paper>

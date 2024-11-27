@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-  TablePagination, TableRow, Typography, IconButton, Tooltip, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
+  TablePagination, TableRow, Typography, IconButton, Tooltip,Autocomplete, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -14,6 +14,7 @@ import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
 import RippleLoader from '../Components/Loader';
+import CustomTextField from '../Mui/CustomTextField';
 
 const ManageQrCA = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -247,7 +248,7 @@ const ManageQrCA = () => {
   return (
     <Container maxWidth={false} disableGutters>
       <Box mt={4} width="100%">
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
           Manage QR Codes
         </Typography>
 
@@ -255,16 +256,26 @@ const ManageQrCA = () => {
           {/* Filter Container */}
           <Box display="flex" flexWrap="wrap" gap={2} width="100%">
             {/* First Row */}
-            <Box display="flex" flexWrap="wrap" gap={2} width="100%">
-              <TextField
+            <Box
+              display="flex"
+              flexWrap="wrap"
+              gap={2}
+              width="100%"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+            >
+              <CustomTextField
                 label="Search Payment Reference"
                 variant="outlined"
                 size="small"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
+                }}
               />
-              <TextField
+              <CustomTextField
                 label="Start Date"
                 type="date"
                 variant="outlined"
@@ -273,9 +284,13 @@ const ManageQrCA = () => {
                 name="startDate"
                 value={dateFilter.startDate}
                 onChange={handleDateChange}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
+                }}
               />
-              <TextField
+              <CustomTextField
                 label="End Date"
                 type="date"
                 variant="outlined"
@@ -284,53 +299,117 @@ const ManageQrCA = () => {
                 name="endDate"
                 value={dateFilter.endDate}
                 onChange={handleDateChange}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
+                }}
               />
             </Box>
 
             {/* Second Row */}
-            <Box display="flex" flexWrap="wrap" gap={2} mt={2} width="100%">
-              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                <InputLabel>Branch Name</InputLabel>
-                <Select
-                  value={branchFilter}
-                  onChange={(e) => setBranchFilter(e.target.value)}
-                  label="Branch Name"
-                >
-                  <MenuItem value="">All Branches</MenuItem>
-                  {branches.map((branch) => (
-                    <MenuItem key={branch.id} value={branch.branch_name}>
-                      {branch.branch_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl variant="outlined" size="small" sx={{ flex: 1 }}>
-                <InputLabel>User Name</InputLabel>
-                <Select
-                  value={userFilter}
-                  onChange={(e) => setUserFilter(e.target.value)}
-                  label="User Name"
-                >
-                  <MenuItem value="">All Users</MenuItem>
-                  {users.map((user) => (
-                    <MenuItem key={user.id} value={user.username}>
-                      {user.username}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+            <Box
+              display="flex"
+              flexWrap="wrap"
+              gap={2}
+              mt={2}
+              width="100%"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+            >
+              {/* Branch Name Autocomplete */}
+              <Autocomplete
+                options={branches}
+                getOptionLabel={(branch) => branch.branch_name || ''}
+                value={branchFilter ? branches.find(b => b.branch_name === branchFilter) : null}
+                onChange={(event, newValue) => setBranchFilter(newValue ? newValue.branch_name : '')}
+                renderInput={(params) => (
+                  <CustomTextField
+                    {...params}
+                    label="Branch Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      minWidth: { xs: '100%', sm: '400px' },
+                      maxWidth: '500px',
+                    }}
+                  />
+                )}
+              />
+
+              {/* User Name Autocomplete */}
+              <Autocomplete
+                options={users}
+                getOptionLabel={(user) => user.username || ''}
+                value={userFilter ? users.find(u => u.username === userFilter) : null}
+                onChange={(event, newValue) => setUserFilter(newValue ? newValue.username : '')}
+                renderInput={(params) => (
+                  <CustomTextField
+                    {...params}
+                    label="User Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      minWidth: { xs: '100%', sm: '400px' },
+                      maxWidth: '500px',
+                    }}
+                  />
+                )}
+              />
             </Box>
           </Box>
-
           {/* Buttons */}
-          <Box mt={2} display="flex" gap={2}>
-            <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+          <Box mt={2} display="flex" gap={2} flexWrap="wrap" sx={{
+            '@media (max-width: 735px)': {
+              flexDirection: 'column',
+              alignItems: 'stretch',
+            },
+            width: '100%',
+          }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                flex: 1,
+                backgroundColor: '#FBB03A',
+                color: 'black',
+                '&:hover': {
+                  backgroundColor: '#ED1F79',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                width: '100%',
+                '@media (max-width: 735px)': {
+                  width: '100%',
+                },
+              }}
+              onClick={() => setPage(0)}
+            >
               Apply Filters
             </Button>
+
             <Button
               variant="contained"
               color="secondary"
+              sx={{
+                flex: 1,
+                backgroundColor: '#ED1F79',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                width: '100%',
+                '@media (max-width: 735px)': {
+                  width: '100%',
+                },
+              }}
               onClick={() => {
                 setSearchTerm('');
                 setBranchFilter('');
@@ -342,15 +421,46 @@ const ManageQrCA = () => {
               Clear Filters
             </Button>
 
-            <CSVLink
-              data={filteredQrCodes}
-              headers={headers}
-              filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
-            >
-              <Button variant="contained" color="primary" startIcon={<DownloadIcon />}>
-                Export to CSV
-              </Button>
-            </CSVLink>
+            <Box sx={{
+              flex: 1,
+              width: '100%',
+              '@media (max-width: 735px)': {
+                width: '100%',
+              },
+            }}>
+              <CSVLink
+                data={filteredQrCodes}
+                headers={headers}
+                sx={{
+                  width: '100%',
+                  textDecoration: 'none',
+                }}
+                filename={`QR_Codes_${new Date().toISOString().split('T')[0]}.csv`}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    flex: 1,
+                    backgroundColor: '#b3b3b3',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#FBB03A',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                    minWidth: '120px',
+                    width: '100%',
+                    '@media (max-width: 735px)': {
+                      width: '100%',
+                    },
+                  }}
+                  startIcon={<DownloadIcon />}
+                >
+                  Export to CSV
+                </Button>
+              </CSVLink>
+            </Box>
           </Box>
         </Box>
         <TableContainer component={Paper}>

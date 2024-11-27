@@ -259,7 +259,7 @@ const ManageQr = () => {
               flexWrap="wrap"
               gap={2}
               width="100%"
-              flexDirection={{ xs: 'column', sm: 'row' }} 
+              flexDirection={{ xs: 'column', sm: 'row' }}
             >
               <CustomTextField
                 label="Search Payment Reference"
@@ -270,6 +270,7 @@ const ManageQr = () => {
                 sx={{
                   flex: 1,
                   minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
                 }}
               />
               <CustomTextField
@@ -283,7 +284,8 @@ const ManageQr = () => {
                 onChange={handleDateChange}
                 sx={{
                   flex: 1,
-                  minWidth: { xs: '100%', sm: '300px' }, 
+                  minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
                 }}
               />
               <CustomTextField
@@ -297,17 +299,20 @@ const ManageQr = () => {
                 onChange={handleDateChange}
                 sx={{
                   flex: 1,
-                  minWidth: { xs: '100%', sm: '300px' }, 
+                  minWidth: { xs: '100%', sm: '300px' },
+                  maxWidth: '400px',
                 }}
               />
             </Box>
 
+            {/* Second Row */}
             <Box
               display="flex"
-              flexDirection={{ xs: 'column', sm: 'row' }}
+              flexWrap="wrap"
               gap={2}
               mt={2}
               width="100%"
+              flexDirection={{ xs: 'column', sm: 'row' }}
             >
               {/* Branch Name Autocomplete */}
               <Autocomplete
@@ -323,7 +328,9 @@ const ManageQr = () => {
                     fullWidth
                     size="small"
                     sx={{
-                      minWidth: { xs: '100%', sm: '300px' },
+                      flex: 1,
+                      minWidth: { xs: '100%', sm: '400px' },
+                      maxWidth: '500px',
                     }}
                   />
                 )}
@@ -343,22 +350,22 @@ const ManageQr = () => {
                     fullWidth
                     size="small"
                     sx={{
-                      minWidth: { xs: '100%', sm: '300px' },
+                      flex: 1,
+                      minWidth: { xs: '100%', sm: '400px' },
+                      maxWidth: '500px',
                     }}
                   />
                 )}
               />
             </Box>
-
-
           </Box>
-
           {/* Buttons */}
           <Box mt={2} display="flex" gap={2} flexWrap="wrap" sx={{
             '@media (max-width: 735px)': {
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: 'stretch',
             },
+            width: '100%',
           }}>
             <Button
               variant="contained"
@@ -373,6 +380,7 @@ const ManageQr = () => {
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 400,
                 minWidth: '120px',
+                width: '100%',
                 '@media (max-width: 735px)': {
                   width: '100%',
                 },
@@ -395,6 +403,7 @@ const ManageQr = () => {
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 400,
                 minWidth: '120px',
+                width: '100%',
                 '@media (max-width: 735px)': {
                   width: '100%',
                 },
@@ -439,6 +448,7 @@ const ManageQr = () => {
                     fontFamily: 'Montserrat, sans-serif',
                     fontWeight: 400,
                     minWidth: '120px',
+                    width: '100%',
                     '@media (max-width: 735px)': {
                       width: '100%',
                     },
@@ -450,6 +460,7 @@ const ManageQr = () => {
               </CSVLink>
             </Box>
           </Box>
+
 
         </Box>
         <TableContainer component={Paper}>

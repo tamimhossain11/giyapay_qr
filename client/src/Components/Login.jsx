@@ -66,7 +66,7 @@ const Login = () => {
                 setSnackbarOpen(true);
 
                 // Redirect based on user type and ID
-                if (decodedToken.userType === 'admin' && decodedToken.id === 5) {
+                if (decodedToken.userType === 'admin' && decodedToken.id === 1) {
                     navigate('/merchant-management');
                 } else if (decodedToken.userType === 'admin') {
                     navigate('/super-dashboard');

@@ -105,28 +105,7 @@ const EditBranch = () => {
               },
             }}
           >
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                maxWidth: '150px',
-                flex: 1,
-                backgroundColor: '#ED1F79',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: '#FBB03A',
-                },
-                fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
-                minWidth: '120px',
-                '@media (max-width: 512px)': {
-                  maxWidth: '100%',
-                },
-              }}
-              color="primary"
-            >
-              Save Changes
-            </Button>
+     
             <Button
               type="button"
               variant="outlined"
@@ -149,6 +128,29 @@ const EditBranch = () => {
               onClick={handleCancel}
             >
               Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                maxWidth: '150px',
+                flex: 1,
+                backgroundColor: '#ED1F79',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#FBB03A',
+                },
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 400,
+                minWidth: '120px',
+                '@media (max-width: 512px)': {
+                  maxWidth: '100%',
+                },
+              }}
+              color="primary"
+            >
+              Save Changes
             </Button>
           </Box>
 

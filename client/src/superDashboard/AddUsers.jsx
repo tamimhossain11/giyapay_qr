@@ -298,6 +298,29 @@ const AddUser = () => {
                 },
               }}
             >
+               <Button
+                variant="outlined"
+                color="secondary"
+                sx={{
+                  maxWidth: '150px',
+                  flex: 1,
+                  backgroundColor: '#FBB03A',
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: '#ED1F79',
+                  },
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 400,
+                  minWidth: '120px',
+                  '@media (max-width: 440px)': {
+                    maxWidth: '100%',
+                  },
+                }}
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              
               <Button
                 variant="contained"
                 color="primary"
@@ -319,29 +342,6 @@ const AddUser = () => {
                 onClick={handleSave}
               >
                 Save
-              </Button>
-
-              <Button
-                variant="outlined"
-                color="secondary"
-                sx={{
-                  maxWidth: '150px',
-                  flex: 1,
-                  backgroundColor: '#FBB03A',
-                  color: 'black',
-                  '&:hover': {
-                    backgroundColor: '#ED1F79',
-                  },
-                  fontFamily: 'Montserrat, sans-serif',
-                  fontWeight: 400,
-                  minWidth: '120px',
-                  '@media (max-width: 440px)': {
-                    maxWidth: '100%',
-                  },
-                }}
-                onClick={handleCancel}
-              >
-                Cancel
               </Button>
             </Box>
 

@@ -221,28 +221,6 @@ const CreateBranch = () => {
             },
           }}
         >
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{
-              maxWidth: '150px',
-              flex: 1,
-              backgroundColor: '#ED1F79',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: '#FBB03A',
-              },
-              fontFamily: 'Montserrat, sans-serif',
-              fontWeight: 400,
-              minWidth: '120px',
-              '@media (max-width: 440px)': {
-                maxWidth: '100%',
-              },
-            }}
-            onClick={handleSave}
-          >
-            {id ? 'Update' : 'Save'}
-          </Button>
 
           <Button
             variant="contained"
@@ -266,6 +244,28 @@ const CreateBranch = () => {
             onClick={handleCancel}
           >
             Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#ED1F79',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#FBB03A',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+              minWidth: '120px',
+              '@media (max-width: 440px)': {
+                maxWidth: '100%',
+              },
+            }}
+            onClick={handleSave}
+          >
+            {id ? 'Update' : 'Save'}
           </Button>
         </Box>
 

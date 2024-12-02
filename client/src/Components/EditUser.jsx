@@ -153,13 +153,13 @@ const EditUser = () => {
   const handleUpdate = async () => {
     setError(''); // Clear any previous error messages
     setIsError(false); // Reset error state
-  
+
     // Use validateForm to check all fields
     if (!validateForm()) {
       setIsError(true); // Validation failed, it's an error
       return; // Stop if validation fails
     }
-  
+
     try {
       const updatedUser = {
         first_name: user.first_name,
@@ -170,18 +170,18 @@ const EditUser = () => {
         branch_id: user.user_type === 'Branch User' ? selectedBranch : null,
         status: user.status,
       };
-  
+
       if (newPassword && newPassword.trim()) {
         updatedUser.password = newPassword;
       }
-  
+
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/users/edit/${id}`, updatedUser);
-  
+
       setUpdateSuccess(true);
       setSnackbarMessage('User updated successfully');
       setIsError(false); // No error
       setOpenSnackbar(true);
-  
+
       // Navigate back after showing the Snackbar for 2 seconds
       setTimeout(() => {
         navigate('/super-dashboard/manage-users');
@@ -194,7 +194,7 @@ const EditUser = () => {
       setOpenSnackbar(true);
     }
   };
-  
+
 
 
   const handleCancel = () => {
@@ -298,80 +298,79 @@ const EditUser = () => {
       {error && <Typography color="error">{error}</Typography>}
 
       <Box
-  mt={2}
-  display="flex"
-  justifyContent="space-between"
-  flexWrap="wrap"
-  gap={2}
-  sx={{
-    // For small screens (below 440px), stack the buttons vertically and make them full width
-    '@media (max-width: 440px)': {
-      flexDirection: 'column',
-      justifyContent: 'center', // Center the buttons when stacked
-    },
-  }}
->
-  <Button
-    variant="contained"
-    color="primary"
-    onClick={handleUpdate}
-    sx={{
-      maxWidth: '150px',
-      flex: 1,
-      backgroundColor: '#ED1F79',
-      color: 'white',
-      '&:hover': {
-        backgroundColor: '#FBB03A',
-      },
-      fontFamily: 'Montserrat, sans-serif',
-      fontWeight: 400,
-      minWidth: '120px',
-      // Full width on smaller screens
-      '@media (max-width: 440px)': {
-        maxWidth: '100%',
-      },
-    }}
-  >
-    Update User
-  </Button>
-
-  <Button
-    variant="outlined"
-    color="secondary"
-    onClick={handleCancel}
-    sx={{
-      maxWidth: '150px',
-      flex: 1,
-      backgroundColor: '#FBB03A',
-      color: 'black',
-      '&:hover': {
-        backgroundColor: '#ED1F79',
-      },
-      fontFamily: 'Montserrat, sans-serif',
-      fontWeight: 400,
-      minWidth: '120px',
-      // Full width on smaller screens
-      '@media (max-width: 440px)': {
-        maxWidth: '100%',
-      },
-    }}
-  >
-    Cancel
-  </Button>
-</Box>
+        mt={2}
+        display="flex"
+        justifyContent="space-between"
+        flexWrap="wrap"
+        gap={2}
+        sx={{
+          // For small screens (below 440px), stack the buttons vertically and make them full width
+          '@media (max-width: 440px)': {
+            flexDirection: 'column',
+            justifyContent: 'center', // Center the buttons when stacked
+          },
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleCancel}
+          sx={{
+            maxWidth: '150px',
+            flex: 1,
+            backgroundColor: '#FBB03A',
+            color: 'black',
+            '&:hover': {
+              backgroundColor: '#ED1F79',
+            },
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+            minWidth: '120px',
+            // Full width on smaller screens
+            '@media (max-width: 440px)': {
+              maxWidth: '100%',
+            },
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUpdate}
+          sx={{
+            maxWidth: '150px',
+            flex: 1,
+            backgroundColor: '#ED1F79',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: '#FBB03A',
+            },
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+            minWidth: '120px',
+            // Full width on smaller screens
+            '@media (max-width: 440px)': {
+              maxWidth: '100%',
+            },
+          }}
+        >
+          Update User
+        </Button>
+      </Box>
 
 
       {/* Snackbar for success/error message */}
       <Snackbar
-  open={openSnackbar}
-  autoHideDuration={6000}
-  onClose={() => setOpenSnackbar(false)}
-  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
->
-  <Alert onClose={() => setOpenSnackbar(false)} severity={isError ? 'error' : 'success'}>
-    {snackbarMessage}
-  </Alert>
-</Snackbar>
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={isError ? 'error' : 'success'}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
 
     </div>

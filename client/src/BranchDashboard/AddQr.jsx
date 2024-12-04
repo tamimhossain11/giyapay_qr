@@ -97,14 +97,14 @@ const AddQr = () => {
 
     // Validate invoice number
     if (!isValidInvoiceNumber(formData.invoice_number)) {
-      setInvoiceError('Invalid invoice number. Please use only letters, numbers, and no special characters.');
+      setInvoiceError('Invalid Job Order. Please use only letters, numbers, and no special characters.');
       return;
     }
 
     // Check if invoice number already exists
     const invoiceExists = await checkInvoiceNumberExists(formData.invoice_number);
     if (invoiceExists) {
-      setInvoiceError('Invoice number already exists. Please choose a different one.');
+      setInvoiceError('Job Order number already exists. Please choose a different one.');
       return;
     }
 
@@ -136,7 +136,7 @@ const AddQr = () => {
         currency: 'PHP',
         nonce,
         timestamp,
-        description: `Branch Name: ${formData.branch_name}\nUser Name: ${formData.user_name}\nInvoice Number: ${formData.invoice_number}`,
+        description: `Branch Name: ${formData.branch_name}\nUser Name: ${formData.user_name}\nJob Order: ${formData.invoice_number}`,
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',
@@ -199,7 +199,7 @@ const AddQr = () => {
       const response = await axios.get(url);
       return response.data.status;
     } catch (error) {
-      console.error('Error checking invoice number:', error.response ? error.response.data : error.message);
+      console.error('Error checking Job Order:', error.response ? error.response.data : error.message);
       return false;
     }
   };
@@ -226,7 +226,7 @@ const AddQr = () => {
               disabled
             />
             <Customtextfield
-              label="Invoice #"
+              label="Job Order #"
               name="invoice_number"
               value={formData.invoice_number}
               onChange={handleChange}
@@ -305,7 +305,7 @@ const AddQr = () => {
                 {formData.branch_name}
               </Typography>
               <Typography variant="body2" sx={{ color: '#666' }}>
-                Invoice #: {formData.invoice_number}
+                Job Order #: {formData.invoice_number}
               </Typography>
             </Box>
 

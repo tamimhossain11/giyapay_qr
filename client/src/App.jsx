@@ -22,6 +22,7 @@ import NotFound from './Components/NotFound';
 import ManageQRBU from './BranchDashboard/ManageQRBU';
 import ManageQrCA from './CoAdminDashboard/ManageQrCA';
 import UploadPage from './superDashboard/UploadPage';
+import AfterSales from './MultiUserPages/AfterSales';
 
 function App() {
     useEffect(() => {
@@ -78,6 +79,7 @@ function App() {
                     <Route path="manage-branches" element={<BranchManagement />} />
                     <Route path="manage-branches/add" element={<AddBranchForm />} />
                     <Route path="profile" element={<ProfilePage />} />
+                    <Route path="aftersales" element={<AfterSales />} />
                     <Route path="manage-users" element={<ManageUsers />} />
                     <Route path="manage-users/add" element={<AddUser />} />
                     <Route path="edit-users/:id" element={<EditUser />} />
@@ -98,6 +100,7 @@ function App() {
                     <Route path="" element={<OverView />} />
                     <Route path="manage-qr-ca" element={<ManageQrCA />} />
                     <Route path="profile" element={<ProfilePage />} />
+                    <Route path="aftersales" element={<AfterSales />} />
                 </Route>
 
                 {/* Branch User routes */}
@@ -113,6 +116,7 @@ function App() {
                     <Route path="manage-qrbu" element={<ManageQRBU />} />
                     <Route path="add-qr" element={<AddQr />} />
                     <Route path="profile" element={<ProfilePage />} />
+                    <Route path="aftersales" element={<AfterSales />} />
                 </Route>
 
                 {/* 404 route */}

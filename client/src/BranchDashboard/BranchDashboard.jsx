@@ -82,6 +82,10 @@ const BranchDashboard = () => {
     navigate("/branch-dashboard/profile");
     handleMenuClose();
   };
+  const handleafterSales = () => {
+    navigate("/branch-dashboard/aftersales");
+    handleMenuClose();
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -146,6 +150,7 @@ const BranchDashboard = () => {
             onClose={handleMenuClose}
           >
             <MenuItem onClick={handleProfileView}>View Profile</MenuItem>
+            <MenuItem onClick={handleafterSales}>Aftersales Request</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>
@@ -185,6 +190,9 @@ const BranchDashboard = () => {
           <ListItem button onClick={() => { handleProfileView(); handleDrawerToggle(); }}>
             <ListItemText primary="View Profile" />
           </ListItem>
+          <ListItem button onClick={() => { handleafterSales(); handleDrawerToggle(); }}>
+            <ListItemText primary="AftersalesRequest" />
+          </ListItem>
           <ListItem button onClick={() => { handleLogout(); handleDrawerToggle(); }}>
             <ListItemText primary="Logout" />
           </ListItem>
@@ -204,7 +212,20 @@ const BranchDashboard = () => {
           Your session has expired. Please log in again.
         </DialogContent>
         <DialogActions>
-          <Button onClick={fallbackLogout} color="primary" variant="contained">
+        <Button onClick={fallbackLogout} 
+            sx={{
+              maxWidth: '150px',
+              flex: 1,
+              backgroundColor: '#FBB03A',
+              color: 'black',
+              '&:hover': {
+                backgroundColor: '#ED1F79',
+              },
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 400,
+            }}
+          color="primary" 
+          variant="contained">
             Login
           </Button>
         </DialogActions>

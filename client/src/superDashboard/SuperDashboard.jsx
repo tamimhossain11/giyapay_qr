@@ -83,6 +83,10 @@ const SuperDashboard = () => {
     navigate("/super-dashboard/profile");
     handleMenuClose();
   };
+  const handleafterSales = () => {
+    navigate("/super-dashboard/aftersales");
+    handleMenuClose();
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -154,6 +158,7 @@ const SuperDashboard = () => {
             onClose={handleMenuClose}
           >
             <MenuItem onClick={handleProfileView}>View Profile</MenuItem>
+            <MenuItem onClick={handleafterSales}>Aftersales Request</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>
@@ -201,6 +206,9 @@ const SuperDashboard = () => {
           </ListItem>
           <ListItem button onClick={() => { handleProfileView(); handleDrawerToggle(); }}>
             <ListItemText primary="View Profile" />
+          </ListItem>
+          <ListItem button onClick={() => { handleafterSales(); handleDrawerToggle(); }}>
+            <ListItemText primary="AftersalesRequest" />
           </ListItem>
           <ListItem button onClick={() => { handleLogout(); handleDrawerToggle(); }}>
             <ListItemText primary="Logout" />

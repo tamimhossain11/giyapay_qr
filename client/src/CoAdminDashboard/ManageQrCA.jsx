@@ -567,7 +567,18 @@ const ManageQrCA = () => {
                   <strong>Updated At:</strong> {selectedQr.updated_at}
                 </Typography>
                 <Box mt={2} display="flex" justifyContent="flex-end">
-                  <Button variant="contained" color="primary" onClick={handleCloseView}>
+                <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
+                    maxWidth: '150px',
+                    flex: 1,
+                    backgroundColor: '#FBB03A',
+                    color: 'black',
+                    '&:hover': {
+                      backgroundColor: '#ED1F79',
+                    },
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 400,
+                  }}
+                  >
                     Close
                   </Button>
                 </Box>

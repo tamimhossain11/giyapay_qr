@@ -148,7 +148,9 @@ const ManageUsers = () => {
           >
             Add User
           </Button>
-
+          {users.length === 0 ? (
+            <Typography>No User found. Add a new User to get started.</Typography>
+          ) : (
           <Box sx={{ overflowX: 'auto' }}>
             <Table size={isMobile ? 'small' : 'medium'}>
               <TableHead>
@@ -241,7 +243,7 @@ const ManageUsers = () => {
               </TableBody>
             </Table>
           </Box>
-
+          )}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"

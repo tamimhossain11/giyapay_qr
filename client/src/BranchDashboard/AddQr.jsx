@@ -145,7 +145,7 @@ const AddQr = () => {
         customer_email: customerEmail,
       };
 
-      const checkoutUrl = `https://sandbox.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
+      const checkoutUrl = `https://pay.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
 
       // Save the QR code and initiate payment
       await axios.post(`${backendUrl}/api/qr-codes/create`, {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createQrCode, handleCallback,getAdminQrCodes,checkInvoice,getFilteredQrCodes,getQrCodesBU,getFilteredQrCodesCA,countQrCodesByAdmin } from '../controller/qrCodesController.js';
+import { createQrCode, handleCallback,getAdminQrCodes,checkInvoice,getFilteredQrCodes,getQrCodesBU,getFilteredQrCodesCA,countQrCodesByAdmin,getPaymentDetailsByInvoice } from '../controller/qrCodesController.js';
 import models from '../model/index.js';
 import { authenticateToken } from '../middleware/authenticate.js';
 
@@ -43,6 +43,9 @@ router.get('/check-invoice/:invoice_number', checkInvoice);
 router.get('/filter',authenticateToken, getFilteredQrCodes);
 
 router.get('/coadmin_filter',authenticateToken, getFilteredQrCodesCA);
+
+// Route for fetching payment details by invoice number
+router.get('/api/payment-details/:invoice_number', getPaymentDetailsByInvoice);
 
 
 router.get('/csv', async (req, res) => {

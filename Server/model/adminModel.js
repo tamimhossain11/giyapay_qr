@@ -28,6 +28,19 @@ const Admin = sequelize.define('Admin', {
     type: DataTypes.STRING,
     allowNull: false, 
   },
+  paymentUrl: {
+    type: DataTypes.STRING,
+    allowNull: false, 
+  },
+  payment_method: {
+    type: DataTypes.STRING,
+    allowNull: false, 
+  },
+  gateway_account_type: {
+    type: DataTypes.STRING,
+    allowNull: false, 
+  },
+  
 }, {
   tableName: 'admin', 
   timestamps: false,

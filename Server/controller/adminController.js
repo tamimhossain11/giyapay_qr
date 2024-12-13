@@ -3,9 +3,9 @@ import Admin from '../model/adminModel.js';
 
 // Controller for adding an admin
 export const addAdmin = async (req, res) => {
-  const { email, password, merchant_name, merchant_secret, merchant_id } = req.body;
+  const { email, password, merchant_name, merchant_secret, merchant_id, paymentUrl, payment_method, gateway_account_type } = req.body;
 
-  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id) {
+  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id || !paymentUrl|| !payment_method || !gateway_account_type) {
     return res.status(400).json({ error: 'Email, password, and other fields are required' });
   }
 
@@ -19,12 +19,15 @@ export const addAdmin = async (req, res) => {
       merchant_id,
       merchant_secret,
       merchant_name,
+      paymentUrl,
+      payment_method,
+      gateway_account_type,
     });
 
     // Emit the event to update all clients with the new admin list
     const io = req.app.get('socketio');
     const admins = await Admin.findAll({
-      attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret'], // Select only necessary fields
+      attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret', 'paymentUrl', 'payment_method', 'gateway_account_type'], // Select only necessary fields
     });
     io.emit('adminListUpdated', admins); // Emit updated list to all connected clients
 
@@ -51,7 +54,7 @@ export const countAdmins = async (req, res) => {
 export const getAllAdmins = async (req, res) => {
   try {
     const admins = await Admin.findAll({
-      attributes: ['id', 'email', 'merchant_id', 'merchant_secret', 'merchant_name'],
+      attributes: ['id', 'email', 'merchant_id', 'merchant_secret', 'merchant_name','paymentUrl', 'payment_method', 'gateway_account_type'],
     });
 
     if (!admins || admins.length === 0) {

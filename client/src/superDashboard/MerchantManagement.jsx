@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
     TextField, Button, Box, Typography, Container, Paper, IconButton, InputAdornment, Grid,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Snackbar,
-    Alert
+    Alert,FormControl,InputLabel,Select,MenuItem
 } from '@mui/material';
 import { Visibility, VisibilityOff, ExpandMore, ExpandLess, Logout } from '@mui/icons-material';
 import { FaUsers } from 'react-icons/fa';
@@ -54,6 +54,10 @@ const MerchantManagement = () => {
     const [merchantID, setMerchantID] = useState('');
     const [merchantName, setMerchantName] = useState('');
     const [merchantSecret, setMerchantSecret] = useState('');
+    const [paymentUrl, setPaymentUrl] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [gatewayAccount, setGatewayAccount] = useState('');
+
     const [showPassword, setShowPassword] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [adminTotal, setAdminTotal] = useState(0);
@@ -146,10 +150,14 @@ const MerchantManagement = () => {
         if (!merchantName) newErrors.merchantName = 'Merchant Name is required';
         if (!merchantID) newErrors.merchantID = 'Merchant ID is required';
         if (!merchantSecret) newErrors.merchantSecret = 'Merchant Secret is required';
+        if (!paymentUrl) newErrors.paymentUrl = 'Payment Url is required';
+        if (!gatewayAccount) newErrors.gatewayAccount = 'Gateway Account Type is required';
+        if (!paymentMethod) newErrors.paymentMethod = 'Payment Method is required';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
 
 
     const handleLogout = () => {
@@ -162,6 +170,7 @@ const MerchantManagement = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
         if (!validateForm()) return;
 
         try {
@@ -171,6 +180,9 @@ const MerchantManagement = () => {
                 merchant_name: merchantName,
                 merchant_id: merchantID,
                 merchant_secret: merchantSecret,
+                paymentUrl, // Added directly from state
+                gateway_account_type: gatewayAccount, // Included this in the payload
+                payment_method: paymentMethod,
             });
 
             setSnackbarMessage(response.data.message);
@@ -180,6 +192,9 @@ const MerchantManagement = () => {
             setPassword('');
             setMerchantID('');
             setMerchantSecret('');
+            setPaymentUrl(''); // Clear state for checkoutUrl
+            setGatewayAccount(''); // Clear state for gatewayAccount
+            setPaymentMethod('');
         } catch (error) {
             console.error('Error adding admin:', error);
             setSnackbarMessage('Failed to add admin');
@@ -187,6 +202,7 @@ const MerchantManagement = () => {
             setSnackbarOpen(true);
         }
     };
+
 
 
     const handleClickShowPassword = () => {
@@ -282,6 +298,45 @@ const MerchantManagement = () => {
                                     helperText={errors.merchantSecret}
                                 />
                             </Box>
+                            <Box mb={2}>
+                                <CustomTextField
+                                    label="checkout Url"
+                                    value={paymentUrl}
+                                    onChange={(e) => setPaymentUrl(e.target.value)}
+                                    fullWidth
+                                    required
+                                    error={!!errors.paymentUrl}
+                                    helperText={errors.paymentUrl}
+                                />
+                            </Box>
+                            <Box mb={2}>
+                                <FormControl fullWidth required error={!!errors.gatewayAccount}>
+                                    <InputLabel id="gateway-account-type-label">Gateway Account Type</InputLabel>
+                                    <Select
+                                        labelId="gateway-account-type-label"
+                                        value={gatewayAccount}
+                                        onChange={(e) => setGatewayAccount(e.target.value)}
+                                    >
+                                        <MenuItem value="Individual">Individual</MenuItem>
+                                        <MenuItem value="Universal">Universal</MenuItem>
+                                    </Select>
+                                    {errors.gatewayAccount && (
+                                        <FormHelperText>{errors.gatewayAccount}</FormHelperText>
+                                    )}
+                                </FormControl>
+                            </Box>
+                            <Box mb={2}>
+                                <CustomTextField
+                                    label="Payment Method"
+                                    value={paymentMethod}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    fullWidth
+                                    required
+                                    error={!!errors.paymentMethod}
+                                    helperText={errors.paymentMethod}
+                                />
+                            </Box>
+
                             <Button
                                 type="submit"
                                 variant="contained"
@@ -315,7 +370,7 @@ const MerchantManagement = () => {
                             sx={{
                                 mt: 4,
                                 color: '#fff',
-                                backgroundColor: '#ED1F79', 
+                                backgroundColor: '#ED1F79',
                                 padding: '10px 50px',
                                 borderRadius: '8px',
                                 fontFamily: 'Montserrat, sans-serif',
@@ -324,7 +379,7 @@ const MerchantManagement = () => {
                                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
-                                    backgroundColor: '#FBB03A', 
+                                    backgroundColor: '#FBB03A',
                                     boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
                                 },
                             }}
@@ -345,9 +400,9 @@ const MerchantManagement = () => {
                             <Typography
                                 variant="h6"
                                 sx={{
-                                    color: '#ED1F79', 
-                                    fontFamily: 'Montserrat, sans-serif', 
-                                    fontWeight: 600, 
+                                    color: '#ED1F79',
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    fontWeight: 600,
                                 }}
                             >
                                 Total Admins: {adminTotal}
@@ -363,6 +418,9 @@ const MerchantManagement = () => {
                                         <TableCell>Merchant Name</TableCell>
                                         <TableCell>Merchant ID</TableCell>
                                         <TableCell>Email</TableCell>
+                                        <TableCell>Payment URL</TableCell>
+                                        <TableCell>Gateway Account Type</TableCell>
+                                        <TableCell>Payment Method</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -374,6 +432,9 @@ const MerchantManagement = () => {
                                                 <TableCell sx={{ minWidth: 200, wordBreak: 'break-word' }}>{admin.merchant_name}</TableCell>
                                                 <TableCell sx={{ minWidth: 150, wordBreak: 'break-word' }}>{admin.merchant_id}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.email}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.paymentUrl}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.gateway_account_type}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.payment_method}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => toggleRowExpansion(index)}>
                                                         {expandedRow === index ? <ExpandLess /> : <ExpandMore />}

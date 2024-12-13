@@ -368,6 +368,38 @@ const countQrCodesByAdmin = async (req, res) => {
   }
 };
 
+//Api for query the invoice and get pyment refrence and status
+
+const getPaymentDetailsByInvoice = async (req, res) => {
+  try {
+    const { invoice_number } = req.params; // Extract invoice_number from request params
+
+    if (!invoice_number) {
+      return res.status(400).json({ error: 'Invoice number is required' });
+    }
+
+    // Find the QR Code entry by invoice_number
+    const qrCode = await QrCode.findOne({
+      where: { invoice_number },
+      attributes: ['payment_reference', 'status'], // Fetch only the required fields
+    });
+
+    if (!qrCode) {
+      return res.status(404).json({ error: 'Invoice number not found' });
+    }
+
+    // Return the payment_reference and status
+    res.status(200).json({
+      reference_number: qrCode.payment_reference,
+      payment_status: qrCode.status,
+    });
+  } catch (error) {
+    console.error('Error fetching payment details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 
 
 export { 
@@ -378,6 +410,7 @@ export {
   getFilteredQrCodes,
   getFilteredQrCodesCA, 
   getQrCodesBU  ,
-  countQrCodesByAdmin
+  countQrCodesByAdmin,
+  getPaymentDetailsByInvoice
 };
 

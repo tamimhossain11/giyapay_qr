@@ -24,6 +24,9 @@ const AddQr = () => {
   const [merchantID, setMerchantID] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [merchantSecret, setMerchantSecret] = useState('');
+  const [paymentUrl, setPaymentUrl] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [gatewayAccount, setGatewayAccount] = useState('');
 
   const [invoiceError, setInvoiceError] = useState('');
   const [amountError, setAmountError] = useState('');
@@ -63,6 +66,10 @@ const AddQr = () => {
             setMerchantID(user.admin.merchant_id);
             setMerchantSecret(user.admin.merchant_secret);
             setCustomerEmail(user.admin.email);
+            setPaymentUrl(user.admin.paymentUrl);
+            setGatewayAccount(user.admin.gateway_account_type);
+            setPaymentMethod(user.admin.payment_method);
+            
           }
 
         } else {
@@ -140,12 +147,12 @@ const AddQr = () => {
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',
-        gateway_account_type: 'Universal',
-        payment_method: 'MASTERCARD/VISA',
+        gateway_account_type: gatewayAccount,
+        payment_method: paymentMethod,
         customer_email: customerEmail,
       };
 
-      const checkoutUrl = `https://pay.giyapay.com/checkout/?${new URLSearchParams(params).toString()}`;
+      const checkoutUrl = `${paymentUrl}/checkout/?${new URLSearchParams(params).toString()}`;
 
       // Save the QR code and initiate payment
       await axios.post(`${backendUrl}/api/qr-codes/create`, {

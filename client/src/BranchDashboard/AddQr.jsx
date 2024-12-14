@@ -147,7 +147,7 @@ const AddQr = () => {
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',
-        gateway_account_type: gatewayAccount,
+       // gateway_account_type: gatewayAccount,
         payment_method: paymentMethod,
         customer_email: customerEmail,
       };

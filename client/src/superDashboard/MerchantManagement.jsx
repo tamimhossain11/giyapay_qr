@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
     TextField, Button, Box, Typography, Container, Paper, IconButton, InputAdornment, Grid,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, Snackbar,
-    Alert,FormControl,InputLabel,Select,MenuItem
+    Alert, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { Visibility, VisibilityOff, ExpandMore, ExpandLess, Logout } from '@mui/icons-material';
 import { FaUsers } from 'react-icons/fa';
@@ -150,13 +150,18 @@ const MerchantManagement = () => {
         if (!merchantName) newErrors.merchantName = 'Merchant Name is required';
         if (!merchantID) newErrors.merchantID = 'Merchant ID is required';
         if (!merchantSecret) newErrors.merchantSecret = 'Merchant Secret is required';
-        if (!paymentUrl) newErrors.paymentUrl = 'Payment Url is required';
+        if (!paymentUrl) newErrors.paymentUrl = 'Payment URL is required';
         if (!gatewayAccount) newErrors.gatewayAccount = 'Gateway Account Type is required';
-        if (!paymentMethod) newErrors.paymentMethod = 'Payment Method is required';
+
+        // Validate Payment Method only if Gateway Account is Individual
+        if (gatewayAccount === 'Individual' && !paymentMethod) {
+            newErrors.paymentMethod = 'Payment Method is required for Individual accounts';
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
 
 
 
@@ -173,27 +178,31 @@ const MerchantManagement = () => {
 
         if (!validateForm()) return;
 
+        const formData = {
+            email,
+            password,
+            merchant_name: merchantName,
+            merchant_id: merchantID,
+            merchant_secret: merchantSecret,
+            paymentUrl,
+            gateway_account_type: gatewayAccount,
+            payment_method: gatewayAccount === 'Universal' ? null : paymentMethod, // Set to null for Universal
+        };
+
         try {
-            const response = await axios.post(`${backendUrl}/admin/add`, {
-                email,
-                password,
-                merchant_name: merchantName,
-                merchant_id: merchantID,
-                merchant_secret: merchantSecret,
-                paymentUrl, // Added directly from state
-                gateway_account_type: gatewayAccount, // Included this in the payload
-                payment_method: paymentMethod,
-            });
+            const response = await axios.post(`${backendUrl}/admin/add`, formData);
 
             setSnackbarMessage(response.data.message);
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
+
+            // Clear form state
             setEmail('');
             setPassword('');
             setMerchantID('');
             setMerchantSecret('');
-            setPaymentUrl(''); // Clear state for checkoutUrl
-            setGatewayAccount(''); // Clear state for gatewayAccount
+            setPaymentUrl('');
+            setGatewayAccount('');
             setPaymentMethod('');
         } catch (error) {
             console.error('Error adding admin:', error);
@@ -315,27 +324,42 @@ const MerchantManagement = () => {
                                     <Select
                                         labelId="gateway-account-type-label"
                                         value={gatewayAccount}
-                                        onChange={(e) => setGatewayAccount(e.target.value)}
+                                        onChange={(e) => {
+                                            setGatewayAccount(e.target.value);
+
+                                            // Reset payment method if Gateway Account Type is Universal
+                                            if (e.target.value === 'Universal') {
+                                                setPaymentMethod('');
+                                            }
+                                        }}
                                     >
                                         <MenuItem value="Individual">Individual</MenuItem>
                                         <MenuItem value="Universal">Universal</MenuItem>
                                     </Select>
-                                    {errors.gatewayAccount && (
-                                        <FormHelperText>{errors.gatewayAccount}</FormHelperText>
-                                    )}
+                                    {errors.gatewayAccount && <FormHelperText>{errors.gatewayAccount}</FormHelperText>}
                                 </FormControl>
                             </Box>
-                            <Box mb={2}>
-                                <CustomTextField
-                                    label="Payment Method"
-                                    value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                    fullWidth
-                                    required
-                                    error={!!errors.paymentMethod}
-                                    helperText={errors.paymentMethod}
-                                />
-                            </Box>
+
+                            {/* Conditional Payment Method Field */}
+                            {gatewayAccount === 'Individual' && (
+                                <Box mb={2}>
+                                    <FormControl fullWidth required error={!!errors.paymentMethod}>
+                                        <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                                        <Select
+                                            labelId="payment-method-label"
+                                            value={paymentMethod}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                        >
+                                            {/* Example Payment Methods */}
+                                            <MenuItem value="Credit Card">Credit Card</MenuItem>
+                                            <MenuItem value="PayPal">PayPal</MenuItem>
+                                            <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                                        </Select>
+                                        {errors.paymentMethod && <FormHelperText>{errors.paymentMethod}</FormHelperText>}
+                                    </FormControl>
+                                </Box>
+                            )}
+
 
                             <Button
                                 type="submit"
@@ -434,7 +458,7 @@ const MerchantManagement = () => {
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.email}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.paymentUrl}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.gateway_account_type}</TableCell>
-                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.payment_method}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.payment_method} </TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => toggleRowExpansion(index)}>
                                                         {expandedRow === index ? <ExpandLess /> : <ExpandMore />}

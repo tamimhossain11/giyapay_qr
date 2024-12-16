@@ -10,7 +10,7 @@ const CallbackResponsePage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [transactionDetails, setTransactionDetails] = useState({ amount: '', refno: '' });
   const [transactionProcessed, setTransactionProcessed] = useState(false);
-  const [loading, setLoading] = useState(true);  // New state to manage loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -58,7 +58,7 @@ const CallbackResponsePage = () => {
     if (transactionProcessed) {
       return (
         <Box sx={{ textAlign: 'center' }}>
-          <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79'  }} />
+          <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
             Transaction Already Processed
           </Typography>
@@ -146,17 +146,7 @@ const CallbackResponsePage = () => {
     <Container sx={{ maxWidth: 800, mt: 5, mb: 5 }}>
       <Box sx={{ textAlign: 'center' }}>
         {renderContent()}
-        <Button variant="contained"  sx={{ 
-    mt: 4, 
-    backgroundColor: '#fbb03a', 
-    color: '#000000',
-    '&:hover': {
-      backgroundColor: '#b3b3b3', // Set hover color here
-      color: '#000000',
-    },
-  }}  href="/">
-          Go Back to Home
-        </Button>
+        
       </Box>
     </Container>
   );

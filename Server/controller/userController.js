@@ -40,7 +40,7 @@ export const getProfile = async (req, res) => {
           {
             model: Admin,
             as: 'admin', // Include admin details
-            attributes: ['id','merchant_id', 'merchant_secret','email','paymentUrl', 'payment_method', 'gateway_account_type'],
+            attributes: ['id','merchant_name','merchant_id', 'merchant_secret','email','paymentUrl', 'payment_method', 'gateway_account_type'],
           },
         ],
         attributes: ['id', 'first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],

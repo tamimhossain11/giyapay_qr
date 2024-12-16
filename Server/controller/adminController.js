@@ -5,7 +5,7 @@ import Admin from '../model/adminModel.js';
 export const addAdmin = async (req, res) => {
   const { email, password, merchant_name, merchant_secret, merchant_id, paymentUrl, payment_method, gateway_account_type } = req.body;
 
-  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id || !paymentUrl|| !payment_method || !gateway_account_type) {
+  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id || !paymentUrl|| !gateway_account_type) {
     return res.status(400).json({ error: 'Email, password, and other fields are required' });
   }
 
@@ -20,7 +20,7 @@ export const addAdmin = async (req, res) => {
       merchant_secret,
       merchant_name,
       paymentUrl,
-      payment_method,
+      payment_method: payment_method || null,
       gateway_account_type,
     });
 

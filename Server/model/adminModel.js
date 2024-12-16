@@ -34,7 +34,8 @@ const Admin = sequelize.define('Admin', {
   },
   payment_method: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
+    defaultValue: '', 
   },
   gateway_account_type: {
     type: DataTypes.STRING,

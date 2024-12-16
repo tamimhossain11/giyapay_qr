@@ -27,6 +27,7 @@ const AddQr = () => {
   const [paymentUrl, setPaymentUrl] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [gatewayAccount, setGatewayAccount] = useState('');
+  const [merchantName, setMerchantName] = useState('');
 
   const [invoiceError, setInvoiceError] = useState('');
   const [amountError, setAmountError] = useState('');
@@ -69,7 +70,7 @@ const AddQr = () => {
             setPaymentUrl(user.admin.paymentUrl);
             setGatewayAccount(user.admin.gateway_account_type);
             setPaymentMethod(user.admin.payment_method);
-            
+            setMerchantName(user.admin.merchant_name);
           }
 
         } else {
@@ -143,13 +144,13 @@ const AddQr = () => {
         currency: 'PHP',
         nonce,
         timestamp,
-        description: `Branch Name: ${formData.branch_name}\nUser Name: ${formData.user_name}\nIMS Sales Number: ${formData.invoice_number}`,
+        description: `Branch Name: ${formData.branch_name}||User Name: ${formData.user_name}|| IMS Sales Number: ${formData.invoice_number}`,
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',
-       // gateway_account_type: gatewayAccount,
+        gateway_account_type: gatewayAccount,
         payment_method: paymentMethod,
-        customer_email: customerEmail,
+        merchant_name: merchantName,
       };
 
       const checkoutUrl = `${paymentUrl}/checkout/?${new URLSearchParams(params).toString()}`;

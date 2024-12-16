@@ -351,9 +351,9 @@ const MerchantManagement = () => {
                                             onChange={(e) => setPaymentMethod(e.target.value)}
                                         >
                                             {/* Example Payment Methods */}
-                                            <MenuItem value="Credit Card">Credit Card</MenuItem>
-                                            <MenuItem value="PayPal">PayPal</MenuItem>
-                                            <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                                            <MenuItem value="MASTERCARD/VISA">MASTERCARD/VISA</MenuItem>
+                                            <MenuItem value="GCASH">GCASH</MenuItem>
+                                            <MenuItem value="INSTAPAY">INSTAPAY</MenuItem>
                                         </Select>
                                         {errors.paymentMethod && <FormHelperText>{errors.paymentMethod}</FormHelperText>}
                                     </FormControl>

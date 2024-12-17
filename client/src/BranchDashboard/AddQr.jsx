@@ -144,7 +144,7 @@ const AddQr = () => {
         currency: 'PHP',
         nonce,
         timestamp,
-        description: `Branch Name: ${formData.branch_name}||User Name: ${formData.user_name}|| IMS Sales Number: ${formData.invoice_number}`,
+        description: `Branch Name: ${formData.branch_name} || User Name: ${formData.user_name} ||  IMS Sales Number: ${formData.invoice_number}`,
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',

@@ -37,6 +37,11 @@ const Admin = sequelize.define('Admin', {
     allowNull: false,
     defaultValue: '', 
   },
+  merchant_url: {
+    type: DataTypes.STRING,
+    allowNull: true, 
+  },
+  
   gateway_account_type: {
     type: DataTypes.STRING,
     allowNull: false, 

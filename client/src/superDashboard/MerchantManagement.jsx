@@ -55,6 +55,7 @@ const MerchantManagement = () => {
     const [merchantName, setMerchantName] = useState('');
     const [merchantSecret, setMerchantSecret] = useState('');
     const [paymentUrl, setPaymentUrl] = useState('');
+    const [merchantUrl, setMerchantUrl] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
     const [gatewayAccount, setGatewayAccount] = useState('');
 
@@ -151,6 +152,7 @@ const MerchantManagement = () => {
         if (!merchantID) newErrors.merchantID = 'Merchant ID is required';
         if (!merchantSecret) newErrors.merchantSecret = 'Merchant Secret is required';
         if (!paymentUrl) newErrors.paymentUrl = 'Payment URL is required';
+        if (!merchantUrl) newErrors.merchantUrl = 'Merchant URL is required';
         if (!gatewayAccount) newErrors.gatewayAccount = 'Gateway Account Type is required';
 
         // Validate Payment Method only if Gateway Account is Individual
@@ -185,8 +187,9 @@ const MerchantManagement = () => {
             merchant_id: merchantID,
             merchant_secret: merchantSecret,
             paymentUrl,
+            merchant_url: merchantUrl,
             gateway_account_type: gatewayAccount,
-            payment_method: gatewayAccount === 'Universal' ? null : paymentMethod, // Set to null for Universal
+            payment_method: gatewayAccount === 'Universal' ? null : paymentMethod,
         };
 
         try {
@@ -202,6 +205,7 @@ const MerchantManagement = () => {
             setMerchantID('');
             setMerchantSecret('');
             setPaymentUrl('');
+            setMerchantUrl('');
             setGatewayAccount('');
             setPaymentMethod('');
         } catch (error) {
@@ -316,6 +320,17 @@ const MerchantManagement = () => {
                                     required
                                     error={!!errors.paymentUrl}
                                     helperText={errors.paymentUrl}
+                                />
+                            </Box>
+                            <Box mb={2}>
+                                <CustomTextField
+                                    label="Merchant Url"
+                                    value={merchantUrl}
+                                    onChange={(e) => setMerchantUrl(e.target.value)}
+                                    fullWidth
+                                    required
+                                    error={!!errors.merchantUrl}
+                                    helperText={errors.merchantUrl}
                                 />
                             </Box>
                             <Box mb={2}>
@@ -443,6 +458,7 @@ const MerchantManagement = () => {
                                         <TableCell>Merchant ID</TableCell>
                                         <TableCell>Email</TableCell>
                                         <TableCell>Payment URL</TableCell>
+                                        <TableCell>Merchant URL</TableCell>
                                         <TableCell>Gateway Account Type</TableCell>
                                         <TableCell>Payment Method</TableCell>
                                         <TableCell>Actions</TableCell>
@@ -457,6 +473,7 @@ const MerchantManagement = () => {
                                                 <TableCell sx={{ minWidth: 150, wordBreak: 'break-word' }}>{admin.merchant_id}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.email}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.paymentUrl}</TableCell>
+                                                <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.merchant_url}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.gateway_account_type}</TableCell>
                                                 <TableCell sx={{ minWidth: 250, wordBreak: 'break-word' }}>{admin.payment_method} </TableCell>
                                                 <TableCell>

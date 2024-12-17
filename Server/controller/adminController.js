@@ -3,9 +3,9 @@ import Admin from '../model/adminModel.js';
 
 // Controller for adding an admin
 export const addAdmin = async (req, res) => {
-  const { email, password, merchant_name, merchant_secret, merchant_id, paymentUrl, payment_method, gateway_account_type } = req.body;
+  const { email, password, merchant_name, merchant_secret, merchant_id, paymentUrl,merchant_url, payment_method, gateway_account_type } = req.body;
 
-  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id || !paymentUrl|| !gateway_account_type) {
+  if (!email || !password || !merchant_name || !merchant_secret || !merchant_id || !paymentUrl|| !merchant_url || !gateway_account_type) {
     return res.status(400).json({ error: 'Email, password, and other fields are required' });
   }
 
@@ -20,6 +20,7 @@ export const addAdmin = async (req, res) => {
       merchant_secret,
       merchant_name,
       paymentUrl,
+      merchant_url,
       payment_method: payment_method || null,
       gateway_account_type,
     });
@@ -27,7 +28,7 @@ export const addAdmin = async (req, res) => {
     // Emit the event to update all clients with the new admin list
     const io = req.app.get('socketio');
     const admins = await Admin.findAll({
-      attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret', 'paymentUrl', 'payment_method', 'gateway_account_type'], // Select only necessary fields
+      attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret', 'paymentUrl','merchant_url', 'payment_method', 'gateway_account_type'], // Select only necessary fields
     });
     io.emit('adminListUpdated', admins); // Emit updated list to all connected clients
 
@@ -54,7 +55,7 @@ export const countAdmins = async (req, res) => {
 export const getAllAdmins = async (req, res) => {
   try {
     const admins = await Admin.findAll({
-      attributes: ['id', 'email', 'merchant_id', 'merchant_secret', 'merchant_name','paymentUrl', 'payment_method', 'gateway_account_type'],
+      attributes: ['id', 'email', 'merchant_id', 'merchant_secret', 'merchant_name','paymentUrl','merchant_url', 'payment_method', 'gateway_account_type'],
     });
 
     if (!admins || admins.length === 0) {

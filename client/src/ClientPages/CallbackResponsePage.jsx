@@ -11,6 +11,7 @@ const CallbackResponsePage = () => {
   const [transactionDetails, setTransactionDetails] = useState({ amount: '', refno: '' });
   const [transactionProcessed, setTransactionProcessed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [merchantUrl, setMerchantUrl] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -20,6 +21,11 @@ const CallbackResponsePage = () => {
     const signature = params.get('signature');
     const invoice_number = params.get('invoice_number');
     const error = params.get('error');
+    const merchant_url = params.get('merchant_url');
+
+    if (merchant_url) {
+      setMerchantUrl(merchant_url);
+    }
 
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
@@ -146,7 +152,33 @@ const CallbackResponsePage = () => {
     <Container sx={{ maxWidth: 800, mt: 5, mb: 5 }}>
       <Box sx={{ textAlign: 'center' }}>
         {renderContent()}
-        
+        <Button
+          variant="contained"
+          sx={{
+            mt: 4,
+            backgroundColor: '#ed1f79', // GiyaPay pink
+            color: '#fff',
+            fontWeight: 'bold',
+            borderRadius: '25px', // Rounded corners
+            textTransform: 'none',
+            fontSize: '16px',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+            padding: '10px 20px',
+            '&:hover': {
+              backgroundColor: '#d91c6e', // Darker pink for hover
+            },
+            '&:disabled': {
+              backgroundColor: '#f8c4da', // Light pink for disabled
+              color: '#fff',
+            },
+          }}
+          onClick={() => window.location.href = merchantUrl}
+          disabled={!merchantUrl}
+        >
+          Return to Merchant
+        </Button>
+
+
       </Box>
     </Container>
   );

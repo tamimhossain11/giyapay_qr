@@ -25,6 +25,7 @@ const AddQr = () => {
   const [customerEmail, setCustomerEmail] = useState('');
   const [merchantSecret, setMerchantSecret] = useState('');
   const [paymentUrl, setPaymentUrl] = useState('');
+  const [merchantUrl, setMerchantUrl] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [gatewayAccount, setGatewayAccount] = useState('');
   const [merchantName, setMerchantName] = useState('');
@@ -71,6 +72,7 @@ const AddQr = () => {
             setGatewayAccount(user.admin.gateway_account_type);
             setPaymentMethod(user.admin.payment_method);
             setMerchantName(user.admin.merchant_name);
+            setMerchantUrl(user.admin.merchant_url);
           }
 
         } else {
@@ -136,15 +138,15 @@ const AddQr = () => {
       );
 
       const params = {
-        success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}`,
-        error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}`,
-        cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}`,
+        success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
+        error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
+        cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
         merchant_id: merchantID,
         amount: amountInCents,
         currency: 'PHP',
         nonce,
         timestamp,
-        description: `Branch Name: ${formData.branch_name} || User Name: ${formData.user_name} ||  IMS Sales Number: ${formData.invoice_number}`,
+        description: `Branch Name: ${formData.branch_name} || User Name: ${formData.user_name} || IMS Sales Number: ${formData.invoice_number}`,
         signature,
         order_id: formData.invoice_number,
         payWith: 'GiyaPay',
@@ -306,7 +308,7 @@ const AddQr = () => {
               <QRCode
                 value={generatedQrCode}
                 size={300}
-                style={{ width: '100%', height: 'auto',marginBottom:'10px' }}
+                style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
               />
               {/* Centered Branch Name and Invoice Number */}
               <Typography variant="body1" sx={{ fontWeight: '500', color: '#333' }}>

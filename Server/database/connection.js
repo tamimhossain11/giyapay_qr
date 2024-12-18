@@ -9,15 +9,21 @@ const {
   DB_USER,
   DB_PASSWORD,
   DB_HOST,
-  DB_PORT,
   DB_DIALECT
 } = process.env;
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-    host: DB_HOST,
-    port: parseInt(DB_PORT, 10), 
     dialect: DB_DIALECT,
-    logging: false,
+    dialectOptions: {
+        socketPath: DB_HOST,  // Unix socket path for Cloud SQL connection
+    },
+    logging: false,  // Disable logging or set to true for debugging
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+    },
 });
 
 async function testConnection() {

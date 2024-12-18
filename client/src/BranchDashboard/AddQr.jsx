@@ -261,13 +261,13 @@ const AddQr = () => {
               fullWidth
               sx={{
                 color: '#fff',
-                backgroundColor: '#FBB03A', // Solid GiyaPay yellow
+                backgroundColor: '#FBB03A', 
                 '&:hover': {
-                  backgroundColor: '#FBB03A', // Maintain same color on hover
-                  boxShadow: 'none', // Remove any default box shadow on hover
+                  backgroundColor: '#FBB03A', 
+                  boxShadow: 'none',
                 },
                 '&:focus': {
-                  outline: 'none', // Remove default outline on focus
+                  outline: 'none', 
                 },
                 padding: '12px 24px',
                 borderRadius: '8px',

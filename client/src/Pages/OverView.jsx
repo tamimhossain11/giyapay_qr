@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import CountUp from 'react-countup'; // Import CountUp for animation
-import '../css/home.css'; // Ensure this file includes your custom styles
+import CountUp from 'react-countup';
+import '../css/home.css'; 
 import { FaQrcode, FaBuilding, FaUsers } from 'react-icons/fa';
 
 const OverView = () => {

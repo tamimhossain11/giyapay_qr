@@ -12,9 +12,9 @@ const GradientButton = styled(Button)(({ theme }) => ({
   padding: '12px 24px',
   borderRadius: '8px',
   width: '100%',
-  fontFamily: 'Montserrat, sans-serif', // Set font to Montserrat
-  fontWeight: 400, // Font weight 400
-  textTransform: 'none', // Prevent uppercase text
+  fontFamily: 'Montserrat, sans-serif',
+  fontWeight: 400,
+  textTransform: 'none',
   '&:hover': {
     backgroundPosition: '100% 0',
   },
@@ -26,7 +26,7 @@ export default function LoginButton({ onClick, children, ...props }) {
     <GradientButton
       variant="contained"
       onClick={onClick}
-      {...props} 
+      {...props}
     >
       {children}
     </GradientButton>

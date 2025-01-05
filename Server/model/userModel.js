@@ -45,11 +45,11 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'admin',  
+      model: 'admin',
       key: 'id',
     },
   },
-  
+
 }, {
   timestamps: true,
   tableName: 'users',

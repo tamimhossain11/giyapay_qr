@@ -3,13 +3,13 @@ import sequelize from '../database/connection.js';
 import User from './userModel.js';
 import Branch from './branchModel.js';
 import QrCode from './qrCodesModel.js';
-import Admin from './adminModel.js'; 
+import Admin from './adminModel.js';
 
 const models = {
   User: User,
   Branch: Branch,
   QrCode: QrCode,
-  Admin: Admin,  
+  Admin: Admin,
 };
 
 // Define associations

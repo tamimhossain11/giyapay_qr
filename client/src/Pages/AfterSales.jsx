@@ -9,7 +9,6 @@ import RippleLoader from '../Components/Loader';
 const AfterSales = () => {
   const [loading, setLoading] = useState(true);
 
-  // Function to handle iframe loading completion
   const handleIframeLoad = () => {
     setLoading(false);
   };
@@ -41,7 +40,6 @@ const AfterSales = () => {
             <RippleLoader />
           </Box>
         )}
-        {/* Embed the iframe */}
         <Box
           sx={{
             display: loading ? 'none' : 'block',

@@ -15,9 +15,9 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  admin_id: { 
+  admin_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,  
+    allowNull: false,
   },
   amount: {
     type: DataTypes.DECIMAL(10, 2),
@@ -59,8 +59,8 @@ const QrCode = sequelize.define('QrCode', {
   },
 }, {
   tableName: 'qr_codes',
-  timestamps: true, 
-  underscored: true, 
+  timestamps: true,
+  underscored: true,
 });
 
 export default QrCode;

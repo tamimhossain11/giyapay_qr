@@ -17,10 +17,10 @@ export const getProfile = async (req, res) => {
     }
 
     console.log("Fetching profile for user ID:", userId);
-    
+
     if (userType === 'admin') {
       const admin = await Admin.findByPk(userId, {
-        attributes: ['id', 'email', 'merchant_id','merchant_name', 'merchant_secret','paymentUrl','merchant_url', 'payment_method', 'gateway_account_type'],
+        attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret', 'paymentUrl', 'merchant_url', 'payment_method', 'gateway_account_type'],
       });
 
       if (!admin) {
@@ -28,7 +28,7 @@ export const getProfile = async (req, res) => {
         return res.status(404).json({ message: 'Admin not found' });
       }
 
-      res.json(admin); // Respond with admin details, including merchant_name and merchant_secret
+      res.json(admin);
     } else {
       const user = await User.findByPk(userId, {
         include: [
@@ -39,8 +39,8 @@ export const getProfile = async (req, res) => {
           },
           {
             model: Admin,
-            as: 'admin', // Include admin details
-            attributes: ['id','merchant_name','merchant_id', 'merchant_secret','email','paymentUrl','merchant_url', 'payment_method', 'gateway_account_type'],
+            as: 'admin',
+            attributes: ['id', 'merchant_name', 'merchant_id', 'merchant_secret', 'email', 'paymentUrl', 'merchant_url', 'payment_method', 'gateway_account_type'],
           },
         ],
         attributes: ['id', 'first_name', 'last_name', 'username', 'email', 'user_type', 'status', 'branch_id'],
@@ -131,10 +131,10 @@ export const addUser = async (req, res) => {
 // Controller function to get all users based on admin_id
 export const getAllUsers = async (req, res) => {
   try {
-    const adminId = req.user.id; 
+    const adminId = req.user.id;
 
     const users = await User.findAll({
-      where: { admin_id: adminId }, 
+      where: { admin_id: adminId },
       include: {
         model: Branch,
         as: 'branch',
@@ -154,8 +154,8 @@ export const getAllUsers = async (req, res) => {
 
 export const getAllUsersCA = async (req, res) => {
   try {
-    const { userType, admin_id } = req.user;  // Assuming the token provides userType and admin_id
-    
+    const { userType, admin_id } = req.user;
+
     if (!admin_id) {
       return res.status(400).json({ message: 'Admin ID is missing' });
     }
@@ -165,7 +165,7 @@ export const getAllUsersCA = async (req, res) => {
     // Admins and Co-Admins should both have access to users linked to their admin_id
     if (userType === 'admin' || userType === 'Co-Admin') {
       whereConditions = {
-        admin_id: admin_id, // Fetch users linked to this admin or co-admin's admin_id
+        admin_id: admin_id,
       };
     } else {
       return res.status(403).json({ message: 'You do not have the appropriate permissions to view this data' });

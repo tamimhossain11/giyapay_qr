@@ -1,4 +1,3 @@
-// CustomAutocomplete.jsx
 import React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -9,18 +8,18 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     fontWeight: 400,
     borderRadius: '10px',
     '& fieldset': {
-      borderColor: '#e0e0e0', // Default border color
+      borderColor: '#e0e0e0',
       borderWidth: '1px',
     },
     '&:hover fieldset': {
-      borderColor: '#000', // Border color on hover
+      borderColor: '#000',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#000', // Border color when focused
+      borderColor: '#000',
     },
   },
   '& .MuiInputLabel-root': {
-    color: '#616161', // Label color
+    color: '#616161',
     fontFamily: 'Montserrat, sans-serif',
   },
 }));

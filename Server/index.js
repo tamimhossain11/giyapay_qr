@@ -53,13 +53,13 @@ app.use('/upload', uploadRoutes);
 
 app.get('/user/count', authenticateToken, async (req, res) => {
   try {
-    const { userType, id, admin_id } = req.user; 
+    const { userType, id, admin_id } = req.user;
 
     let adminId;
     if (userType === 'admin') {
-      adminId = id; 
+      adminId = id;
     } else if (userType === 'Co-Admin' && admin_id) {
-      adminId = admin_id; 
+      adminId = admin_id;
     } else {
       return res.status(400).json({ Status: false, Error: 'Admin ID is missing' });
     }
@@ -67,8 +67,8 @@ app.get('/user/count', authenticateToken, async (req, res) => {
     const userCount = await User.count({
       where: {
         [Sequelize.Op.or]: [
-          { id: adminId }, 
-          { admin_id: adminId } 
+          { id: adminId },
+          { admin_id: adminId }
         ]
       }
     });

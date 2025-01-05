@@ -33,7 +33,6 @@ const CallbackResponsePage = () => {
     } else if (nonce && refno && amountInCents && signature && invoice_number) {
       const amount = (parseFloat(amountInCents) / 100).toFixed(2);
 
-      // Set loading state to true while fetching
       setLoading(true);
 
       axios
@@ -47,15 +46,15 @@ const CallbackResponsePage = () => {
         .then((response) => {
           if (response.data.message === 'Transaction already processed') {
             setTransactionProcessed(true);
-            setLoading(false); // Stop loading when transaction is processed
+            setLoading(false);
           } else {
             setTransactionDetails({ amount, refno });
-            setLoading(false); // Stop loading when data is loaded
+            setLoading(false);
           }
         })
         .catch((error) => {
           console.error('Error saving transaction:', error.response ? error.response.data : error.message);
-          setLoading(false); // Stop loading if there’s an error
+          setLoading(false);
         });
     }
   }, [callbackType, location]);
@@ -156,19 +155,19 @@ const CallbackResponsePage = () => {
           variant="contained"
           sx={{
             mt: 4,
-            backgroundColor: '#ed1f79', // GiyaPay pink
+            backgroundColor: '#ed1f79',
             color: '#fff',
             fontWeight: 'bold',
-            borderRadius: '25px', // Rounded corners
+            borderRadius: '25px',
             textTransform: 'none',
             fontSize: '16px',
             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
             padding: '10px 20px',
             '&:hover': {
-              backgroundColor: '#d91c6e', // Darker pink for hover
+              backgroundColor: '#d91c6e',
             },
             '&:disabled': {
-              backgroundColor: '#f8c4da', // Light pink for disabled
+              backgroundColor: '#f8c4da',
               color: '#fff',
             },
           }}

@@ -4,7 +4,7 @@ import { Button, Card, Grid, Typography, Box, Alert, Select, MenuItem, FormContr
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import RippleLoader from '../Components/Loader'
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../Components/Mui/CustomTextField';
 
 const UploadPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);

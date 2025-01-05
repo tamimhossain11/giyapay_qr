@@ -229,7 +229,7 @@ const SuperDashboard = () => {
           Your session has expired. Please log in again.
         </DialogContent>
         <DialogActions>
-          <Button onClick={fallbackLogout} 
+          <Button onClick={fallbackLogout}
             sx={{
               maxWidth: '150px',
               flex: 1,
@@ -241,8 +241,8 @@ const SuperDashboard = () => {
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 400,
             }}
-          color="primary" 
-          variant="contained">
+            color="primary"
+            variant="contained">
             Login
           </Button>
         </DialogActions>

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { QRCodeCanvas } from 'qrcode.react';
-import Customtextfield from '../Mui/CustomTextField'
+import Customtextfield from '../../Components/Mui/CustomTextField'
 
 
 const AddQr = () => {
@@ -91,7 +91,7 @@ const AddQr = () => {
 
     // If the field is "amount", only allow numbers and one decimal point
     if (name === 'amount') {
-      const regex = /^[0-9]*\.?[0-9]*$/;  // Allows numbers and one decimal point
+      const regex = /^[0-9]*\.?[0-9]*$/;
       if (regex.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
@@ -261,13 +261,13 @@ const AddQr = () => {
               fullWidth
               sx={{
                 color: '#fff',
-                backgroundColor: '#FBB03A', 
+                backgroundColor: '#FBB03A',
                 '&:hover': {
-                  backgroundColor: '#FBB03A', 
+                  backgroundColor: '#FBB03A',
                   boxShadow: 'none',
                 },
                 '&:focus': {
-                  outline: 'none', 
+                  outline: 'none',
                 },
                 padding: '12px 24px',
                 borderRadius: '8px',
@@ -332,9 +332,9 @@ const AddQr = () => {
                   textTransform: 'none',
                   fontSize: '1rem',
                   fontWeight: 'bold',
-                  backgroundColor: '#FBB03A', // Solid GiyaPay yellow
+                  backgroundColor: '#FBB03A',
                   '&:hover': {
-                    backgroundColor: '#FBB03A', // Same color on hover to keep it solid
+                    backgroundColor: '#FBB03A',
                   },
                 }}
               >

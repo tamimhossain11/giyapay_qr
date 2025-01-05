@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import '../css/login.css';
+import '../../css/login.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import logo from '../assets/login.svg';
+import logo from '../../assets/login.svg';
 import InputAdornments from '../Mui/InputAdornments';
 import LoginButton from '../Mui/LoginButton';
 import Button from '@mui/material/Button';
@@ -101,7 +101,7 @@ const Login = () => {
     };
 
     const goBack = () => {
-        navigate(-1); // Navigates to the previous page
+        navigate(-1);
     };
 
     return (
@@ -145,8 +145,8 @@ const Login = () => {
                                     color: '#ED1F79',
                                     borderColor: '#ED1F79',
                                     '&:hover': {
-                                        backgroundColor: '#00000', // Change this to your desired hover color
-                                        borderColor: '#FBB03A', // Change this to your desired hover border color
+                                        backgroundColor: '#00000',
+                                        borderColor: '#FBB03A',
                                     },
                                     fontFamily: 'Montserrat, sans-serif',
                                     fontWeight: 400,

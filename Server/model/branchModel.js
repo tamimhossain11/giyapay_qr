@@ -19,10 +19,10 @@ const Branch = sequelize.define('Branch', {
   admin_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: Admin, // Assuming you have an Admin table/model
+      model: Admin,
       key: 'id',
     },
-    allowNull: false, // Make it required if needed
+    allowNull: false,
   },
 }, {
   tableName: 'branches',

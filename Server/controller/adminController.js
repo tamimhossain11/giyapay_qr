@@ -12,7 +12,6 @@ export const addAdmin = async (req, res) => {
   try {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // Create the new admin
     const newAdmin = await Admin.create({
       email,
       password: hashedPassword,
@@ -25,12 +24,11 @@ export const addAdmin = async (req, res) => {
       gateway_account_type,
     });
 
-    // Emit the event to update all clients with the new admin list
     const io = req.app.get('socketio');
     const admins = await Admin.findAll({
       attributes: ['id', 'email', 'merchant_id', 'merchant_name', 'merchant_secret', 'paymentUrl','merchant_url', 'payment_method', 'gateway_account_type'], // Select only necessary fields
     });
-    io.emit('adminListUpdated', admins); // Emit updated list to all connected clients
+    io.emit('adminListUpdated', admins); 
 
     res.status(201).json({ message: 'Admin added successfully' });
   } catch (error) {

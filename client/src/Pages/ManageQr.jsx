@@ -14,7 +14,7 @@ import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
 import RippleLoader from '../Components/Loader';
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../Components/Mui/CustomTextField';
 
 const ManageQr = () => {
   const [qrCodes, setQrCodes] = useState([]);

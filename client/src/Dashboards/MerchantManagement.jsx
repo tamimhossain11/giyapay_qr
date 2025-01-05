@@ -9,7 +9,7 @@ import { Visibility, VisibilityOff, ExpandMore, ExpandLess, Logout } from '@mui/
 import { FaUsers } from 'react-icons/fa';
 import { styled } from '@mui/system';
 import io from 'socket.io-client';
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../Components/Mui/CustomTextField';
 
 
 const LeftSection = styled(Box)(({ theme }) => ({
@@ -26,7 +26,7 @@ const RightSection = styled(Box)(({ theme }) => ({
 }));
 
 const WelcomeBanner = styled(Box)(({ theme }) => ({
-    backgroundColor: '#ED1F79', // Giyapay brand color
+    backgroundColor: '#ED1F79',
     color: theme.palette.common.white,
     padding: theme.spacing(2),
     textAlign: 'center',

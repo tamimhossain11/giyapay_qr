@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Container, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
-  TablePagination, TableRow, Typography, IconButton, Tooltip,Autocomplete, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
+  TablePagination, TableRow, Typography, IconButton, Tooltip, Autocomplete, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -14,7 +14,7 @@ import { CSVLink } from 'react-csv';
 import QRCode from 'qrcode.react';
 import { io } from 'socket.io-client';
 import RippleLoader from '../Components/Loader';
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../Components/Mui/CustomTextField';
 
 const ManageQrCA = () => {
   const [qrCodes, setQrCodes] = useState([]);
@@ -240,7 +240,7 @@ const ManageQrCA = () => {
         alignItems="center"
         height="80vh"
       >
-        <RippleLoader/>
+        <RippleLoader />
       </Box>
     );
   }
@@ -567,7 +567,7 @@ const ManageQrCA = () => {
                   <strong>Updated At:</strong> {selectedQr.updated_at}
                 </Typography>
                 <Box mt={2} display="flex" justifyContent="flex-end">
-                <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
+                  <Button variant="contained" color="primary" onClick={handleCloseView} sx={{
                     maxWidth: '150px',
                     flex: 1,
                     backgroundColor: '#FBB03A',

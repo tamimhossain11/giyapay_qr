@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../database/connection.js'; 
+import sequelize from '../database/connection.js';
 
 const BlacklistedToken = sequelize.define('BlacklistedToken', {
     token: {
@@ -15,7 +15,7 @@ const BlacklistedToken = sequelize.define('BlacklistedToken', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'BlacklistedTokens', 
+    tableName: 'BlacklistedTokens',
     timestamps: true
 });
 

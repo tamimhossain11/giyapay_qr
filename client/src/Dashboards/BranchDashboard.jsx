@@ -24,7 +24,7 @@ const BranchDashboard = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false); 
+  const [sessionExpired, setSessionExpired] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
@@ -33,9 +33,9 @@ const BranchDashboard = () => {
 
     const currentTime = Date.now();
     if (expirationTime && currentTime >= expirationTime) {
-      setSessionExpired(true);  
+      setSessionExpired(true);
     } else if (!token) {
-      navigate("/"); 
+      navigate("/");
     }
   }, [navigate]);
 
@@ -60,7 +60,7 @@ const BranchDashboard = () => {
         }
       );
 
-     
+
       localStorage.removeItem("token");
       localStorage.removeItem("expirationTime");
 
@@ -75,7 +75,7 @@ const BranchDashboard = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("expirationTime");
 
-    navigate("/"); 
+    navigate("/");
   };
 
   const handleProfileView = () => {
@@ -96,9 +96,9 @@ const BranchDashboard = () => {
     const currentTime = Date.now();
 
     if (currentTime >= expirationTime) {
-      handleLogout(); 
+      handleLogout();
     } else {
-      navigate(route); 
+      navigate(route);
     }
   };
 
@@ -171,11 +171,11 @@ const BranchDashboard = () => {
         }}
       >
         <IconButton
-          edge="start"  
+          edge="start"
           aria-label="close drawer"
           onClick={handleDrawerToggle}
           className="drawer-close-icon"
-          sx={{ alignSelf: "flex-start" }}  
+          sx={{ alignSelf: "flex-start" }}
         >
           <CloseIcon />
         </IconButton>
@@ -212,7 +212,7 @@ const BranchDashboard = () => {
           Your session has expired. Please log in again.
         </DialogContent>
         <DialogActions>
-        <Button onClick={fallbackLogout} 
+          <Button onClick={fallbackLogout}
             sx={{
               maxWidth: '150px',
               flex: 1,
@@ -224,8 +224,8 @@ const BranchDashboard = () => {
               fontFamily: 'Montserrat, sans-serif',
               fontWeight: 400,
             }}
-          color="primary" 
-          variant="contained">
+            color="primary"
+            variant="contained">
             Login
           </Button>
         </DialogActions>

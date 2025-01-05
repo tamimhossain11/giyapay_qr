@@ -33,24 +33,20 @@ const createQrCode = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
-    // Validate amount field: must be a valid positive number
     if (isNaN(amount) || parseFloat(amount) <= 0) {
       return res.status(400).json({ error: 'Amount must be a valid positive number.' });
     }
 
-    // Check if the branch exists
     const branch = await Branch.findByPk(branch_id);
     if (!branch) {
       return res.status(404).json({ error: 'Branch not found. Please check the branch ID.' });
     }
 
-    // Check if the user exists
     const user = await User.findByPk(user_id);
     if (!user) {
       return res.status(404).json({ error: 'User not found. Please check the user ID.' });
     }
 
-    // Check if the invoice number already exists
     const existingInvoice = await QrCode.findOne({ where: { invoice_number } });
     if (existingInvoice) {
       return res.status(409).json({ error: 'Invoice number already exists. Please choose a different one.' });
@@ -95,7 +91,6 @@ const handleCallback = async (req, res) => {
       return res.status(400).json({ message: 'Invalid data provided' });
     }
 
-    // Find the QR code entry by invoice number
     const qrCode = await QrCode.findOne({ where: { invoice_number } });
 
     if (!qrCode) {
@@ -103,7 +98,6 @@ const handleCallback = async (req, res) => {
       return res.status(404).json({ message: 'QR Code not found' });
     }
 
-    // Check if the status has already been updated to avoid double submission
     if (qrCode.status === 'Paid' || qrCode.status === 'Failed' || qrCode.status === 'Cancelled') {
       console.log('Transaction already processed:', qrCode.status);
       return res.status(200).json({ message: 'Transaction already processed', qrCode });
@@ -372,7 +366,7 @@ const countQrCodesByAdmin = async (req, res) => {
 
 const getPaymentDetailsByInvoice = async (req, res) => {
   try {
-    const { invoice_number } = req.params; // Extract invoice_number from request params
+    const { invoice_number } = req.params; 
 
     if (!invoice_number) {
       return res.status(400).json({ error: 'Invoice number is required' });
@@ -381,7 +375,7 @@ const getPaymentDetailsByInvoice = async (req, res) => {
     // Find the QR Code entry by invoice_number
     const qrCode = await QrCode.findOne({
       where: { invoice_number },
-      attributes: ['payment_reference', 'status'], // Fetch only the required fields
+      attributes: ['payment_reference', 'status'],
     });
 
     if (!qrCode) {

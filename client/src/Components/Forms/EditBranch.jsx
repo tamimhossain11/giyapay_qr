@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography, Snackbar, Paper, Alert } from '@mui/material';
 import axios from 'axios';
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../../Components/Mui/CustomTextField';
 
 const EditBranch = () => {
   const { id } = useParams();
@@ -105,7 +105,7 @@ const EditBranch = () => {
               },
             }}
           >
-     
+
             <Button
               type="button"
               variant="outlined"

@@ -1,4 +1,3 @@
-/* General Container */
 body {
   font-family: 'Montserrat', sans-serif;
 }
@@ -13,7 +12,7 @@ body {
 .card {
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   border-radius: 15px;
-  background-color: #ffffff; /* Changed to white for better contrast */
+  background-color: #ffffff;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
   border: none;
@@ -35,7 +34,7 @@ body {
 .card-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #4f4f4f; /* Secondary color */
+  color: #4f4f4f;
   margin-bottom: 0.5rem;
 }
 
@@ -43,21 +42,21 @@ body {
 .card-text {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #828282; /* Secondary color */
+  color: #828282;
   margin-top: 0.5rem;
 }
 
 /* Background Colors for Cards */
 .overview-card:nth-child(1) {
-  border-top: 5px solid #ed1f79; /* Primary color */
+  border-top: 5px solid #ed1f79;
 }
 
 .overview-card:nth-child(2) {
-  border-top: 5px solid #fbb03a; /* Primary color */
+  border-top: 5px solid #fbb03a;
 }
 
 .overview-card:nth-child(3) {
-  border-top: 5px solid #b3b3b3; /* Secondary color */
+  border-top: 5px solid #b3b3b3;
 }
 
 /* Responsive Grid */

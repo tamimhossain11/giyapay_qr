@@ -4,7 +4,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MuiAlert from '@mui/material/Alert';
-import CustomTextField from '../Mui/CustomTextField';
+import CustomTextField from '../../Components/Mui/CustomTextField';
 
 const EditUser = () => {
   const { id } = useParams();
@@ -92,7 +92,6 @@ const EditUser = () => {
   };
 
 
-  // Check if the username already exists (excluding current user's username)
   const checkUsernameAvailability = async (username) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-username/${username}/${id}`);
@@ -102,7 +101,6 @@ const EditUser = () => {
     }
   };
 
-  // Check if the email already exists (excluding current user's email)
   const checkEmailAvailability = async (email) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/check-email/${email}/${id}`);
@@ -113,11 +111,10 @@ const EditUser = () => {
   };
 
 
-  // Handle dynamic email validation
   const handleEmailChange = async (e) => {
     const email = e.target.value;
     setUser({ ...user, email });
-    setEmailError(''); // Clear error
+    setEmailError('');
 
     if (email.trim() === '') {
       setEmailError('Email is required');
@@ -132,11 +129,10 @@ const EditUser = () => {
 
 
 
-  // Handle dynamic username validation
   const handleUsernameChange = async (e) => {
     const username = e.target.value;
     setUser({ ...user, username });
-    setUsernameError(''); // Clear error
+    setUsernameError('');
 
     if (username.trim() === '') {
       setUsernameError('Username is required');
@@ -151,13 +147,12 @@ const EditUser = () => {
   };
 
   const handleUpdate = async () => {
-    setError(''); // Clear any previous error messages
-    setIsError(false); // Reset error state
+    setError('');
+    setIsError(false);
 
-    // Use validateForm to check all fields
     if (!validateForm()) {
-      setIsError(true); // Validation failed, it's an error
-      return; // Stop if validation fails
+      setIsError(true);
+      return;
     }
 
     try {
@@ -179,10 +174,9 @@ const EditUser = () => {
 
       setUpdateSuccess(true);
       setSnackbarMessage('User updated successfully');
-      setIsError(false); // No error
+      setIsError(false);
       setOpenSnackbar(true);
 
-      // Navigate back after showing the Snackbar for 2 seconds
       setTimeout(() => {
         navigate('/super-dashboard/manage-users');
       }, 2000);
@@ -190,7 +184,7 @@ const EditUser = () => {
       console.error('Failed to update user:', error);
       setError(error.response?.data?.error || 'An error occurred while updating the user.');
       setSnackbarMessage('Error updating user.');
-      setIsError(true); // Set error state
+      setIsError(true);
       setOpenSnackbar(true);
     }
   };
@@ -229,7 +223,7 @@ const EditUser = () => {
       <CustomTextField
         label="Username"
         value={user.username || ''}
-        onChange={handleUsernameChange} // Dynamic check
+        onChange={handleUsernameChange}
         fullWidth
         margin="normal"
         required
@@ -240,7 +234,7 @@ const EditUser = () => {
       <CustomTextField
         label="Email"
         value={user.email || ''}
-        onChange={handleEmailChange} // Dynamic check
+        onChange={handleEmailChange}
         fullWidth
         margin="normal"
         required
@@ -304,10 +298,9 @@ const EditUser = () => {
         flexWrap="wrap"
         gap={2}
         sx={{
-          // For small screens (below 440px), stack the buttons vertically and make them full width
           '@media (max-width: 440px)': {
             flexDirection: 'column',
-            justifyContent: 'center', // Center the buttons when stacked
+            justifyContent: 'center',
           },
         }}
       >
@@ -326,7 +319,6 @@ const EditUser = () => {
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 400,
             minWidth: '120px',
-            // Full width on smaller screens
             '@media (max-width: 440px)': {
               maxWidth: '100%',
             },
@@ -349,7 +341,6 @@ const EditUser = () => {
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 400,
             minWidth: '120px',
-            // Full width on smaller screens
             '@media (max-width: 440px)': {
               maxWidth: '100%',
             },
@@ -371,8 +362,6 @@ const EditUser = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
-
     </div>
   );
 };

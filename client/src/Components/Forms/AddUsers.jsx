@@ -298,7 +298,7 @@ const AddUser = () => {
                 },
               }}
             >
-               <Button
+              <Button
                 variant="outlined"
                 color="secondary"
                 sx={{
@@ -320,7 +320,7 @@ const AddUser = () => {
               >
                 Cancel
               </Button>
-              
+
               <Button
                 variant="contained"
                 color="primary"

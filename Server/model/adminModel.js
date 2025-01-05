@@ -18,37 +18,37 @@ const Admin = sequelize.define('Admin', {
   },
   merchant_id: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
   },
   merchant_secret: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
   },
   merchant_name: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
   },
   paymentUrl: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
   },
   payment_method: {
     type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: '', 
+    defaultValue: '',
   },
   merchant_url: {
     type: DataTypes.STRING,
-    allowNull: true, 
+    allowNull: true,
   },
-  
+
   gateway_account_type: {
     type: DataTypes.STRING,
-    allowNull: false, 
+    allowNull: false,
   },
-  
+
 }, {
-  tableName: 'admin', 
+  tableName: 'admin',
   timestamps: false,
 });
 

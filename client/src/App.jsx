@@ -1,28 +1,28 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import Login from './Components/Login';
-import SuperDashboard from './superDashboard/SuperDashboard';
-import OverView from './MultiUserPages/OverView';
+import Login from './Components/Forms/Login';
+import SuperDashboard from './Dashboards/AdminDashboard';
+import OverView from './Pages/OverView';
 import PrivateRoute from './Components/PrivateRoute';
-import AddQr from './BranchDashboard/AddQr';
-import ManageQr from './BranchDashboard/ManageQr';
-import AddBranchForm from './superDashboard/AddBranch';
-import BranchManagement from './superDashboard/ManageBranch';
-import BranchDashboard from './BranchDashboard/BranchDashboard';
-import ProfilePage from './MultiUserPages/ProfilePage';
-import ManageUsers from './superDashboard/ManageUsers';
-import MerchantManagement from './superDashboard/MerchantManagement';
-import AddUser from './superDashboard/AddUsers';
-import EditUser from './Components/EditUser';
-import EditBranch from './Components/EditBranch';
-import CallbackResponsePage from './ClientPages/CallbackResponsePage';
-import CoAdminDashboard from './CoAdminDashboard/CoAdminDashboard';
-import NotFound from './Components/NotFound';
-import ManageQRBU from './BranchDashboard/ManageQRBU';
-import ManageQrCA from './CoAdminDashboard/ManageQrCA';
-import UploadPage from './superDashboard/UploadPage';
-import AfterSales from './MultiUserPages/AfterSales';
+import AddQr from './Components/Forms/AddQr';
+import ManageQr from './Pages/ManageQr';
+import AddBranchForm from './Components/Forms/AddBranch';
+import BranchManagement from './Pages/ManageBranch';
+import BranchDashboard from './Dashboards/BranchDashboard';
+import ProfilePage from './Pages/ProfilePage';
+import ManageUsers from './Pages/ManageUsers';
+import MerchantManagement from './Dashboards/MerchantManagement';
+import AddUser from './Components/Forms/AddUsers';
+import EditUser from './Components/Forms/EditUser';
+import EditBranch from './Components/Forms/EditBranch';
+import CallbackResponsePage from './Pages/CallbackResponsePage';
+import CoAdminDashboard from './Dashboards/CoAdminDashboard';
+import NotFound from './Pages/NotFound';
+import ManageQrBU from './Pages/ManageQRBU';
+import ManageQrCA from './Pages/ManageQrCA';
+import UploadPage from './Pages/UploadPage';
+import AfterSales from './Pages/AfterSales';
 
 function App() {
     useEffect(() => {
@@ -112,8 +112,8 @@ function App() {
                         </PrivateRoute>
                     }
                 >
-                    <Route path="" element={<ManageQRBU />} />
-                    <Route path="manage-qrbu" element={<ManageQRBU />} />
+                    <Route path="" element={<ManageQrBU />} />
+                    <Route path="manage-qrbu" element={<ManageQrBU />} />
                     <Route path="add-qr" element={<AddQr />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="aftersales" element={<AfterSales />} />

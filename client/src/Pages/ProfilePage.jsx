@@ -15,7 +15,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import BranchIcon from '@mui/icons-material/Business';
 import StatusIcon from '@mui/icons-material/ToggleOn';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import LockIcon from '@mui/icons-material/Lock'; 
+import LockIcon from '@mui/icons-material/Lock';
 import RippleLoader from '../Components/Loader';
 
 const ProfilePage = () => {
@@ -59,10 +59,10 @@ const ProfilePage = () => {
           marginLeft: 1,
           fontFamily: 'Montserrat, sans-serif',
           wordWrap: 'break-word',
-          whiteSpace: 'normal', 
-          overflowWrap: 'break-word', 
-          overflow: 'hidden', 
-          maxWidth: '100%', 
+          whiteSpace: 'normal',
+          overflowWrap: 'break-word',
+          overflow: 'hidden',
+          maxWidth: '100%',
         }}
       >
         <strong>{label}:</strong> {value || 'N/A'}

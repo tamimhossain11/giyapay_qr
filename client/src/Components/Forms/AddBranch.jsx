@@ -7,7 +7,7 @@ import CustomTextField from '../Mui/CustomTextField';
 const CreateBranch = () => {
   const { id } = useParams();
   const [branchName, setBranchName] = useState('');
-  const [isBranchNameUnique, setIsBranchNameUnique] = useState(true); 
+  const [isBranchNameUnique, setIsBranchNameUnique] = useState(true);
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
   const [branchUser, setBranchUser] = useState(null);
@@ -113,7 +113,7 @@ const CreateBranch = () => {
         bankName,
         bankBranch,
         branchUserId: branchUser && branchUser.id !== 'addLater' ? branchUser.id : null,
-        adminId, 
+        adminId,
       };
 
       if (id) {
@@ -217,7 +217,7 @@ const CreateBranch = () => {
           sx={{
             '@media (max-width: 440px)': {
               flexDirection: 'column',
-              justifyContent: 'center',  
+              justifyContent: 'center',
             },
           }}
         >

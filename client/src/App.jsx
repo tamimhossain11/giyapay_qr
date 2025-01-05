@@ -19,7 +19,7 @@ import EditBranch from './Components/Forms/EditBranch';
 import CallbackResponsePage from './Pages/CallbackResponsePage';
 import CoAdminDashboard from './Dashboards/CoAdminDashboard';
 import NotFound from './Pages/NotFound';
-import ManageQrBU from './Pages/ManageQRBU';
+import ManageQrBU from './Pages/ManageQrBU';
 import ManageQrCA from './Pages/ManageQrCA';
 import UploadPage from './Pages/UploadPage';
 import AfterSales from './Pages/AfterSales';

@@ -86,26 +86,10 @@ Hosting
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 User Flow
+--------------------------
 Simplified User Flow Diagram
+----------------------------------------
 
 +-------------------+                          +-------------------+
 |   Super Admin     |                          |    End User       |
@@ -134,51 +118,17 @@ Simplified User Flow Diagram
 +-------------------+
 
 
-
-
-How to Start the System
-Frontend
-Clone the repository:
-
-git clone https://github.com/tamimhossain11/giyapay_qr.git
-
-cd frontend
-Install dependencies:
-
-npm install
-
-Start the development server:
-
-npm run dev
-
-Access the application at http://localhost:5173
-Backend
-Clone the repository:
-
-git clone https://github.com/tamimhossain11/giyapay_qr.git
-
-cd backend
-Install dependencies:
-
-npm install
-
-Start the server:
-
-npm start
-
-The server runs at http://localhost:3000.
-
-Deployment
-Frontend
-Hosted on Vercel.
-Backend
-Deployed on Google Cloud Platform (GCP).
-
 FAQs
+======================
 Q1: Who can generate QR codes?
+--------------------
 Only Branch Users can generate QR codes for branch-specific payments.
+--------------------
 Q2: Can Co-Admins manage QR codes?
+-------------------------
 No, Co-Admins can only view, filter, and print transaction details for their assigned branches.
+-----------------------------------
 Q3: How are payment statuses updated?
+----------------------------------
 Payment statuses are updated in real-time using Socket.IO and visible to Admin, Co-Admin, and Branch Users.
 

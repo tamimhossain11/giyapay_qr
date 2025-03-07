@@ -23,6 +23,7 @@ import ManageQrBU from './Pages/ManageQrBU';
 import ManageQrCA from './Pages/ManageQrCA';
 import UploadPage from './Pages/UploadPage';
 import AfterSales from './Pages/AfterSales';
+import SuccessCallback from './Pages/successCallbackPage';
 
 function App() {
     useEffect(() => {
@@ -65,6 +66,7 @@ function App() {
                 {/* Public routes */}
                 <Route path="/" element={<Login />} />
                 <Route path="/callback/:callbackType" element={<CallbackResponsePage />} />
+                <Route path="/callback-page/success-callback" element={<SuccessCallback />} />
 
                 {/*Super Admin routes */}
                 <Route

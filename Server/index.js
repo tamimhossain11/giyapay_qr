@@ -16,6 +16,7 @@ import { authenticateToken } from './middleware/authenticate.js';
 import User from './model/userModel.js';
 import { Op } from 'sequelize';
 import Admin from './model/adminModel.js';
+import "./middleware/checkTransactions.js"
 
 const PORT = process.env.PORT || 3000;
 const app = express();

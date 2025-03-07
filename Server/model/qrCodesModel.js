@@ -57,6 +57,15 @@ const QrCode = sequelize.define('QrCode', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  timestamp: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  retry_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  
 }, {
   tableName: 'qr_codes',
   timestamps: true,

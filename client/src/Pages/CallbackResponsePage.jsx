@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { Container, Typography, Box, Button, Grid, Paper, LinearProgress, Alert } from '@mui/material';
-import { CheckCircleOutline, ErrorOutline, Cancel } from '@mui/icons-material';
+import { ErrorOutline, Cancel } from '@mui/icons-material';
 import axios from 'axios';
 
 const CallbackResponsePage = () => {
@@ -22,6 +22,8 @@ const CallbackResponsePage = () => {
     const invoice_number = params.get('invoice_number');
     const error = params.get('error');
     const merchant_url = params.get('merchant_url');
+    const id = params.get('id');
+    const timestamp = params.get('timestamp');
 
     if (merchant_url) {
       setMerchantUrl(merchant_url);
@@ -30,7 +32,7 @@ const CallbackResponsePage = () => {
     if (callbackType === 'error-callback' && error) {
       setErrorMessage(error);
       setLoading(false);
-    } else if (nonce && refno && amountInCents && signature && invoice_number) {
+    } else if (nonce && refno && amountInCents && signature && invoice_number && id) {
       const amount = (parseFloat(amountInCents) / 100).toFixed(2);
 
       setLoading(true);
@@ -42,6 +44,8 @@ const CallbackResponsePage = () => {
           amount,
           signature,
           invoice_number,
+          id,
+          timestamp,
         })
         .then((response) => {
           if (response.data.message === 'Transaction already processed') {
@@ -63,7 +67,6 @@ const CallbackResponsePage = () => {
     if (transactionProcessed) {
       return (
         <Box sx={{ textAlign: 'center' }}>
-          <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79' }} />
           <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
             Transaction Already Processed
           </Typography>
@@ -86,32 +89,6 @@ const CallbackResponsePage = () => {
     }
 
     switch (callbackType) {
-      case 'success-callback':
-        return (
-          <Box sx={{ textAlign: 'center' }}>
-            <CheckCircleOutline sx={{ fontSize: 70, color: '#ed1f79' }} />
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, color: '#ed1f79' }}>
-              Payment Successful!
-            </Typography>
-            <Typography variant="body1" sx={{ mt: 2 }}>
-              Thank you for your payment. Your transaction was completed successfully.
-            </Typography>
-            <Paper sx={{ p: 3, mt: 4, borderRadius: 3, backgroundColor: '#ffffff', boxShadow: 3 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1">Amount</Typography>
-                  <Typography variant="h6" sx={{ color: '#ed1f79' }}>
-                    ₱{transactionDetails.amount}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1">Reference Number</Typography>
-                  <Typography variant="h6">{transactionDetails.refno}</Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Box>
-        );
       case 'error-callback':
         return (
           <Box sx={{ textAlign: 'center' }}>
@@ -176,8 +153,6 @@ const CallbackResponsePage = () => {
         >
           Return to Merchant
         </Button>
-
-
       </Box>
     </Container>
   );

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createQrCode, handleCallback,getAdminQrCodes,checkInvoice,getFilteredQrCodes,getQrCodesBU,getFilteredQrCodesCA,countQrCodesByAdmin,getPaymentDetailsByInvoice } from '../controller/qrCodesController.js';
+import { createQrCode,handleSuccessCallback, handleCallback,getAdminQrCodes,checkInvoice,getFilteredQrCodes,getQrCodesBU,getFilteredQrCodesCA,countQrCodesByAdmin,getPaymentDetailsByInvoice } from '../controller/qrCodesController.js';
 import models from '../model/index.js';
 import { authenticateToken } from '../middleware/authenticate.js';
 
@@ -21,20 +21,25 @@ router.get('/count', authenticateToken, countQrCodesByAdmin);
 
 // Callback
 const validateCallbackType = (req, res, next) => {
-    console.log('Validating callback type:', req.params.callbackType); 
-    const { callbackType } = req.params;
-    const validTypes = ['success-callback', 'error-callback', 'cancel-callback'];
-    if (!validTypes.includes(callbackType)) {
-        console.error('Invalid callback type:', callbackType);
-        return res.status(400).json({ error: 'Invalid callback type' });
-    }
-    next();
+  console.log('Validating callback type:', req.params.callbackType); 
+  const { callbackType } = req.params;
+  const validTypes = ['error-callback', 'cancel-callback']; // Removed 'success-callback'
+  
+  if (!validTypes.includes(callbackType)) {
+      console.error('Invalid callback type:', callbackType);
+      return res.status(400).json({ error: 'Invalid callback type' });
+  }
+  next();
 };
 
 router.post('/callback/:callbackType', validateCallbackType, (req, res, next) => {
-    console.log('POST /callback/:callbackType route hit');
-    next();
+  console.log('POST /callback/:callbackType route hit');
+  next();
 }, handleCallback);
+
+// Route for handling success callback separately
+router.post('/success-callback', handleSuccessCallback);
+
 
 //check
 router.get('/check-invoice/:invoice_number', checkInvoice);

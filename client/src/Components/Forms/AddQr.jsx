@@ -39,6 +39,7 @@ const AddQr = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [showLink, setShowLink] = useState(false)
 
 
 
@@ -124,7 +125,7 @@ const AddQr = () => {
       setAmountError('Please enter a valid amount greater than zero.');
       return;
     }
-
+    // ----------------------
     try {
       const nonce = generateNonce();
       const timestamp = generateTimestamp();
@@ -138,9 +139,9 @@ const AddQr = () => {
       );
 
       const params = {
-        success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/success-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
-        error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
-        cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}`,
+        success_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback-page/success-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}&id=${adminId}`,
+        error_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/error-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}&id=${adminId}`,
+        cancel_callback: `${import.meta.env.VITE_FRONTEND_URL}/callback/cancel-callback?invoice_number=${formData.invoice_number}&merchant_url=${encodeURIComponent(merchantUrl)}&id=${adminId}`,        
         merchant_id: merchantID,
         amount: amountInCents,
         currency: 'PHP',
@@ -169,6 +170,7 @@ const AddQr = () => {
         nonce,
         description: params.description,
         admin_id: adminId,
+        timestamp,
       });
 
       setGeneratedQrCode(checkoutUrl);
@@ -182,6 +184,7 @@ const AddQr = () => {
     navigate('/branch-dashboard/manage-qrbu');
   };
 
+  //generating signature for transaction
   const generateNonce = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
 
   const generateTimestamp = () => Math.floor(Date.now() / 1000);
@@ -195,6 +198,7 @@ const AddQr = () => {
 
     return CryptoJS.SHA512(myStringForHashing).toString(CryptoJS.enc.Hex);
   };
+
 
   const isValidInvoiceNumber = (invoice_number) => {
     const regex = /^[a-zA-Z0-9]+$/;
@@ -317,6 +321,31 @@ const AddQr = () => {
               <Typography variant="body2" sx={{ color: '#666' }}>
                 IMS Sales Number #: {formData.invoice_number}
               </Typography>
+            </Box>
+
+            {/* Proceed to Payment Button */}
+            <Box mt={2}>
+              <Button
+                variant="contained"
+                size="large"
+                fullWidth
+                href={generatedQrCode}
+                target="_blank"
+                sx={{
+                  padding: '12px 0',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  backgroundColor: '#ed1f79',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#c2185b',
+                  },
+                }}
+              >
+                Proceed to Payment
+              </Button>
             </Box>
 
             {/* Done Button */}

@@ -54,6 +54,16 @@ models.User.belongsTo(models.Admin, {
   as: 'admin',
 });
 
+//admin and qr codes model.
+models.Admin.hasMany(models.QrCode, {
+  foreignKey: 'admin_id',
+  as: 'qrCodes',
+});
+
+models.QrCode.belongsTo(models.Admin, {
+  foreignKey: 'admin_id',
+  as: 'admin',
+});
 // Export all models
 export default models;
 export { sequelize };

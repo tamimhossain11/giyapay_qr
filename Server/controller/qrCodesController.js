@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import models from '../model/index.js';
 const { QrCode, User, Branch ,Admin } = models;
+import crypto from "crypto";
 
 const createQrCode = async (req, res) => {
   try {
@@ -15,6 +16,7 @@ const createQrCode = async (req, res) => {
       nonce,
       description,
       admin_id,
+      timestamp,
     } = req.body;
 
     // Validate that all fields are present
@@ -28,7 +30,8 @@ const createQrCode = async (req, res) => {
       !signature ||
       !nonce ||
       !description ||
-      !admin_id
+      !admin_id ||
+      !timestamp
     ) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
@@ -64,6 +67,7 @@ const createQrCode = async (req, res) => {
       nonce,
       description,
       admin_id,
+      timestamp,
     });
 
     // Success response with created QR code details
@@ -79,62 +83,141 @@ const createQrCode = async (req, res) => {
   }
 };
 
+//Under fix
 const handleCallback = async (req, res) => {
   try {
-    console.log('Received callback request:', req.body);
+    console.log("Received callback request:", req.body);
 
-    const { nonce, refno, amount, signature, invoice_number } = req.body;
+    const { nonce, refno, amount, invoice_number, timestamp, id } = req.body; // 'id' is the admin ID
     const callbackType = req.params.callbackType;
 
-    if (!nonce || !refno || !amount || !signature || !invoice_number) {
-      console.error('Invalid data provided:', req.body);
-      return res.status(400).json({ message: 'Invalid data provided' });
+    if (!nonce || !refno || !amount || !invoice_number || !timestamp || !id) {
+      console.error("Invalid data provided:", req.body);
+      return res.status(400).json({ message: "Invalid data provided" });
     }
 
+    // Find QR Code
     const qrCode = await QrCode.findOne({ where: { invoice_number } });
 
     if (!qrCode) {
-      console.error('QR Code not found for invoice number:', invoice_number);
-      return res.status(404).json({ message: 'QR Code not found' });
+      console.error("QR Code not found for invoice number:", invoice_number);
+      return res.status(404).json({ message: "QR Code not found" });
     }
 
-    if (qrCode.status === 'Paid' || qrCode.status === 'Failed' || qrCode.status === 'Cancelled') {
-      console.log('Transaction already processed:', qrCode.status);
-      return res.status(200).json({ message: 'Transaction already processed', qrCode });
+    // Prevent duplicate processing
+    if (["Failed", "Cancelled"].includes(qrCode.status)) {
+      console.log("Transaction already processed:", qrCode.status);
+      return res.status(200).json({ message: "Transaction already processed", qrCode });
     }
 
+    // Update Status
     const updateData = {
       amount,
       payment_reference: refno,
     };
 
     switch (callbackType) {
-      case 'success-callback':
-        updateData.status = 'Paid';
+      case "error-callback":
+        updateData.status = "Failed";
         break;
-      case 'error-callback':
-        updateData.status = 'Failed';
-        break;
-      case 'cancel-callback':
-        updateData.status = 'Cancelled';
+      case "cancel-callback":
+        updateData.status = "Cancelled";
         break;
       default:
-        updateData.status = 'Unknown';
+        updateData.status = "Unknown";
         break;
     }
 
-    // Update QR code and allow Sequelize to handle the updated_at timestamp
     await qrCode.update(updateData);
 
-    console.log('QR Code updated successfully:', qrCode);
+    console.log("QR Code updated successfully:", qrCode);
 
-    const io = req.app.get('socketio');
-    io.emit('qr-code-updated', { qrCode });
+    const io = req.app.get("socketio");
+    io.emit("qr-code-updated", { qrCode });
 
-    res.status(200).json({ message: 'QR Code updated successfully', qrCode });
+    res.status(200).json({ message: "QR Code updated successfully", qrCode });
   } catch (error) {
-    console.error('Error handling callback:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error handling callback:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export default handleCallback;
+
+
+const handleSuccessCallback = async (req, res) => {
+  try {
+    const { callbackUrl } = req.body;
+
+    if (!callbackUrl) {
+      return res.status(400).json({ message: "Callback URL is missing" });
+    }
+
+    // Extract parameters from callback URL
+    const url = new URL(callbackUrl);
+    const params = new URLSearchParams(url.search);
+
+    const refno = params.get("refno");
+    const amountInCents = params.get("amount");
+    const invoice_number = params.get("invoice_number");
+    const id = params.get("id"); // Admin ID from URL
+    const callbackSignature = params.get("signature"); // Signature from Giyapay
+
+    if (!refno || !amountInCents || !invoice_number || !id || !callbackSignature) {
+      return res.status(400).json({ message: "Invalid callback parameters" });
+    }
+
+    // Fetch admin secret key from the database
+    const admin = await Admin.findOne({ where: { id } });
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    const secretKey = admin.merchant_secret; // Use admin's secret key
+
+    // Extracting the part of URL that needs to be hashed
+    const toBeHashed = callbackUrl.split("&signature=");
+    const myStringForHashing = `${toBeHashed[0]}${secretKey}`; // Remove `()` // Append secret key
+
+    // Hashing with SHA512
+    const computedSignature = crypto.createHash("sha512").update(myStringForHashing).digest("hex");
+
+    console.log("Computed Signature:", computedSignature);
+    console.log("Callback Signature:", callbackSignature);
+
+    if (computedSignature !== callbackSignature) {
+      return res.status(401).json({ message: "Signature verification failed" });
+    }
+
+    // Convert amount from cents to standard currency
+    const amount = (parseFloat(amountInCents) / 100).toFixed(2);
+
+    // Check if transaction exists
+    const existingTransaction = await QrCode.findOne({ where: { invoice_number } });
+
+    if (!existingTransaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    if (existingTransaction.status === "paid") {
+      return res.status(200).json({ message: "Transaction already processed" });
+    }
+
+    // Update transaction status
+    await QrCode.update(
+      { status: "paid", amount, payment_reference: refno },
+      { where: { id: existingTransaction.id } }
+    );
+
+    return res.status(200).json({
+      message: "Transaction verified and updated successfully",
+      amount,
+      refno,
+    });
+  } catch (error) {
+    console.error("Error verifying callback:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -405,6 +488,7 @@ export {
   getFilteredQrCodesCA, 
   getQrCodesBU  ,
   countQrCodesByAdmin,
-  getPaymentDetailsByInvoice
+  getPaymentDetailsByInvoice,
+  handleSuccessCallback
 };
 

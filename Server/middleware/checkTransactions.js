@@ -1,12 +1,13 @@
 import cron from "node-cron";
 import axios from "axios";
 import CryptoJS from "crypto-js";
-import models from "../model/index.js"; // Import models
+import models from "../model/index.js";
 
-const { QrCode, Admin } = models; // Destructure models
-const MAX_RETRIES = 10; // Maximum retry count
+const { QrCode, Admin } = models;
+const MAX_RETRIES = 10;
+const RETRY_INTERVALS = [1, 2, 5, 10, 15, 30]; 
 
-// Function to generate transaction check signature
+// Generate transaction check signature
 const generateCheckTransactionSignature = (merchantID, invoice_number, timestamp, nonce, merchantSecret) => {
   const myStringForHashing = `${merchantID}${invoice_number}${timestamp}${nonce}${merchantSecret}`;
   return CryptoJS.SHA512(myStringForHashing).toString(CryptoJS.enc.Hex);
@@ -16,12 +17,12 @@ const generateCheckTransactionSignature = (merchantID, invoice_number, timestamp
 const checkTransactions = async () => {
   try {
     const transactions = await QrCode.findAll({
-      where: { status: "pending" }, // Fetch only pending transactions
+      where: { status: "pending" },
       include: [{ model: Admin, as: "admin", attributes: ["merchant_id", "merchant_secret", "paymentUrl"] }],
     });
 
     if (!transactions.length) {
-      console.log("No pending transactions to check.");
+      console.log("No pending transactions.");
       return;
     }
 
@@ -47,46 +48,44 @@ const checkTransactions = async () => {
 
           const url = `${paymentUrl}/api/1.0/transaction/${invoice_number}?signature=${signature}&merchantId=${merchant_id}&timestamp=${timestamp}&nonce=${nonce}&secretKey=${merchant_secret}`;
 
-          try {
-            // Send GET request to check transaction
-            const response = await axios.get(url);
+          // Send GET request to check transaction
+          const response = await axios.get(url);
 
-            if (response.data && response.data.data) {
-              const { referenceNumber, status, amount } = response.data.data;
+          if (response.data && response.data.data) {
+            const { referenceNumber, status, amount } = response.data.data;
 
-              await transaction.update({
-                status: status.toLowerCase(), // Normalize status
-                payment_reference: referenceNumber, // Update reference number
-                amount: parseFloat(amount), // Ensure amount is stored as float
-                retry_count: transaction.retry_count + 1, // Increase retry count
-              });
+            await transaction.update({
+              status: status.toLowerCase(),
+              payment_reference: referenceNumber,
+              amount: parseFloat(amount),
+              retry_count: 0, 
+            });
 
-              console.log(`✅ Updated transaction ${invoice_number}: Status=${status}, Reference=${referenceNumber}, Amount=${amount}, Retry Count=${transaction.retry_count}`);
-            } else {
-              console.warn(`⚠️ Unexpected response format for transaction ${invoice_number}`);
-            }
-          } catch (error) {
-            if (error.response && error.response.status === 404) {
-              // Increase retry count
-              await transaction.update({
-                retry_count: transaction.retry_count + 1,
-              });
-
-              console.warn(`⚠️ Transaction ${invoice_number} not found (404). Retry ${transaction.retry_count}/${MAX_RETRIES}.`);
-
-              // If max retries reached, mark as expired
-              if (transaction.retry_count >= MAX_RETRIES) {
-                await transaction.update({
-                  status: "expired",
-                });
-                console.log(`🚫 Transaction ${invoice_number} marked as expired after ${MAX_RETRIES} retries.`);
-              }
-            } else {
-              console.error(`❌ Error processing transaction ${invoice_number}:`, error.message);
-            }
+            console.log(`✅ Updated transaction ${invoice_number}: Status=${status}, Reference=${referenceNumber}, Amount=${amount}`);
+          } else {
+            console.warn(`⚠️ Unexpected response format for transaction ${invoice_number}`);
           }
         } catch (error) {
-          console.error(`❌ Error processing transaction ${transaction.invoice_number}:`, error.message);
+          if (error.response && error.response.status === 404) {
+            const newRetryCount = transaction.retry_count + 1;
+
+            // Determine retry interval
+            const retryInterval = RETRY_INTERVALS[Math.min(newRetryCount, RETRY_INTERVALS.length - 1)];
+
+            await transaction.update({
+              retry_count: newRetryCount,
+              next_check_time: new Date(Date.now() + retryInterval * 60 * 1000), s
+            });
+
+            console.warn(`⚠️ Transaction ${invoice_number} not found (404). Retry ${newRetryCount}/${MAX_RETRIES} in ${retryInterval} minutes.`);
+
+            if (newRetryCount >= MAX_RETRIES) {
+              await transaction.update({ status: "expired" });
+              console.log(`🚫 Transaction ${invoice_number} marked as expired.`);
+            }
+          } else {
+            console.error(`❌ Error processing transaction ${transaction.invoice_number}:`, error.message);
+          }
         }
       })
     );
@@ -95,16 +94,10 @@ const checkTransactions = async () => {
   }
 };
 
-// Start the cron job
-const transactionCronJob = cron.schedule("*/1 * * * *", () => {
-  console.log("🔄 Checking transactions every 1 minute...");
-  checkTransactions();
+// Schedule polling with exponential backoff
+cron.schedule("*/1 * * * *", async () => {
+  console.log("🔄 Checking transactions...");
+  await checkTransactions();
 });
-
-// Stop the cron job after 10 minutes
-setTimeout(() => {
-  console.log("⏳ Stopping transaction checking after 10 minutes.");
-  transactionCronJob.stop();
-}, 10 * 60 * 1000);
 
 export default checkTransactions;

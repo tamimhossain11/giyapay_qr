@@ -340,7 +340,7 @@ const getFilteredQrCodesCA = async (req, res) => {
   }
 };
 
-//Filtered qr dor admin
+//Filtered qr for admin
 const getFilteredQrCodes = async (req, res) => {
   const { searchTerm, branchFilter, userFilter, startDate, endDate } = req.query;
 

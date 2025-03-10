@@ -149,13 +149,13 @@ const cleanUpBlacklistedTokens = async () => {
 setInterval(cleanUpBlacklistedTokens, 24 * 60 * 60 * 1000);
 
 // Socket.IO connection event
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+app.set("socketio", io);
 
-  app.set('socketio', io);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 

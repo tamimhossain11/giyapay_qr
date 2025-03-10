@@ -217,7 +217,7 @@ const SuperDashboard = () => {
       </Drawer>
 
 
-      {/* Session Timeout Modal */}
+      {/* Session Timeout Modal   */}
       <Dialog
         open={sessionExpired}
         onClose={fallbackLogout}

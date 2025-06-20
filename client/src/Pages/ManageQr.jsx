@@ -479,29 +479,33 @@ const ManageQr = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr, index) => (
-                <TableRow key={qr.id || `qr-${index}`}>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.id}</TableCell>
-                  <TableCell>
-                    <QRCode value={qr.qr_code} size={50} />
-                  </TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.payment_reference}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.amount}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.status}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }} style={{ whiteSpace: 'pre-wrap' }}>
-                    {qr.description}
-                  </TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.created_at}</TableCell>
-                  <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.updated_at}</TableCell>
-                  <TableCell>
-                    <Tooltip title="View QR Code">
-                      <IconButton onClick={() => handleOpenView(qr)}>
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {[...filteredQrCodes]
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((qr, index) => (
+
+                  <TableRow key={qr.id || `qr-${index}`}>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.id}</TableCell>
+                    <TableCell>
+                      <QRCode value={qr.qr_code} size={50} />
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.payment_reference}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.amount}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.status}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }} style={{ whiteSpace: 'pre-wrap' }}>
+                      {qr.description}
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.created_at}</TableCell>
+                    <TableCell sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>{qr.updated_at}</TableCell>
+                    <TableCell>
+                      <Tooltip title="View QR Code">
+                        <IconButton onClick={() => handleOpenView(qr)}>
+                          <ViewIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>

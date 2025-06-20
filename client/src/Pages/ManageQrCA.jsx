@@ -479,29 +479,32 @@ const ManageQrCA = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredQrCodes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((qr, index) => (
-                <TableRow key={qr.id || `qr-${index}`}>
-                  <TableCell>{qr.id}</TableCell>
-                  <TableCell>
-                    <QRCode value={qr.qr_code} size={50} />
-                  </TableCell>
-                  <TableCell>{qr.payment_reference}</TableCell>
-                  <TableCell>{qr.amount}</TableCell>
-                  <TableCell>{qr.status}</TableCell>
-                  <TableCell style={{ whiteSpace: 'pre-wrap' }}>
-                    {qr.description}
-                  </TableCell>
-                  <TableCell>{qr.created_at}</TableCell>
-                  <TableCell>{qr.updated_at}</TableCell>
-                  <TableCell>
-                    <Tooltip title="View QR Code">
-                      <IconButton onClick={() => handleOpenView(qr)}>
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {[...filteredQrCodes]
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((qr, index) => (
+                  <TableRow key={qr.id || `qr-${index}`}>
+                    <TableCell>{qr.id}</TableCell>
+                    <TableCell>
+                      <QRCode value={qr.qr_code} size={50} />
+                    </TableCell>
+                    <TableCell>{qr.payment_reference}</TableCell>
+                    <TableCell>{qr.amount}</TableCell>
+                    <TableCell>{qr.status}</TableCell>
+                    <TableCell style={{ whiteSpace: 'pre-wrap' }}>
+                      {qr.description}
+                    </TableCell>
+                    <TableCell>{qr.created_at}</TableCell>
+                    <TableCell>{qr.updated_at}</TableCell>
+                    <TableCell>
+                      <Tooltip title="View QR Code">
+                        <IconButton onClick={() => handleOpenView(qr)}>
+                          <ViewIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
